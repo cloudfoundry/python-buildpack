@@ -46,7 +46,7 @@ See the [Machete](https://github.com/cf-buildpacks/machete) CF buildpack test fr
 
 ## Reporting Issues
 
-Open an issue on this project
+[Open an issue on this project](https://github.com/cloudfoundry/python-buildpack/issues/new)
 
 ## Active Development
 
