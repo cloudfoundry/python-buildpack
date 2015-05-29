@@ -73,7 +73,7 @@ Find our guidelines [here](./CONTRIBUTING.md).
 
 ## Reporting Issues
 
-Open an issue on this project
+[Open an issue on this project](https://github.com/cloudfoundry/python-buildpack/issues/new)
 
 ## Active Development
 
