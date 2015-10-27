@@ -1,4 +1,3 @@
-set +eu
 PYTHON_VERSION=$(cat runtime.txt)
 
 # Install Python.
@@ -28,6 +27,7 @@ if [ ! "$SKIP_INSTALL" ]; then
     # Prepare destination directory.
     mkdir -p .heroku/python
 
+    echo "Downloaded [`translate_dependency_url https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz`]"
     curl `translate_dependency_url https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz` -s | tar zxv -C .heroku/python &> /dev/null
     if [[ $? != 0 ]] ; then
       puts-warn "Resource https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz is not provided by this buildpack. Please upgrade your buildpack to receive the latest resources."
@@ -73,5 +73,4 @@ if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
   bpwatch stop prepare_environment
 fi
 
-set -eu
 hash -r
