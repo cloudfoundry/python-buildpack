@@ -3,19 +3,64 @@
 
 OUT_PREFIX=$1
 
+# fail hard
+set -o pipefail
+# fail harder
+set -e
+
 # Use new path, containing autoconf.
-export PATH="/app/.heroku/python/bin/:$PATH"
+LD_LIBRARY_PATH="/app/.heroku/python/lib/:$LD_LIBRARY_PATH"
+PATH="/app/.heroku/python/bin/:$PATH"
+export LD_LIBRARY_PATH PATH
 hash -r
+
+
+
+PROJ4_ZIP='https://github.com/OSGeo/proj.4/archive/4.9.2.zip'
+GEOS_TARBALL='http://download.osgeo.org/geos/geos-3.4.2.tar.bz2'
+SOURCE_TARBALL='http://download.osgeo.org/gdal/1.11.0/gdal-1.11.0.tar.gz'
+
+echo "Building proj.4"
+
+curl -LO ${PROJ4_ZIP}
+unzip -o 4.9.2.zip
+rm 4.9.2.zip
+
+pushd proj.4-4.9.2 > /dev/null 1>&2
+./configure --prefix=${OUT_PREFIX} &&
+make
+make install
+popd
+
+echo "Building geos"
+
+curl -L ${GEOS_TARBALL} | tar jx
+pushd geos-3.4.2 > /dev/null 1>&2
+./configure  --enable-python --prefix=${OUT_PREFIX} &&
+make
+make install
+popd
+
 
 
 echo "Building gdal..."
 
-SOURCE_TARBALL='http://download.osgeo.org/gdal/1.11.0/gdal-1.11.0.tar.gz'
-
 curl -L $SOURCE_TARBALL | tar zx
 
 cd gdal-1.11.0
-./configure --prefix=$OUT_PREFIX  &&
+./configure --prefix=$OUT_PREFIX \
+    --with-jpeg \
+    --with-png=internal \
+    --with-geotiff=internal \
+    --with-libtiff=internal \
+    --with-libz=internal \
+    --with-curl \
+    --with-gif=internal \
+    --with-geos=${OUT_PREFIX}/bin/geos-config \
+    --with-proj-share=${OUT_PREFIX}/share \
+    --without-expat \
+    --with-threads \
+    --with-python &&
 make
 make install
 
