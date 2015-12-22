@@ -39,7 +39,7 @@ VIRTUALENV_LOC=".heroku/venv"
 LEGACY_TRIGGER="lib/python2.7"
 
 DEFAULT_PYTHON_VERSION="python-2.7.10"
-DEFAULT_PYTHON_STACK="cedar"
+DEFAULT_PYTHON_STACK="cedar-14"
 PYTHON_EXE="/app/.heroku/python/bin/python"
 PIP_VERSION="7.1.2"
 SETUPTOOLS_VERSION="18.7.1"
