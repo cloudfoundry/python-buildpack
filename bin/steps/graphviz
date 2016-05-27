@@ -29,6 +29,7 @@ if (pip-grep -s requirements.txt Graphviz graphviz pygraphviz &> /dev/null) then
 
   export LIBRARY_PATH=${LIBRARY_PATH}:.heroku/vendor/lib
   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:.heroku/vendor/lib
+  export PATH=${PATH}:.heroku/vendor/bin
 fi
 
 bpwatch stop graphviz_install
