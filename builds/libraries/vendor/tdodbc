@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Build Path: /app/.heroku/vendor/
+
+OUT_PREFIX=$1
+
+echo "Building unix odbc..."
+
+SOURCE_TARBALL='ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.4.tar.gz'
+
+curl -L $SOURCE_TARBALL | tar zx
+
+cd unixODBC-2.3.4
+./configure --prefix=$OUT_PREFIX  &&
+make
+make install
+
+# Cleanup
+cd ..
