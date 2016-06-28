@@ -8,7 +8,7 @@ VENDORED_ODBC="https://s3.amazonaws.com/python-buildpack/unixODBC.2.3.4.tar.gz"
 bpwatch start odbc_install
 
 # If GDAL exists within requirements, use vendored gdal.
-if (pip-grep -s requirements.txt odbc ODBC unixODBC &> /dev/null) then
+if (pip-grep -s odbc.txt odbc ODBC unixODBC &> /dev/null) then
 
   if [ -f ".heroku/vendor/bin/odbcinst" ]; then
     export ODBC=$(pwd)/vendor
