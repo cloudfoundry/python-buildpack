@@ -77,11 +77,11 @@ dependencies:
     uri: https://pivotal-buildpacks.s3.amazonaws.com/concourse-binaries/python/python-3.5.1-linux-x64.tgz
     md5: a292283d7eec49d7ea5c60036f633740
   - name: odbc
-      version: 2.3.4
-      cf_stacks:
-        - cflinuxfs2
-      uri: https://pivotal-buildpacks.s3.amazonaws.com/python/binaries/cflinuxfs2/libmemcache.tar.gz
-      md5: 6b40600ab7c5bd52b5c6eedd18efb651
+    version: 2.3.4
+    cf_stacks:
+      - cflinuxfs2
+    uri: https://s3.amazonaws.com/python-buildpack/unixODBC.2.3.4.tar.gz
+    md5: 45af21fe2a99b1c42586d9e7e95185c7
 
 exclude_files:
   - .git/
