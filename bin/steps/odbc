@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Syntax sugar.
+source $BIN_DIR/utils
+
+VENDORED_ODBC="https://s3.amazonaws.com/python-buildpack/unixODBC.2.3.4.tar.gz"
+
+bpwatch start odbc_install
+
+# If GDAL exists within requirements, use vendored gdal.
+if (pip-grep -s requirements.txt odbc ODBC unixODBC &> /dev/null) then
+
+  if [ -f ".heroku/vendor/bin/odbcinst" ]; then
+    export ODBC=$(pwd)/vendor
+  else
+    echo "-----> Noticed ODBC. Bootstrapping odbc."
+    mkdir -p .heroku/vendor
+    # Download and extract cryptography into target vendor directory.
+    curl $VENDORED_ODBC -s | tar zxv -C .heroku/vendor &> /dev/null
+
+    export ODBC=$(pwd)/vendor
+  fi
+fi
+
+bpwatch stop odbc_install
