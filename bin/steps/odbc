@@ -3,7 +3,10 @@
 # Syntax sugar.
 source $BIN_DIR/utils
 
-VENDORED_ODBC="https://s3.amazonaws.com/python-buildpack/unixODBC.2.3.4.tar.gz"
+#VENDORED_ODBC="https://s3.amazonaws.com/python-buildpack/unixODBC.2.3.4.tar.gz"
+TD_ICU = "https://s3.amazonaws.com/teradata-odbc/tdicu1510.tar.gz"
+TD_ODBC = "https://s3.amazonaws.com/teradata-odbc/tdodbc1510.tar.gz"
+TD_GSS = "https://s3.amazonaws.com/teradata-odbc/teragss.tar.gz"
 
 bpwatch start odbc_install
 
@@ -16,7 +19,12 @@ if (pip-grep -s odbc.txt odbc ODBC unixODBC &> /dev/null) then
     echo "-----> Noticed ODBC. Bootstrapping odbc."
     mkdir -p .heroku/vendor
     # Download and extract cryptography into target vendor directory.
-    curl $VENDORED_ODBC -s | tar zxv -C .heroku/vendor &> /dev/null
+    echo "-----> Getting TD ICU."
+    curl $TD_ICU -s | tar zxv -C .heroku/vendor &> /dev/null
+    echo "-----> Getting TD ODBC."
+    curl $TD_ODBC -s | tar zxv -C .heroku/vendor &> /dev/null
+    echo "-----> Getting TD GSS."
+    curl $TD_GSS -s | tar zxv -C .heroku/vendor &> /dev/null
 
     export ODBC=$(pwd)/vendor
   fi
