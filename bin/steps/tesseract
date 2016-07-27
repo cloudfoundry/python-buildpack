@@ -13,7 +13,7 @@ TESSERACT_OCR_LANGUAGES=eng,fin
 
 echo "Unpacking Tesseract-OCR binaries"
 mkdir -p $INSTALL_DIR
-tar -zxvf $TESSERACT_OCR_TGZ -C $INSTALL_DIR
+tar -zxvf $ROOT_DIR/$TESSERACT_OCR_TGZ -C $INSTALL_DIR
 
 echo 'Getting Tesseract-OCR training data'
 if [ $TESSERACT_OCR_LANGUAGES ]
