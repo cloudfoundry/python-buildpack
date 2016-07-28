@@ -8,6 +8,8 @@ This is based on the [Heroku buildpack] (https://github.com/heroku/heroku-buildp
 
 This buildpack supports running Django and Flask apps.
 
+This buildpack includes tesseract based on the [tesseract buildpack] (https://github.com/matteotiziano/heroku-buildpack-tesseract).
+
 ### Buildpack User Documentation
 
 Official buildpack documentation can be found at http://docs.cloudfoundry.org/buildpacks/python/index.html.
