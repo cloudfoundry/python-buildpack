@@ -22,6 +22,9 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 
+apt-get update
+apt-get install pkg-config libxml2-dev libxslt-dev python-dev lib32z1-dev libxmlsec1-dev
+
 # Use miniconda if environment.yml exists and exit
 if [ -f $BUILD_DIR/environment.yml ]; then
   echo "----------------- USING CONDA BUILDPACK -----------------"
