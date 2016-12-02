@@ -18,3 +18,4 @@ if [ ! -f $BUILD_DIR/requirements.txt ] && [ ! -f $BUILD_DIR/setup.py ] && [ ! -
 fi
 
 echo "python `cat $BP/VERSION`"
+echo $APPD_APP_NAME

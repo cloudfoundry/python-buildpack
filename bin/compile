@@ -143,6 +143,10 @@ export LIBRARY_PATH=/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.
 export LD_LIBRARY_PATH=/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config:$PKG_CONFIG_PATH
 
+if [[ $VCAP_SERVICES == *appdynamics* ]]; then
+  source $BIN_DIR/steps/appdynamics-setup
+fi
+
 # Switch to the repo's context.
 cd $BUILD_DIR
 
@@ -292,3 +296,4 @@ if [[ ! "$SKIP_MOVE_BUILD" ]]; then
   bpwatch stop anvil_appdir_commit
   bpwatch stop compile
 fi
+

@@ -1,0 +1,76 @@
+BUILD_DIR='/app'
+echo "Setting up for Appdynamics"
+
+if ! grep -Fxq "appdynamics" /app/requirements.txt
+then
+  echo "appdynamics" >> /app/requirements.txt
+fi
+
+mkdir -p $BUILD_DIR/.profile.d
+
+echo "echo \"env-setup for Appdynamics\" " >> $BUILD_DIR/.profile.d/appdynamics.sh
+
+#set application name
+if [[ -v APPD_APP_NAME ]]; then
+  echo "export APPD_APP_NAME=`echo $APPD_APP_NAME`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+elif [[ $VCAP_SERVICES == *application-name* ]]; then
+  echo "export APPD_APP_NAME=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"application-name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "export APPD_APP_NAME=`echo $VCAP_APPLICATION | python -m json.tool | sed -n -e '/"application_name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+fi
+
+#set tier name
+if [[ -v APPD_TIER_NAME ]]; then
+ echo "export APPD_TIER_NAME=`echo $APPD_TIER_NAME`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+elif [[ $VCAP_SERVICES == *tier-name* ]]; then
+  echo "export APPD_TIER_NAME=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"tier-name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "export APPD_TIER_NAME=`echo $VCAP_APPLICATION | python -m json.tool | sed -n -e '/"application_name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+fi
+
+#set node name
+if [[ -v APPD_NODE_NAME ]]; then
+  echo "export APPD_NODE_NAME=`echo $APPD_NODE_NAME`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+elif [[ $VCAP_SERVICES == *node-name* ]]; then
+  echo "export APPD_NODE_NAME=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"node-name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "export APPD_NODE_NAME=`echo $VCAP_APPLICATION | python -m json.tool | sed -n -e '/"application_name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+fi
+
+#set host name
+if [[ $VCAP_SERVICES == *host-name* ]]; then
+  echo "export APPD_CONTROLLER_HOST=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"host-name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "Unable to find controller host"
+fi
+
+#set port name
+if [[ $VCAP_SERVICES == *port* ]]; then
+  echo "export APPD_CONTROLLER_PORT=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"port":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "Unable to find controller port"
+fi
+
+#set ssl enable
+if [[ $VCAP_SERVICES == *ssl-enabled* ]]; then
+  echo "export APPD_SSL_ENABLED=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"ssl-enabled":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "Unable to find ssl enabled flag"
+fi
+
+#set account-access-key
+if [[ $VCAP_SERVICES == *account-access-key* ]]; then
+  echo "export APPD_ACCOUNT_ACCESS_KEY=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"account-access-key":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "Unable to find controller account access key"
+fi
+
+#set account-name
+if [[ $VCAP_SERVICES == *account-name* ]]; then
+  echo "export APPD_ACCOUNT_NAME=`echo $VCAP_SERVICES | python -m json.tool | sed -n -e '/"account-name":/ s/^.*"\(.*\)".*/\1/p'`" >> $BUILD_DIR/.profile.d/appdynamics.sh
+else
+  echo "Unable to find controller account name"
+fi
+
+chmod +x $BUILD_DIR/.profile.d/appdynamics.sh
+awk 'NR==1{mid=5; $0=substr($0,1,mid) "/home/vcap/app/.heroku/python/bin/pyagent run " substr($0,mid+1)} 1' /app/Procfile > /app/tmp && mv /app/tmp /app/Procfile
