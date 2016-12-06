@@ -28,7 +28,7 @@ CONDA_ENVS_CACHE="$CACHE/envs"
 RUNTIME="$BUILD_DIR/runtime.txt"
 
 # Get the runtime version and download appropriate Miniconda
-MINICONDA_VERSION="4.1.11"
+MINICONDA_VERSION="4.2.12"
 if [ -e $RUNTIME ]; then
     PYTHON_VERSION=$(cut -d- -f2 $RUNTIME)
     if [ ${PYTHON_VERSION:0:1} -eq 3 ]; then
