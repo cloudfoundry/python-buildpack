@@ -215,6 +215,10 @@ source $BIN_DIR/steps/gdal
 # Install dependencies with Pip (where the magic happens).
 source $BIN_DIR/steps/pip-install
 
+# Support for pip install -e.
+rm -fr $BUILD_DIR/.heroku/src
+deep-cp /app/.heroku/src $BUILD_DIR/.heroku/src
+
 # Django collectstatic support.
 sub-env $BIN_DIR/steps/collectstatic
 
@@ -231,14 +235,23 @@ set-default-env PYTHONPATH /app/
 # Install sane-default script for $WEB_CONCURRENCY and $FORWARDED_ALLOW_IPS.
 cp $ROOT_DIR/vendor/python.gunicorn.sh $GUNICORN_PROFILE_PATH
 
-# Support for pip install -e.
-rm -fr $BUILD_DIR/.heroku/src
-deep-cp /app/.heroku/src $BUILD_DIR/.heroku/src
-
 # Experimental post_compile hook.
 bpwatch start post_compile
   source $BIN_DIR/steps/hooks/post_compile
 bpwatch stop post_compile
+
+
+set +e
+# rewrite build dir in egg links to /app so things are found at runtime
+find .heroku/python/lib/python*/site-packages/ -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
+find .heroku/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
+set -e
+
+set +e
+# Support for PyPy
+find .heroku/python/lib-python/*/site-packages/  -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
+find .heroku/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
+set -e
 
 # Store new artifacts in cache.
 bpwatch start dump_cache
