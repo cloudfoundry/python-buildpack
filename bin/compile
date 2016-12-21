@@ -23,12 +23,12 @@ CACHE_DIR=$2
 ENV_DIR=$3
 
 $ROOT_DIR/compile-extensions/bin/check_buildpack_version $ROOT_DIR $CACHE_DIR
-$ROOT_DIR/compile-extensions/bin/store_buildpack_metadata $ROOT_DIR $CACHE_DIR
 
 # Use miniconda if environment.yml exists and exit
 if [ -f $BUILD_DIR/environment.yml ]; then
   echo "----------------- USING CONDA BUILDPACK -----------------"
   $BIN_DIR/steps/conda-install $BUILD_DIR $CACHE_DIR
+  $ROOT_DIR/compile-extensions/bin/store_buildpack_metadata $ROOT_DIR $CACHE_DIR
   exit 0
 fi
 
@@ -279,4 +279,5 @@ bpwatch start dump_cache
 bpwatch stop dump_cache
 
 # Fin.
+$ROOT_DIR/compile-extensions/bin/store_buildpack_metadata $ROOT_DIR $CACHE_DIR
 bpwatch stop compile
