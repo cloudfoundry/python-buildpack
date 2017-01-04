@@ -185,9 +185,9 @@ mkdir -p /app/.heroku/src
 if [[ $BUILD_DIR != '/app' ]]; then
     # python expects to reside in /app, so set up symlinks
     # we will not remove these later so subsequent buildpacks can still invoke it
-    ln -s $BUILD_DIR/.heroku/python /app/.heroku/python
-    ln -s $BUILD_DIR/.heroku/vendor /app/.heroku/vendor
-    ln -s $BUILD_DIR/.heroku/venv /app/.heroku/venv
+    ln -nsf $BUILD_DIR/.heroku/python /app/.heroku/python
+    ln -nsf $BUILD_DIR/.heroku/vendor /app/.heroku/vendor
+    ln -nsf $BUILD_DIR/.heroku/venv /app/.heroku/venv
     # Note: .heroku/src is copied in later.
 fi
 
@@ -243,17 +243,14 @@ bpwatch start post_compile
   source $BIN_DIR/steps/hooks/post_compile
 bpwatch stop post_compile
 
-
 set +e
 # rewrite build dir in egg links to /app so things are found at runtime
-find .heroku/python/lib/python*/site-packages/ -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
-find .heroku/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
+find .heroku/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)#/app#" &> /dev/null
 set -e
 
 set +e
 # Support for PyPy
-find .heroku/python/lib-python/*/site-packages/  -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
-find .heroku/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)/#/app/#" &> /dev/null
+find .heroku/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)#/app#" &> /dev/null
 set -e
 
 # Store new artifacts in cache.
