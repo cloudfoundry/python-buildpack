@@ -25,6 +25,7 @@ if (pip-grep -s requirements.txt pylibmc &> /dev/null) then
     # Download and extract libmemcached into target vendor directory.
     exit_code=0
     filtered_url=$($ROOT_DIR/compile-extensions/bin/download_dependency $VENDORED_MEMCACHED /tmp)
+    $ROOT_DIR/compile-extensions/bin/warn_if_newer_patch $VENDORED_MEMCACHED "$ROOT_DIR/manifest.yml"
     echo "Downloaded [$filtered_url]"
 
     downloaded_file=/tmp/libmemcache.tar.gz

@@ -35,6 +35,7 @@ if [ ! "$SKIP_INSTALL" ]; then
       $ROOT_DIR/compile-extensions/bin/recommend_dependency $url
       exit 1
     fi
+    $ROOT_DIR/compile-extensions/bin/warn_if_newer_patch $url "$ROOT_DIR/manifest.yml"
 
     downloaded_file=/tmp/$PYTHON_VERSION.tar.gz
     tar zxvf $downloaded_file -C .heroku/python &> /dev/null

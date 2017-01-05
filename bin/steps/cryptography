@@ -26,6 +26,7 @@ if (pip-grep -s requirements.txt argon2-cffi bcrypt cffi cryptography django[arg
     # Download and extract libffi into target vendor directory.
     exit_code=0
     filtered_url=$($ROOT_DIR/compile-extensions/bin/download_dependency $VENDORED_LIBFFI /tmp)
+    $ROOT_DIR/compile-extensions/bin/warn_if_newer_patch $VENDORED_LIBFFI "$ROOT_DIR/manifest.yml"
     echo "Downloaded [$filtered_url]"
 
     downloaded_file=/tmp/libffi.tar.gz
