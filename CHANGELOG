@@ -1,3 +1,28 @@
+v1.5.14 Jan 10, 2017
+=====================
+
+* Add warning if downloaded dependency is not the latest patch version for a
+given major and minor version
+  (https://www.pivotaltracker.com/story/show/134863437)
+
+* Add warning if buildpack version used to stage an app changes
+  (https://www.pivotaltracker.com/story/show/135234395)
+
+* Add python 3.6.0
+  (https://www.pivotaltracker.com/story/show/136606291)
+
+* Add python 2.7.13, remove python 2.7.11
+  (https://www.pivotaltracker.com/story/show/136306637)
+
+* Update setuptools version to 32.1.0
+  (https://www.pivotaltracker.com/story/show/136345251)
+
+* Update miniconda to 4.2.12
+  (https://www.pivotaltracker.com/story/show/135443165)
+
+* Update pip version to 9.0.1
+  (https://www.pivotaltracker.com/story/show/135025815)
+
 v1.5.13 Dec 01, 2016
 =====================
 
