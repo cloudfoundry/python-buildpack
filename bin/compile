@@ -22,6 +22,7 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 DEPS_DIR=${4:-}
+export BUILD_DIR CACHE_DIR BIN_DIR
 
 # CF Common
 BUILDPACK_PATH=$ROOT_DIR
@@ -38,11 +39,26 @@ if [ -n "$DEPS_DIR" ]; then
 fi
 # END CF Common
 
+# Syntax sugar.
+source $BIN_DIR/utils
+
 # Use miniconda if environment.yml exists and exit
 if [ -f $BUILD_DIR/environment.yml ]; then
   echo "----------------- USING CONDA BUILDPACK -----------------"
+
+  # Experimental pre_compile hook.
+  pushd $BUILD_DIR
+    source $BIN_DIR/steps/hooks/pre_compile
+  popd
+
   $BIN_DIR/steps/conda-install $BUILD_DIR $CACHE_DIR
   $ROOT_DIR/compile-extensions/bin/store_buildpack_metadata $ROOT_DIR $CACHE_DIR
+
+  # Experimental post_compile hook.
+  pushd $BUILD_DIR
+    source $BIN_DIR/steps/hooks/post_compile
+  popd
+
   exit 0
 fi
 
@@ -78,9 +94,6 @@ unset GIT_DIR PYTHONHOME PYTHONPATH
 unset RECEIVE_DATA RUN_KEY BUILD_INFO DEPLOY LOG_TOKEN DYNO
 unset CYTOKINE_LOG_FILE GEM_PATH
 
-# Syntax sugar.
-source $BIN_DIR/utils
-
 # Import collection of warnings.
 source $BIN_DIR/warnings
 
@@ -93,7 +106,7 @@ EXPORT_PATH="$BIN_DIR/../export"
 GUNICORN_PROFILE_PATH="$BUILD_DIR/.profile.d/python.gunicorn.sh"
 
 # We'll need to send these statics to other scripts we `source`.
-export BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH EXPORT_PATH
+export PROFILE_PATH EXPORT_PATH
 
 # Prepend proper environment variables for Python use.
 export PATH=/app/.cloudfoundry/python/bin:/app/.cloudfoundry/vendor/bin:$PATH
