@@ -1,3 +1,15 @@
+v1.5.15 Jan 24, 2017
+=====================
+
+* Add python 3.5.3, remove python 3.5.1
+  (https://www.pivotaltracker.com/story/show/137773317)
+
+* Add python 3.4.6, remove python 3.4.4
+  (https://www.pivotaltracker.com/story/show/137773317)
+
+* Update default python version to 2.7.13
+  (https://www.pivotaltracker.com/story/show/136306637)
+
 v1.5.14 Jan 10, 2017
 =====================
 
