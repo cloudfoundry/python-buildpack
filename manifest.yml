@@ -1,93 +1,92 @@
 ---
 language: python
 default_versions:
-  - name: python
-    version: 2.7.13
+- name: python
+  version: 2.7.13
 url_to_dependency_map:
-  - match: python-(\d+\.\d+\.\d+)
-    name: python
-    version: $1
-  - match: libmemcache
-    name: libmemcache
-    version: 1.0.18
-  - match: libffi
-    name: libffi
-    version: 3.2.1
-
+- match: python-(\d+\.\d+\.\d+)
+  name: python
+  version: "$1"
+- match: libmemcache
+  name: libmemcache
+  version: 1.0.18
+- match: libffi
+  name: libffi
+  version: 3.2.1
 dependencies:
-  - name: libmemcache
-    version: 1.0.18
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64.tgz
-    md5: 9d08074f5b5cb802cb411c22f93f762e
-  - name: libffi
-    version: 3.2.1
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64.tgz
-    md5: 331af925ee2ea8f07d80ccfce4d2000c
-  - name: python
-    version: 2.7.12
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.12-linux-x64.tgz
-    md5: 38fa0667f9662c34c73be36df2b5b21d
-  - name: python
-    version: 2.7.13
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.13-linux-x64.tgz
-    md5: f10ace51cc91429beacf201ab0d06049
-  - name: python
-    version: 3.3.5
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.5-linux-x64.tgz
-    md5: abf00a0a470babc21837584fbff518a7
-  - name: python
-    version: 3.3.6
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.6-linux-x64.tgz
-    md5: 5e42b5355a092ef1cc6ecb1c610ac4e1
-  - name: python
-    version: 3.4.6
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.6-linux-x64.tgz
-    md5: 34658f5466c673b5efc26d4f5cc291b6
-  - name: python
-    version: 3.4.5
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.5-linux-x64.tgz
-    md5: 3e8b3520b1b8a946a239c1f9c31db665
-  - name: python
-    version: 3.5.3
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.3-linux-x64.tgz
-    md5: 105f02b252319a16e8faef23d73712c5
-  - name: python
-    version: 3.5.2
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.2-linux-x64.tgz
-    md5: 4f59bbf15a53f0474d0e844631954782
-  - name: python
-    version: 3.6.0
-    cf_stacks:
-      - cflinuxfs2
-    uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.0-linux-x64.tgz
-    md5: 89c8f988e45c4f078c435a9fbbd9d3b3
+- name: libmemcache
+  version: 1.0.18
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64-9d08074f.tgz
+  md5: 9d08074f5b5cb802cb411c22f93f762e
+- name: libffi
+  version: 3.2.1
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64-331af925.tgz
+  md5: 331af925ee2ea8f07d80ccfce4d2000c
+- name: python
+  version: 2.7.12
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.12-linux-x64-38fa0667.tgz
+  md5: 38fa0667f9662c34c73be36df2b5b21d
+- name: python
+  version: 2.7.13
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.13-linux-x64-f10ace51.tgz
+  md5: f10ace51cc91429beacf201ab0d06049
+- name: python
+  version: 3.3.5
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.5-linux-x64-abf00a0a.tgz
+  md5: abf00a0a470babc21837584fbff518a7
+- name: python
+  version: 3.3.6
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.6-linux-x64-5e42b535.tgz
+  md5: 5e42b5355a092ef1cc6ecb1c610ac4e1
+- name: python
+  version: 3.4.6
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.6-linux-x64-34658f54.tgz
+  md5: 34658f5466c673b5efc26d4f5cc291b6
+- name: python
+  version: 3.4.5
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.5-linux-x64-3e8b3520.tgz
+  md5: 3e8b3520b1b8a946a239c1f9c31db665
+- name: python
+  version: 3.5.3
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.3-linux-x64-105f02b2.tgz
+  md5: 105f02b252319a16e8faef23d73712c5
+- name: python
+  version: 3.5.2
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.2-linux-x64-4f59bbf1.tgz
+  md5: 4f59bbf15a53f0474d0e844631954782
+- name: python
+  version: 3.6.0
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.0-linux-x64-89c8f988.tgz
+  md5: 89c8f988e45c4f078c435a9fbbd9d3b3
 exclude_files:
-  - .git/
-  - .gitignore
-  - .gitmodules
-  - cf_spec/
-  - log/
-  - test/
-  - bin/package
-  - buildpack-packager/
-  - python_buildpack-*v*.zip
+- ".git/"
+- ".gitignore"
+- ".gitmodules"
+- cf_spec/
+- log/
+- test/
+- bin/package
+- buildpack-packager/
+- python_buildpack-*v*.zip
