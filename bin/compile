@@ -209,12 +209,6 @@ source $BIN_DIR/steps/pylibmc
 # Libffi support.
 source $BIN_DIR/steps/cryptography
 
-# Support for Geo libraries.
-sub-env $BIN_DIR/steps/geo-libs
-
-# GDAL support.
-source $BIN_DIR/steps/gdal
-
 # Install dependencies with Pip (where the magic happens).
 source $BIN_DIR/steps/pip-install
 
