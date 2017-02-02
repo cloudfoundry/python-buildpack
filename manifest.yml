@@ -13,6 +13,27 @@ url_to_dependency_map:
 - match: libffi
   name: libffi
   version: 3.2.1
+dependency_deprecation_dates:
+- match: 2.7.\d+
+  version_line: "2.7"
+  name: python
+  date: 2020-01-01
+- match: 3.3.\d+
+  version_line: "3.3"
+  name: python
+  date: 2017-09-29
+- match: 3.4.\d+
+  version_line: "3.4"
+  name: python
+  date: 2019-03-16
+- match: 3.5.\d+
+  version_line: "3.5"
+  name: python
+  date: 2020-09-13
+- match: 3.6.\d+
+  version_line: "3.6"
+  name: python
+  date: 2021-12-23
 dependencies:
 - name: libmemcache
   version: 1.0.18
