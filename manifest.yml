@@ -39,14 +39,14 @@ dependencies:
   version: 1.0.18
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64-9d08074f.tgz
-  md5: 9d08074f5b5cb802cb411c22f93f762e
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64-6d33aa02.tgz
+  md5: 6d33aa02ed716bf89783c45c15b4318b
 - name: libffi
   version: 3.2.1
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64-331af925.tgz
-  md5: 331af925ee2ea8f07d80ccfce4d2000c
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64-5f5bf32c.tgz
+  md5: 5f5bf32ccfc9bf6d59ccee1cccd60f54
 - name: python
   version: 2.7.12
   cf_stacks:

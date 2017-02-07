@@ -54,11 +54,11 @@ source $BUILDPACK_PATH/compile-extensions/lib/common
 # END CF Common
 
 # Static configurations for virtualenv caches.
-VIRTUALENV_LOC=".heroku/venv"
+VIRTUALENV_LOC=".cloudfoundry/venv"
 LEGACY_TRIGGER="lib/python2.7"
 
 DEFAULT_PYTHON_VERSION="python-$($BUILDPACK_PATH/compile-extensions/bin/default_version_for $BUILDPACK_PATH/manifest.yml python)"
-PYTHON_EXE="/app/.heroku/python/bin/python"
+PYTHON_EXE="/app/.cloudfoundry/python/bin/python"
 PIP_VERSION="9.0.1"
 SETUPTOOLS_VERSION="32.1.0"
 
@@ -98,7 +98,7 @@ source $BIN_DIR/utils
 source $BIN_DIR/warnings
 
 # we need to put a bunch of symlinks in there later
-mkdir -p /app/.heroku
+mkdir -p /app/.cloudfoundry
 
 # Set up outputs under new context
 PROFILE_PATH="$BUILD_DIR/.profile.d/python.sh"
@@ -109,14 +109,14 @@ GUNICORN_PROFILE_PATH="$BUILD_DIR/.profile.d/python.gunicorn.sh"
 export BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH EXPORT_PATH
 
 # Prepend proper environment variables for Python use.
-export PATH=/app/.heroku/python/bin:/app/.heroku/vendor/bin:$PATH
+export PATH=/app/.cloudfoundry/python/bin:/app/.cloudfoundry/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.heroku/vendor/include:/app/.heroku/python/include:$C_INCLUDE_PATH
-export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:/app/.heroku/python/include:$CPLUS_INCLUDE_PATH
-export LIBRARY_PATH=/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LIBRARY_PATH
-export LD_LIBRARY_PATH=/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config:$PKG_CONFIG_PATH
+export C_INCLUDE_PATH=/app/.cloudfoundry/vendor/include:/app/.cloudfoundry/python/include:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=/app/.cloudfoundry/vendor/include:/app/.cloudfoundry/python/include:$CPLUS_INCLUDE_PATH
+export LIBRARY_PATH=/app/.cloudfoundry/vendor/lib:/app/.cloudfoundry/python/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=/app/.cloudfoundry/vendor/lib:/app/.cloudfoundry/python/lib:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=/app/.cloudfoundry/vendor/lib/pkg-config:/app/.cloudfoundry/python/lib/pkg-config:$PKG_CONFIG_PATH
 
 # Switch to the repo's context.
 cd $BUILD_DIR
@@ -139,13 +139,13 @@ fi
 
 
 # Sticky runtimes.
-if [ -f $CACHE_DIR/.heroku/python-version ]; then
-  DEFAULT_PYTHON_VERSION=$(cat $CACHE_DIR/.heroku/python-version)
+if [ -f $CACHE_DIR/.cloudfoundry/python-version ]; then
+  DEFAULT_PYTHON_VERSION=$(cat $CACHE_DIR/.cloudfoundry/python-version)
 fi
 
 # Stack fallback for non-declared caches.
-if [ -f $CACHE_DIR/.heroku/python-stack ]; then
-  CACHED_PYTHON_STACK=$(cat $CACHE_DIR/.heroku/python-stack)
+if [ -f $CACHE_DIR/.cloudfoundry/python-stack ]; then
+  CACHED_PYTHON_STACK=$(cat $CACHE_DIR/.cloudfoundry/python-stack)
 else
   CACHED_PYTHON_STACK=$STACK
 fi
@@ -160,35 +160,35 @@ mkdir -p $CACHE_DIR
 
 # Purge "old-style" virtualenvs.
 bpwatch start clear_old_venvs
-  [ -d $CACHE_DIR/$LEGACY_TRIGGER ] && rm -fr $CACHE_DIR/.heroku/bin $CACHE_DIR/.heroku/lib $CACHE_DIR/.heroku/include
-  [ -d $CACHE_DIR/$VIRTUALENV_LOC ] && rm -fr $CACHE_DIR/.heroku/venv $CACHE_DIR/.heroku/src
+  [ -d $CACHE_DIR/$LEGACY_TRIGGER ] && rm -fr $CACHE_DIR/.cloudfoundry/bin $CACHE_DIR/.cloudfoundry/lib $CACHE_DIR/.cloudfoundry/include
+  [ -d $CACHE_DIR/$VIRTUALENV_LOC ] && rm -fr $CACHE_DIR/.cloudfoundry/venv $CACHE_DIR/.cloudfoundry/src
 bpwatch stop clear_old_venvs
 
 # Restore old artifacts from the cache.
 bpwatch start restore_cache
-    mkdir -p .heroku
+    mkdir -p .cloudfoundry
 
-    cp -R $CACHE_DIR/.heroku/python .heroku/ &> /dev/null || true
-    cp -R $CACHE_DIR/.heroku/python-stack .heroku/ &> /dev/null || true
-    cp -R $CACHE_DIR/.heroku/python-version .heroku/ &> /dev/null || true
-    cp -R $CACHE_DIR/.heroku/vendor .heroku/ &> /dev/null || true
-    cp -R $CACHE_DIR/.heroku/venv .heroku/ &> /dev/null || true
-    if [[ -d $CACHE_DIR/.heroku/src ]]; then
-      cp -R $CACHE_DIR/.heroku/src .heroku/ &> /dev/null || true
+    cp -R $CACHE_DIR/.cloudfoundry/python .cloudfoundry/ &> /dev/null || true
+    cp -R $CACHE_DIR/.cloudfoundry/python-stack .cloudfoundry/ &> /dev/null || true
+    cp -R $CACHE_DIR/.cloudfoundry/python-version .cloudfoundry/ &> /dev/null || true
+    cp -R $CACHE_DIR/.cloudfoundry/vendor .cloudfoundry/ &> /dev/null || true
+    cp -R $CACHE_DIR/.cloudfoundry/venv .cloudfoundry/ &> /dev/null || true
+    if [[ -d $CACHE_DIR/.cloudfoundry/src ]]; then
+      cp -R $CACHE_DIR/.cloudfoundry/src .cloudfoundry/ &> /dev/null || true
     fi
 
 bpwatch stop restore_cache
 
 mkdir -p $(dirname $PROFILE_PATH)
-mkdir -p /app/.heroku/src
+mkdir -p /app/.cloudfoundry/src
 
 if [[ $BUILD_DIR != '/app' ]]; then
     # python expects to reside in /app, so set up symlinks
     # we will not remove these later so subsequent buildpacks can still invoke it
-    ln -nsf $BUILD_DIR/.heroku/python /app/.heroku/python
-    ln -nsf $BUILD_DIR/.heroku/vendor /app/.heroku/vendor
-    ln -nsf $BUILD_DIR/.heroku/venv /app/.heroku/venv
-    # Note: .heroku/src is copied in later.
+    ln -nsf $BUILD_DIR/.cloudfoundry/python /app/.cloudfoundry/python
+    ln -nsf $BUILD_DIR/.cloudfoundry/vendor /app/.cloudfoundry/vendor
+    ln -nsf $BUILD_DIR/.cloudfoundry/venv /app/.cloudfoundry/venv
+    # Note: .cloudfoundry/src is copied in later.
 fi
 
 # Install Python.
@@ -213,18 +213,18 @@ source $BIN_DIR/steps/cryptography
 source $BIN_DIR/steps/pip-install
 
 # Support for pip install -e.
-rm -fr $BUILD_DIR/.heroku/src
-deep-cp /app/.heroku/src $BUILD_DIR/.heroku/src
+rm -fr $BUILD_DIR/.cloudfoundry/src
+deep-cp /app/.cloudfoundry/src $BUILD_DIR/.cloudfoundry/src
 
 # Django collectstatic support.
 sub-env $BIN_DIR/steps/collectstatic
 
 # Create .profile script for application runtime environment variables.
-set-env PATH '$HOME/.heroku/python/bin:$PATH'
+set-env PATH '$HOME/.cloudfoundry/python/bin:$PATH'
 set-env PYTHONUNBUFFERED true
-set-env PYTHONHOME /app/.heroku/python
-set-env LIBRARY_PATH '/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LIBRARY_PATH'
-set-env LD_LIBRARY_PATH '/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH'
+set-env PYTHONHOME /app/.cloudfoundry/python
+set-env LIBRARY_PATH '/app/.cloudfoundry/vendor/lib:/app/.cloudfoundry/python/lib:$LIBRARY_PATH'
+set-env LD_LIBRARY_PATH '/app/.cloudfoundry/vendor/lib:/app/.cloudfoundry/python/lib:$LD_LIBRARY_PATH'
 set-default-env LANG en_US.UTF-8
 set-default-env PYTHONHASHSEED random
 set-default-env PYTHONPATH /app/
@@ -239,32 +239,32 @@ bpwatch stop post_compile
 
 set +e
 # rewrite build dir in egg links to /app so things are found at runtime
-find .heroku/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)#/app#" &> /dev/null
+find .cloudfoundry/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)#/app#" &> /dev/null
 set -e
 
 set +e
 # Support for PyPy
-find .heroku/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)#/app#" &> /dev/null
+find .cloudfoundry/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)#/app#" &> /dev/null
 set -e
 
 # Store new artifacts in cache.
 bpwatch start dump_cache
 
-  rm -rf $CACHE_DIR/.heroku/python
-  rm -rf $CACHE_DIR/.heroku/python-version
-  rm -rf $CACHE_DIR/.heroku/python-stack
-  rm -rf $CACHE_DIR/.heroku/vendor
-  rm -rf $CACHE_DIR/.heroku/venv
-  rm -rf $CACHE_DIR/.heroku/src
+  rm -rf $CACHE_DIR/.cloudfoundry/python
+  rm -rf $CACHE_DIR/.cloudfoundry/python-version
+  rm -rf $CACHE_DIR/.cloudfoundry/python-stack
+  rm -rf $CACHE_DIR/.cloudfoundry/vendor
+  rm -rf $CACHE_DIR/.cloudfoundry/venv
+  rm -rf $CACHE_DIR/.cloudfoundry/src
 
-  mkdir -p $CACHE_DIR/.heroku
-  cp -R .heroku/python $CACHE_DIR/.heroku/
-  cp -R .heroku/python-version $CACHE_DIR/.heroku/
-  cp -R .heroku/python-stack $CACHE_DIR/.heroku/ &> /dev/null || true
-  cp -R .heroku/vendor $CACHE_DIR/.heroku/ &> /dev/null || true
-  cp -R .heroku/venv $CACHE_DIR/.heroku/ &> /dev/null || true
-  if [[ -d .heroku/src ]]; then
-    cp -R .heroku/src $CACHE_DIR/.heroku/ &> /dev/null || true
+  mkdir -p $CACHE_DIR/.cloudfoundry
+  cp -R .cloudfoundry/python $CACHE_DIR/.cloudfoundry/
+  cp -R .cloudfoundry/python-version $CACHE_DIR/.cloudfoundry/
+  cp -R .cloudfoundry/python-stack $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+  cp -R .cloudfoundry/vendor $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+  cp -R .cloudfoundry/venv $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+  if [[ -d .cloudfoundry/src ]]; then
+    cp -R .cloudfoundry/src $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
   fi
 
 bpwatch stop dump_cache

@@ -1,16 +1,16 @@
 # Install dependencies with Pip.
 bpwatch start pip_uninstall
-if [[ -f .heroku/python/requirements-declared.txt ]]; then
+if [[ -f .cloudfoundry/python/requirements-declared.txt ]]; then
 
-  cp .heroku/python/requirements-declared.txt requirements-declared.txt
+  cp .cloudfoundry/python/requirements-declared.txt requirements-declared.txt
 
-  pip-diff --stale requirements-declared.txt requirements.txt --exclude setuptools pip wheel > .heroku/python/requirements-stale.txt
+  pip-diff --stale requirements-declared.txt requirements.txt --exclude setuptools pip wheel > .cloudfoundry/python/requirements-stale.txt
 
   rm -fr requirements-declared.txt
 
-  if [[ -s .heroku/python/requirements-stale.txt ]]; then
+  if [[ -s .cloudfoundry/python/requirements-stale.txt ]]; then
     puts-step "Uninstalling stale dependencies"
-    /app/.heroku/python/bin/pip uninstall -r .heroku/python/requirements-stale.txt -y --exists-action=w | cleanup | indent
+    /app/.cloudfoundry/python/bin/pip uninstall -r .cloudfoundry/python/requirements-stale.txt -y --exists-action=w | cleanup | indent
   fi
 fi
 bpwatch stop pip_uninstall

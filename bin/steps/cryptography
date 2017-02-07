@@ -9,7 +9,7 @@
 # The location of the pre-compiled libffi binary.
 VENDORED_LIBFFI="https://lang-python.s3.amazonaws.com/$STACK/libraries/vendor/libffi.tar.gz"
 
-PKG_CONFIG_PATH="/app/.heroku/vendor/lib/pkgconfig:$PKG_CONFIG_PATH"
+PKG_CONFIG_PATH="/app/.cloudfoundry/vendor/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 # Syntax sugar.
 source $BIN_DIR/utils
@@ -19,9 +19,9 @@ bpwatch start libffi_install
 # If a package using cffi exists within requirements, use vendored libffi.
 if (pip-grep -s requirements.txt argon2-cffi bcrypt cffi cryptography django[argon2] Django[argon2] django[bcrypt] Django[bcrypt] PyNaCl pyOpenSSL PyOpenSSL requests[security] misaka &> /dev/null) then
 
-  if [ ! -d ".heroku/vendor/lib/libffi-3.1" ]; then
+  if [ ! -d ".cloudfoundry/vendor/lib/libffi-3.1" ]; then
     echo "-----> Noticed cffi. Bootstrapping libffi."
-    mkdir -p .heroku/vendor
+    mkdir -p .cloudfoundry/vendor
 
     # Download and extract libffi into target vendor directory.
     exit_code=0
@@ -30,7 +30,7 @@ if (pip-grep -s requirements.txt argon2-cffi bcrypt cffi cryptography django[arg
     echo "Downloaded [$filtered_url]"
 
     downloaded_file=/tmp/libffi.tar.gz
-    tar zxvf $downloaded_file -C .heroku/vendor &> /dev/null
+    tar zxvf $downloaded_file -C .cloudfoundry/vendor &> /dev/null
     rm $downloaded_file
   fi
 

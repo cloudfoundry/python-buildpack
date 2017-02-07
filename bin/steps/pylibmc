@@ -18,9 +18,9 @@ bpwatch start pylibmc_install
 # If pylibmc exists within requirements, use vendored libmemcached.
 if (pip-grep -s requirements.txt pylibmc &> /dev/null) then
 
-  if [ ! -d ".heroku/vendor/lib/sasl2" ]; then
+  if [ ! -d ".cloudfoundry/vendor/lib/sasl2" ]; then
     echo "-----> Noticed pylibmc. Bootstrapping libmemcached."
-    mkdir -p .heroku/vendor
+    mkdir -p .cloudfoundry/vendor
  
     # Download and extract libmemcached into target vendor directory.
     exit_code=0
@@ -29,7 +29,7 @@ if (pip-grep -s requirements.txt pylibmc &> /dev/null) then
     echo "Downloaded [$filtered_url]"
 
     downloaded_file=/tmp/libmemcache.tar.gz
-    tar zxvf $downloaded_file -C .heroku/vendor &> /dev/null
+    tar zxvf $downloaded_file -C .cloudfoundry/vendor &> /dev/null
     rm $downloaded_file
   fi
 

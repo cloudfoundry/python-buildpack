@@ -3,28 +3,28 @@ puts-cmd "pip install -r requirements.txt"
 
 set +e
 # delete any existing egg links, to uninstall exisisting installations.
-find .heroku/python/lib/python*/site-packages/ -name "*.egg-link" -delete 2> /dev/null
-find .heroku/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#/$(pwd)/#" &> /dev/null
+find .cloudfoundry/python/lib/python*/site-packages/ -name "*.egg-link" -delete 2> /dev/null
+find .cloudfoundry/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#/$(pwd)/#" &> /dev/null
 set -e
 
 set +e
 # Support for the above, for PyPy.
-find .heroku/python/lib-python/*/site-packages/ -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#$(pwd)/#" &> /dev/null
-find .heroku/python/lib-python/*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#/$(pwd)/#" &> /dev/null
+find .cloudfoundry/python/lib-python/*/site-packages/ -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#$(pwd)/#" &> /dev/null
+find .cloudfoundry/python/lib-python/*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#/$(pwd)/#" &> /dev/null
 set -e
 
 [ ! ${FRESH_PYTHON:-} ] && bpwatch start pip_install
 [ ${FRESH_PYTHON:-} ] && bpwatch start pip_install_first
 
 if test -d $BUILD_DIR/vendor; then
-  /app/.heroku/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src --no-index --find-links=file://$BUILD_DIR/vendor | cleanup | indent
-  cp requirements.txt .heroku/python/requirements-declared.txt
-  /app/.heroku/python/bin/pip freeze --find-links=file://$BUILD_DIR/vendor --disable-pip-version-check > .heroku/python/requirements-installed.txt
+  /app/.cloudfoundry/python/bin/pip install -r requirements.txt --exists-action=w --src=./.cloudfoundry/src --no-index --find-links=file://$BUILD_DIR/vendor | cleanup | indent
+  cp requirements.txt .cloudfoundry/python/requirements-declared.txt
+  /app/.cloudfoundry/python/bin/pip freeze --find-links=file://$BUILD_DIR/vendor --disable-pip-version-check > .cloudfoundry/python/requirements-installed.txt
 else
-  /app/.heroku/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src | cleanup | indent
+  /app/.cloudfoundry/python/bin/pip install -r requirements.txt --exists-action=w --src=./.cloudfoundry/src | cleanup | indent
 
-  cp requirements.txt .heroku/python/requirements-declared.txt
-  /app/.heroku/python/bin/pip freeze > .heroku/python/requirements-installed.txt
+  cp requirements.txt .cloudfoundry/python/requirements-declared.txt
+  /app/.cloudfoundry/python/bin/pip freeze > .cloudfoundry/python/requirements-installed.txt
 fi
 
 [ ! ${FRESH_PYTHON:-} ] && bpwatch stop pip_install
