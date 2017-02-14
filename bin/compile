@@ -24,11 +24,37 @@ ENV_DIR=$3
 
 $ROOT_DIR/compile-extensions/bin/check_buildpack_version $ROOT_DIR $CACHE_DIR
 
+# Cloud Foundry does not have support for Logplex.
+function bpwatch() {
+  :
+}
+
 # Use miniconda if environment.yml exists and exit
 if [ -f $BUILD_DIR/environment.yml ]; then
   echo "----------------- USING CONDA BUILDPACK -----------------"
+
+  # Syntax sugar.
+  source $BIN_DIR/utils
+
+  # We'll need to send these statics to other scripts we `source`.
+  export BUILD_DIR
+  
+  # Switch to the repo's context.
+  cd $BUILD_DIR
+  
+  # Experimental pre_compile hook.
+  bpwatch start pre_compile
+    source $BIN_DIR/steps/hooks/pre_compile
+  bpwatch stop pre_compile
+  
   $BIN_DIR/steps/conda-install $BUILD_DIR $CACHE_DIR
   $ROOT_DIR/compile-extensions/bin/store_buildpack_metadata $ROOT_DIR $CACHE_DIR
+  
+  # Experimental post_compile hook.
+  bpwatch start post_compile
+    source $BIN_DIR/steps/hooks/post_compile
+  bpwatch stop post_compile
+
   exit 0
 fi
 
@@ -41,11 +67,6 @@ rm -rf $TMP_ROOT
 cp -r $ROOT_DIR $TMP_ROOT
 ROOT_DIR=$TMP_ROOT
 cd $ROOT_DIR
-
-# Cloud Foundry does not have support for Logplex.
-function bpwatch() {
-  :
-}
 
 # CF Common
 BUILDPACK_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"
