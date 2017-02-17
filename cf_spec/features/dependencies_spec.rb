@@ -3,7 +3,7 @@ require 'support/python_environment'
 
 describe 'dependencies in the manifest' do
   context 'for Python 2' do
-    before { @env = PythonEnvironment.new('flask_web_app') }
+    before { @env = PythonEnvironment.new('flask') }
 
     describe '#libffi' do
       it 'can integrate with C-header files' do
@@ -23,7 +23,7 @@ describe 'dependencies in the manifest' do
   end
 
   context 'for Python 3' do
-    before { @env = PythonEnvironment.new('flask_web_app_python_3') }
+    before { @env = PythonEnvironment.new('flask_python_3') }
 
     describe '#libffi' do
       it 'can integrate with C-header files' do

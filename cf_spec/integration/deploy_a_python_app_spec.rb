@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'CF Python Buildpack' do
   let(:browser)  { Machete::Browser.new(app) }
-  let(:app_name) { 'flask_web_app' }
+  let(:app_name) { 'flask' }
 
   subject(:app)  { Machete.deploy_app(app_name) }
 
@@ -46,7 +46,7 @@ describe 'CF Python Buildpack' do
     context 'app has dependencies' do
       context 'with Python 2' do
         context 'deploy a flask web app' do
-          let(:app_name) { 'flask_web_app' }
+          let(:app_name) { 'flask' }
 
           specify do
             expect(app).to be_running(60)
@@ -62,7 +62,7 @@ describe 'CF Python Buildpack' do
       end
 
       context 'with Python 3' do
-        let(:app_name) { 'flask_web_app_python_3' }
+        let(:app_name) { 'flask_python_3' }
 
         specify do
           expect(app).to be_running(120)
@@ -77,7 +77,7 @@ describe 'CF Python Buildpack' do
 
     context 'Warning when pip has mercurial dependencies' do
       let(:log_file) { File.open('log/integration.log', 'r') }
-      let(:app_name) { 'mercurial_requirements' }
+      let(:app_name) { 'mercurial' }
 
       before do
         log_file.readlines
@@ -94,7 +94,7 @@ describe 'CF Python Buildpack' do
     context 'app has dependencies' do
       context 'with Python 2' do
         context 'deploy a flask web app' do
-          let(:app_name) { 'flask_web_app' }
+          let(:app_name) { 'flask' }
 
           subject(:app) do
             Machete.deploy_app(app_name, env: {'BP_DEBUG' => '1'})
@@ -127,7 +127,7 @@ describe 'CF Python Buildpack' do
 
       context 'with Python 3' do
         context 'deploy a flask web app' do
-          let(:app_name) { 'flask_web_app_python_3' }
+          let(:app_name) { 'flask_python_3' }
 
           specify do
             expect(app).to be_running(60)
@@ -138,7 +138,7 @@ describe 'CF Python Buildpack' do
         end
 
         context 'deploy a django web app' do
-          let(:app_name) { 'django_web_app_python_3' }
+          let(:app_name) { 'django_python_3' }
 
           specify do
             expect(app).to be_running(60)
@@ -155,7 +155,7 @@ describe 'CF Python Buildpack' do
     end
 
     context 'app has non-vendored dependencies' do
-      let(:app_name) { 'flask_web_app_not_vendored' }
+      let(:app_name) { 'flask_not_vendored' }
 
       specify do
         expect(app).to be_running(60)

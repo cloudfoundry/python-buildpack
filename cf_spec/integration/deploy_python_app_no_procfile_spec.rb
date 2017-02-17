@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'deploying a flask web app' do
   let(:browser)  { Machete::Browser.new(app) }
-   let(:app_name) { 'flask_web_app_python_3_no_procfile' }
+   let(:app_name) { 'flask_no_procfile' }
 
   subject(:app)  { Machete.deploy_app(app_name) }
 
