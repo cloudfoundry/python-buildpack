@@ -170,7 +170,7 @@ describe 'CF Python Buildpack' do
     end
 
     context 'an app that uses miniconda and python 2' do
-      let(:app_name) { 'miniconda_simple_app_python_2' }
+      let(:app_name) { 'miniconda_python_2' }
 
       specify do
         expect(app).to be_running(120)
@@ -189,7 +189,7 @@ describe 'CF Python Buildpack' do
     end
 
     context 'an app that uses miniconda and python 3' do
-      let(:app_name) { 'miniconda_simple_app_python_3' }
+      let(:app_name) { 'miniconda_python_3' }
       before(:each) { create_environment_yml app_name }
       after(:each) {create_environment_yml app_name}
 
@@ -244,7 +244,7 @@ describe 'CF Python Buildpack' do
     end
 
     context 'an app that uses miniconda and specifies python 2 in runtime.txt but python3 in the environment.yml' do
-      let(:app_name) { 'miniconda_simple_app_python_2_3' }
+      let(:app_name) { 'miniconda_python_2_3' }
 
       specify do
         expect(app).to be_running(120)
