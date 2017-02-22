@@ -37,6 +37,21 @@ describe 'CF Python Buildpack' do
     end
   end
 
+  context 'deploy a web app with -e in requirements.txt' do
+    let(:app_name) { 'flask_git_req' }
+
+    specify do
+      expect(app).to be_running(60)
+
+      browser.visit_path('/')
+      expect(browser).to have_body('Hello, World!')
+      # Check that collectstatic ran
+      expect(app).to_not have_logged(/Error while running/)
+      expect(app).to_not have_logged(/ImportError:/)
+
+    end
+  end
+
   it "should not display the allow-all-external deprecation message" do
     expect(app).to be_running
     expect(app).to_not have_logged 'DEPRECATION: --allow-all-external has been deprecated and will be removed in the future'
@@ -109,6 +124,7 @@ describe 'CF Python Buildpack' do
             expect(app).to have_logged('DEBUG: default_version_for python is')
           end
         end
+
         context 'deploy a django web app' do
           let(:app_name) { 'django_web_app' }
 
