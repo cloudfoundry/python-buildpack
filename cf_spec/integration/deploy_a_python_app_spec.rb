@@ -158,6 +158,7 @@ describe 'CF Python Buildpack' do
 
           specify do
             expect(app).to be_running(60)
+            expect(app).to have_logged '-----> Installing python-3.5.'
 
             browser.visit_path('/')
             expect(browser).to have_body('It worked!')

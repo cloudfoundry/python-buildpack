@@ -1,4 +1,5 @@
 PYTHON_VERSION=$(cat runtime.txt)
+PYTHON_VERSION=$($ROOT_DIR/bin/steps/libs/version.rb $ROOT_DIR/manifest.yml $PYTHON_VERSION)
 
 # Install Python.
 if [ -f .cloudfoundry/python-version ]; then
