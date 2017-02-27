@@ -45,10 +45,21 @@ describe 'CF Python Buildpack' do
 
       browser.visit_path('/')
       expect(browser).to have_body('Hello, World!')
-      # Check that collectstatic ran
       expect(app).to_not have_logged(/Error while running/)
       expect(app).to_not have_logged(/ImportError:/)
 
+    end
+  end
+
+  context 'deploy a web app that uses an nltk corpus' do
+    let(:app_name) { 'nltk_flask' }
+
+    specify do
+      expect(app).to be_running(60)
+
+      browser.visit_path('/')
+      expect(browser).to have_body(/The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced/)
+      expect(app).to have_logged(/Downloading NLTK packages: brown/)
     end
   end
 
