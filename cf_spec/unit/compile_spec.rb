@@ -18,17 +18,61 @@ describe 'Compile' do
     end
   end
 
-  context 'find python version line' do
-    let(:manifest) { "cf_spec/fixtures/version-manifest.yml" }
+  describe 'python version selecting' do
+    context 'runtime.txt contains "python" prefix' do
+      let(:manifest) { "cf_spec/fixtures/version-manifest.yml" }
 
-    it 'fully specified line passes through' do
-      output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.12")
-      expect(output.chomp).to eq('python-2.7.12')
+      it 'fully specified line passes through' do
+        output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.12")
+        expect(output.chomp).to eq('python-2.7.12')
+      end
+
+      it 'finds latest of a line' do
+        output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.x")
+        expect(output.chomp).to eq('python-2.7.14')
+      end
     end
 
-    it 'finds latest of a line' do
-      output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.x")
-      expect(output.chomp).to eq('python-2.7.14')
+    context 'runtime.txt contains just the version' do
+      let(:manifest) { "cf_spec/fixtures/version-manifest.yml" }
+
+      it 'fully specified line passes through' do
+        output = run("./bin/steps/libs/version.rb #{manifest} 2.7.12")
+        expect(output.chomp).to eq('python-2.7.12')
+      end
+
+      it 'finds latest of a line' do
+        output = run("./bin/steps/libs/version.rb #{manifest} 2.7.x")
+        expect(output.chomp).to eq('python-2.7.14')
+      end
+    end
+
+    context 'runtime.txt contains "python" prefix and ucs2 suffix' do
+      let(:manifest) { "cf_spec/fixtures/version-manifest.yml" }
+
+      it 'fully specified line passes through' do
+        output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.12-ucs2")
+        expect(output.chomp).to eq('python-2.7.12')
+      end
+
+      it 'finds latest of a line' do
+        output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.x-ucs2")
+        expect(output.chomp).to eq('python-2.7.14')
+      end
+    end
+
+    context 'runtime.txt contains the version and usc2 suffix' do
+      let(:manifest) { "cf_spec/fixtures/version-manifest.yml" }
+
+      it 'fully specified line passes through' do
+        output = run("./bin/steps/libs/version.rb #{manifest} 2.7.12-ucs2")
+        expect(output.chomp).to eq('python-2.7.12')
+      end
+
+      it 'finds latest of a line' do
+        output = run("./bin/steps/libs/version.rb #{manifest} 2.7.x-ucs2")
+        expect(output.chomp).to eq('python-2.7.14')
+      end
     end
   end
 end
