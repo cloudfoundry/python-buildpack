@@ -1,3 +1,25 @@
+v1.5.16 Mar 03, 2017
+=====================
+
+* Allow usc2 version of python 2.x to be specified in runtime.txt
+  (https://www.pivotaltracker.com/story/show/140857561)
+
+* Add nltk support
+  (https://www.pivotaltracker.com/story/show/140311521)
+
+* Allow python version line to be specified in runtime.txt
+  - e.g. python-3.3.x
+  (https://www.pivotaltracker.com/story/show/140505663)
+
+* Fix buildpack so that to pip can install editable dependencies from requirements.txt
+  (https://www.pivotaltracker.com/story/show/139473831)
+
+* Add miniconda 4.3.11. remove miniconda 4.2.12
+  (https://www.pivotaltracker.com/story/show/139957205)
+
+* Add EOL dates for python
+  (https://www.pivotaltracker.com/story/show/137374307)
+
 v1.5.15 Jan 24, 2017
 =====================
 
