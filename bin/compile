@@ -21,13 +21,21 @@ ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
-
+DEPS_DIR=${4:-}
 
 # CF Common
 BUILDPACK_PATH=$ROOT_DIR
 export BUILDPACK_PATH
 source $ROOT_DIR/compile-extensions/lib/common
 $ROOT_DIR/compile-extensions/bin/check_buildpack_version $ROOT_DIR $CACHE_DIR
+
+if [ -n "$DEPS_DIR" ]; then
+  env_vars=$($BUILDPACK_PATH/compile-extensions/bin/build_path_from_supply $DEPS_DIR)
+  for env_var in $env_vars; do
+    export $env_var
+  done
+  $BUILDPACK_PATH/compile-extensions/bin/write_profiled_from_supply $DEPS_DIR $BUILD_DIR
+fi
 # END CF Common
 
 # Use miniconda if environment.yml exists and exit
