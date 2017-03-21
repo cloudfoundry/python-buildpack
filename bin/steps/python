@@ -4,46 +4,39 @@ PYTHON_VERSION=$($ROOT_DIR/bin/steps/libs/version.rb $ROOT_DIR/manifest.yml $PYT
 # Install Python.
 if [ -f .cloudfoundry/python-version ]; then
   if [ ! $(cat .cloudfoundry/python-version) = $PYTHON_VERSION ]; then
-    bpwatch start uninstall_python
-      puts-step "Found $(cat .cloudfoundry/python-version), removing"
-      rm -fr .cloudfoundry/python
-    bpwatch stop uninstall_python
+    puts-step "Found $(cat .cloudfoundry/python-version), removing"
+    rm -fr .cloudfoundry/python
   else
     SKIP_INSTALL=1
   fi
 fi
 
 if [ ! $STACK = $CACHED_PYTHON_STACK ]; then
-  bpwatch start uninstall_python
-    rm -fr .cloudfoundry/python .cloudfoundry/python-stack .cloudfoundry/vendor
-    unset SKIP_INSTALL
-  bpwatch stop uninstall_python
+  rm -fr .cloudfoundry/python .cloudfoundry/python-stack .cloudfoundry/vendor
+  unset SKIP_INSTALL
 fi
 
 
 if [ ! "$SKIP_INSTALL" ]; then
-  bpwatch start install_python
-    puts-step "Installing $PYTHON_VERSION"
+  puts-step "Installing $PYTHON_VERSION"
 
-    # Prepare destination directory.
-    mkdir -p .cloudfoundry/python
+  # Prepare destination directory.
+  mkdir -p .cloudfoundry/python
 
-    exit_code=0
-    url="https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz"
+  exit_code=0
+  url="https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz"
 
-    filtered_url=$($ROOT_DIR/compile-extensions/bin/download_dependency $url /tmp) || exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-      $ROOT_DIR/compile-extensions/bin/recommend_dependency $url
-      exit 1
-    fi
-    $ROOT_DIR/compile-extensions/bin/warn_if_newer_patch $url "$ROOT_DIR/manifest.yml"
+  filtered_url=$($ROOT_DIR/compile-extensions/bin/download_dependency $url /tmp) || exit_code=$?
+  if [ $exit_code -ne 0 ]; then
+    $ROOT_DIR/compile-extensions/bin/recommend_dependency $url
+    exit 1
+  fi
+  $ROOT_DIR/compile-extensions/bin/warn_if_newer_patch $url "$ROOT_DIR/manifest.yml"
 
-    downloaded_file=/tmp/$PYTHON_VERSION.tar.gz
-    tar zxvf $downloaded_file -C .cloudfoundry/python &> /dev/null
-    rm $downloaded_file
-    echo "Downloaded [$filtered_url]"
-
-  bpwatch stop install_python
+  downloaded_file=/tmp/$PYTHON_VERSION.tar.gz
+  tar zxvf $downloaded_file -C .cloudfoundry/python &> /dev/null
+  rm $downloaded_file
+  echo "Downloaded [$filtered_url]"
 
   # Record for future reference.
   echo $PYTHON_VERSION > .cloudfoundry/python-version
@@ -57,29 +50,21 @@ fi
 if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
   WORKING_DIR=$(pwd)
 
-  bpwatch start prepare_environment
-
   TMPTARDIR=$(mktemp -d)
   trap "rm -rf $TMPTARDIR" RETURN
 
-  bpwatch start install_setuptools
-    # Prepare it for the real world
-    # puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
-    tar zxf $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION.tar.gz -C $TMPTARDIR
-    cd $TMPTARDIR/setuptools-$SETUPTOOLS_VERSION/
-    python setup.py install &> /dev/null
-    cd $WORKING_DIR
-  bpwatch stop install_setuptoools
+  # Prepare it for the real world
+  # puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
+  tar zxf $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION.tar.gz -C $TMPTARDIR
+  cd $TMPTARDIR/setuptools-$SETUPTOOLS_VERSION/
+  python setup.py install &> /dev/null
+  cd $WORKING_DIR
 
-  bpwatch start install_pip
-    # puts-step "Installing Pip ($PIP_VERSION)"
-    tar zxf $ROOT_DIR/vendor/pip-$PIP_VERSION.tar.gz -C $TMPTARDIR
-    cd $TMPTARDIR/pip-$PIP_VERSION/
-    python setup.py install &> /dev/null
-    cd $WORKING_DIR
-
-  bpwatch stop install_pip
-  bpwatch stop prepare_environment
+  # puts-step "Installing Pip ($PIP_VERSION)"
+  tar zxf $ROOT_DIR/vendor/pip-$PIP_VERSION.tar.gz -C $TMPTARDIR
+  cd $TMPTARDIR/pip-$PIP_VERSION/
+  python setup.py install &> /dev/null
+  cd $WORKING_DIR
 fi
 
 hash -r

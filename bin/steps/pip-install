@@ -13,9 +13,6 @@ find .cloudfoundry/python/lib-python/*/site-packages/ -name "*.egg-link" -print0
 find .cloudfoundry/python/lib-python/*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#/$(pwd)/#" &> /dev/null
 set -e
 
-[ ! ${FRESH_PYTHON:-} ] && bpwatch start pip_install
-[ ${FRESH_PYTHON:-} ] && bpwatch start pip_install_first
-
 if test -d $BUILD_DIR/vendor; then
   /app/.cloudfoundry/python/bin/pip install -r requirements.txt --exists-action=w --src=/app/.cloudfoundry/src --no-index --find-links=file://$BUILD_DIR/vendor | cleanup | indent
   cp requirements.txt .cloudfoundry/python/requirements-declared.txt
@@ -26,8 +23,5 @@ else
   cp requirements.txt .cloudfoundry/python/requirements-declared.txt
   /app/.cloudfoundry/python/bin/pip freeze > .cloudfoundry/python/requirements-installed.txt
 fi
-
-[ ! ${FRESH_PYTHON:-} ] && bpwatch stop pip_install
-[ ${FRESH_PYTHON:-} ] && bpwatch stop pip_install_first
 
 echo

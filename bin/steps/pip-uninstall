@@ -1,5 +1,4 @@
 # Install dependencies with Pip.
-bpwatch start pip_uninstall
 if [[ -f .cloudfoundry/python/requirements-declared.txt ]]; then
 
   cp .cloudfoundry/python/requirements-declared.txt requirements-declared.txt
@@ -13,4 +12,3 @@ if [[ -f .cloudfoundry/python/requirements-declared.txt ]]; then
     /app/.cloudfoundry/python/bin/pip uninstall -r .cloudfoundry/python/requirements-stale.txt -y --exists-action=w | cleanup | indent
   fi
 fi
-bpwatch stop pip_uninstall

@@ -56,15 +56,6 @@ cp -r $ROOT_DIR $TMP_ROOT
 ROOT_DIR=$TMP_ROOT
 cd $ROOT_DIR
 
-# Cloud Foundry does not have support for Logplex.
-function bpwatch() {
-  :
-}
-
-# Static configurations for virtualenv caches.
-VIRTUALENV_LOC=".cloudfoundry/venv"
-LEGACY_TRIGGER="lib/python2.7"
-
 DEFAULT_PYTHON_VERSION="python-$($BUILDPACK_PATH/compile-extensions/bin/default_version_for $BUILDPACK_PATH/manifest.yml python)"
 PYTHON_EXE="/app/.cloudfoundry/python/bin/python"
 PIP_VERSION="9.0.1"
@@ -73,12 +64,6 @@ SETUPTOOLS_VERSION="32.1.0"
 # Common Problem Warnings
 export WARNINGS_LOG=$(mktemp)
 export RECOMMENDED_PYTHON_VERSION=$DEFAULT_PYTHON_VERSION
-
-# Setup bpwatch
-export PATH=$PATH:$ROOT_DIR/vendor/bpwatch
-LOGPLEX_KEY="t.b90d9d29-5388-4908-9737-b4576af1d4ce"
-export BPWATCH_STORE_PATH=$CACHE_DIR/bpwatch.json
-BUILDPACK_VERSION=v28
 
 # Setup pip-pop (pip-diff)
 export PATH=$PATH:$ROOT_DIR/vendor/pip-pop
@@ -92,12 +77,6 @@ export PATH=$PATH:$ROOT_DIR/vendor/pip-pop
 unset GIT_DIR PYTHONHOME PYTHONPATH
 unset RECEIVE_DATA RUN_KEY BUILD_INFO DEPLOY LOG_TOKEN DYNO
 unset CYTOKINE_LOG_FILE GEM_PATH
-
-# Setup buildpack instrumentation.
-bpwatch init $LOGPLEX_KEY
-bpwatch build python $BUILDPACK_VERSION $REQUEST_ID
-
-bpwatch start compile
 
 # Syntax sugar.
 source $BIN_DIR/utils
@@ -136,9 +115,7 @@ if [[ ! -f Procfile ]]; then
 fi
 
 # Experimental pre_compile hook.
-bpwatch start pre_compile
-  source $BIN_DIR/steps/hooks/pre_compile
-bpwatch stop pre_compile
+source $BIN_DIR/steps/hooks/pre_compile
 
 # If no requirements.txt file given, assume `setup.py develop` is intended.
 if [ ! -f requirements.txt ]; then
@@ -166,26 +143,16 @@ fi
 # Prepare the cache.
 mkdir -p $CACHE_DIR
 
-# Purge "old-style" virtualenvs.
-bpwatch start clear_old_venvs
-  [ -d $CACHE_DIR/$LEGACY_TRIGGER ] && rm -fr $CACHE_DIR/.cloudfoundry/bin $CACHE_DIR/.cloudfoundry/lib $CACHE_DIR/.cloudfoundry/include
-  [ -d $CACHE_DIR/$VIRTUALENV_LOC ] && rm -fr $CACHE_DIR/.cloudfoundry/venv $CACHE_DIR/.cloudfoundry/src
-bpwatch stop clear_old_venvs
-
 # Restore old artifacts from the cache.
-bpwatch start restore_cache
-    mkdir -p .cloudfoundry
+mkdir -p .cloudfoundry
 
-    cp -R $CACHE_DIR/.cloudfoundry/python .cloudfoundry/ &> /dev/null || true
-    cp -R $CACHE_DIR/.cloudfoundry/python-stack .cloudfoundry/ &> /dev/null || true
-    cp -R $CACHE_DIR/.cloudfoundry/python-version .cloudfoundry/ &> /dev/null || true
-    cp -R $CACHE_DIR/.cloudfoundry/vendor .cloudfoundry/ &> /dev/null || true
-    cp -R $CACHE_DIR/.cloudfoundry/venv .cloudfoundry/ &> /dev/null || true
-    if [[ -d $CACHE_DIR/.cloudfoundry/src ]]; then
-      cp -R $CACHE_DIR/.cloudfoundry/src .cloudfoundry/ &> /dev/null || true
-    fi
-
-bpwatch stop restore_cache
+cp -R $CACHE_DIR/.cloudfoundry/python .cloudfoundry/ &> /dev/null || true
+cp -R $CACHE_DIR/.cloudfoundry/python-stack .cloudfoundry/ &> /dev/null || true
+cp -R $CACHE_DIR/.cloudfoundry/python-version .cloudfoundry/ &> /dev/null || true
+cp -R $CACHE_DIR/.cloudfoundry/vendor .cloudfoundry/ &> /dev/null || true
+if [[ -d $CACHE_DIR/.cloudfoundry/src ]]; then
+	cp -R $CACHE_DIR/.cloudfoundry/src .cloudfoundry/ &> /dev/null || true
+fi
 
 mkdir -p $(dirname $PROFILE_PATH)
 mkdir -p /app/.cloudfoundry/src
@@ -195,7 +162,6 @@ if [[ $BUILD_DIR != '/app' ]]; then
     # we will not remove these later so subsequent buildpacks can still invoke it
     ln -nsf $BUILD_DIR/.cloudfoundry/python /app/.cloudfoundry/python
     ln -nsf $BUILD_DIR/.cloudfoundry/vendor /app/.cloudfoundry/vendor
-    ln -nsf $BUILD_DIR/.cloudfoundry/venv /app/.cloudfoundry/venv
     # Note: .cloudfoundry/src is copied in later.
 fi
 
@@ -244,9 +210,7 @@ set-default-env PYTHONPATH /app/
 cp $ROOT_DIR/vendor/python.gunicorn.sh $GUNICORN_PROFILE_PATH
 
 # Experimental post_compile hook.
-bpwatch start post_compile
-  source $BIN_DIR/steps/hooks/post_compile
-bpwatch stop post_compile
+source $BIN_DIR/steps/hooks/post_compile
 
 set +e
 # rewrite build dir in egg links to /app so things are found at runtime
@@ -259,27 +223,20 @@ find .cloudfoundry/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> 
 set -e
 
 # Store new artifacts in cache.
-bpwatch start dump_cache
+rm -rf $CACHE_DIR/.cloudfoundry/python
+rm -rf $CACHE_DIR/.cloudfoundry/python-version
+rm -rf $CACHE_DIR/.cloudfoundry/python-stack
+rm -rf $CACHE_DIR/.cloudfoundry/vendor
+rm -rf $CACHE_DIR/.cloudfoundry/src
 
-  rm -rf $CACHE_DIR/.cloudfoundry/python
-  rm -rf $CACHE_DIR/.cloudfoundry/python-version
-  rm -rf $CACHE_DIR/.cloudfoundry/python-stack
-  rm -rf $CACHE_DIR/.cloudfoundry/vendor
-  rm -rf $CACHE_DIR/.cloudfoundry/venv
-  rm -rf $CACHE_DIR/.cloudfoundry/src
-
-  mkdir -p $CACHE_DIR/.cloudfoundry
-  cp -R .cloudfoundry/python $CACHE_DIR/.cloudfoundry/
-  cp -R .cloudfoundry/python-version $CACHE_DIR/.cloudfoundry/
-  cp -R .cloudfoundry/python-stack $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
-  cp -R .cloudfoundry/vendor $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
-  cp -R .cloudfoundry/venv $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
-  if [[ -d .cloudfoundry/src ]]; then
-    cp -R .cloudfoundry/src $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
-  fi
-
-bpwatch stop dump_cache
+mkdir -p $CACHE_DIR/.cloudfoundry
+cp -R .cloudfoundry/python $CACHE_DIR/.cloudfoundry/
+cp -R .cloudfoundry/python-version $CACHE_DIR/.cloudfoundry/
+cp -R .cloudfoundry/python-stack $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+cp -R .cloudfoundry/vendor $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+if [[ -d .cloudfoundry/src ]]; then
+	cp -R .cloudfoundry/src $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+fi
 
 # Fin.
 $ROOT_DIR/compile-extensions/bin/store_buildpack_metadata $ROOT_DIR $CACHE_DIR
-bpwatch stop compile
