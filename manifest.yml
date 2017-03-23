@@ -101,6 +101,12 @@ dependencies:
   - cflinuxfs2
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.0-linux-x64-89c8f988.tgz
   md5: 89c8f988e45c4f078c435a9fbbd9d3b3
+- name: python
+  version: 3.6.1
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.1-linux-x64-d8e1dbc6.tgz
+  md5: d8e1dbc67436d294890536c99dcda0f0
 exclude_files:
 - ".git/"
 - ".gitignore"
