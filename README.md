@@ -4,7 +4,7 @@
 
 A Cloud Foundry [buildpack](http://docs.cloudfoundry.org/buildpacks/) for Python based apps.
 
-This is based on the [Heroku buildpack] (https://github.com/heroku/heroku-buildpack-python).
+This is based on the [Heroku buildpack](https://github.com/heroku/heroku-buildpack-python).
 
 This buildpack supports running Django and Flask apps.
 
@@ -58,7 +58,7 @@ Find our guidelines [here](./CONTRIBUTING.md).
 
 ### Help and Support
 
-Join the #buildpacks channel in our [Slack community] (http://slack.cloudfoundry.org/) if you need any further assistance.
+Join the #buildpacks channel in our [Slack community](http://slack.cloudfoundry.org/) if you need any further assistance.
 
 ### Reporting Issues
 
