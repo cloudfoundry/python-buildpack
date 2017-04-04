@@ -1,11 +1,12 @@
 from flask import Flask, request
 import subprocess
+import sys
 
 app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "Hello, World!"
+    return "max unicode: %d" % sys.maxunicode
 
 @app.route('/execute', methods=['POST'])
 def execute():
