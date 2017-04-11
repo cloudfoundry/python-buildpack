@@ -1,3 +1,13 @@
+v1.5.18 Apr 11, 2017
+=====================
+
+* Support pre_compile and post_compile hooks when using Conda
+  (https://www.pivotaltracker.com/story/show/137634053)
+
+* Build python 2.7.x with ucs4 support
+  - ucs2 python 2.7.x versions are still included in the manifest
+  (https://www.pivotaltracker.com/story/show/140854911)
+
 v1.5.17 Mar 27, 2017
 =====================
 
