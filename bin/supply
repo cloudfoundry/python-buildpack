@@ -60,11 +60,6 @@ set-env-prepend LD_LIBRARY_PATH $DEPS_DIR/$DEPS_IDX/lib
 # Switch to the repo's context.
 cd $BUILD_DIR
 
-# If no requirements.txt file given, assume `setup.py develop` is intended.
-if [ ! -f requirements.txt ]; then
-  echo "-e ." > requirements.txt
-fi
-
 # Warn for lack of Procfile.
 if [[ ! -f Procfile ]]; then
   puts-warn 'Warning: Your application is missing a Procfile. This file tells Cloud Foundry how to run your application.'
@@ -78,23 +73,32 @@ if [[ -d $CACHE_DIR/src ]]; then
   mv $CACHE_DIR/src $DEPS_DIR/$DEPS_IDX/src &> /dev/null || true
 fi
 
-# Install pip-pop
-cp -r $BUILDPACK_PATH/vendor/pip-pop $DEPS_DIR/$DEPS_IDX/pip-pop
-pushd $DEPS_DIR/$DEPS_IDX/bin >/dev/null
-  ln -s ../pip-pop/* .
-popd >/dev/null
-
 # Experimental pre_compile hook.
 source $BIN_DIR/steps/hooks/pre_compile
 
+# Pipenv Python version support.
+$BIN_DIR/steps/pipenv-python-version.rb $BUILD_DIR
+
 # Install Python,.
 source $BIN_DIR/steps/python
+
+# Install pip-pop
+source $BIN_DIR/steps/pip-pop
+
+# Pipenv support.
+source $BIN_DIR/steps/pipenv
+
+# If no requirements.txt file given, assume `setup.py develop` is intended.
+if [ ! -f requirements.txt ]; then
+  echo "-e ." > requirements.txt
+fi
 
 source $BIN_DIR/steps/cryptography
 
 source $BIN_DIR/steps/pylibmc
 
-cp $BUILDPACK_PATH/vendor/python.gunicorn.sh $DEPS_DIR/$DEPS_IDX/profile.d/python.gunicorn.sh
+# Automatic configuration for Gunicorn's ForwardedAllowIPS setting.
+echo "export FORWARDED_ALLOW_IPS='*'" > $DEPS_DIR/$DEPS_IDX/profile.d/python.gunicorn.sh
 
 set_default_profile_d PYTHONHASHSEED random
 echo random > $DEPS_DIR/$DEPS_IDX/env/PYTHONHASHSEED

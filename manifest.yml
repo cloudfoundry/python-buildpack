@@ -7,6 +7,10 @@ default_versions:
   version: 9.0.1
 - name: setuptools
   version: 32.1.0
+- name: pip-pop
+  version: 0.1.1
+- name: pipenv
+  version: 4.0.1
 - name: libmemcache
   version: 1.0.18
 - name: libffi
@@ -44,6 +48,18 @@ dependencies:
   - cflinuxfs2
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip/pip-9.0.1-35f01da3.tar.gz
   md5: 35f01da33009719497f01a4ba69d63c9
+- name: pip-pop
+  version: 0.1.1
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip-pop/pip-pop-0.1.1-d410583a.tar.gz
+  md5: d410583a3d6af83953c90813b09dbbc1
+- name: pipenv
+  version: 4.0.1
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pipenv/pipenv-4.0.1-148f753f.tar.gz
+  md5: 148f753f37d4e6473e6648068946d5c8
 - name: setuptools
   version: 32.1.0
   cf_stacks:

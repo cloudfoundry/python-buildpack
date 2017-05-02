@@ -17,7 +17,7 @@ if (pip-grep -s requirements.txt pylibmc &> /dev/null) then
 
   LIBMEMCACHE_VERSION=$($BUILDPACK_PATH/compile-extensions/bin/default_version_for $BUILDPACK_PATH/manifest.yml libmemcache)
 
-  # Download and extract libffi into target vendor directory.
+  # Download and extract libmemcache into target vendor directory.
   filtered_url=$($BUILDPACK_PATH/compile-extensions/bin/download_dependency_by_name libmemcache $LIBMEMCACHE_VERSION /tmp/libmemcache.tgz)
   echo "Downloaded [$filtered_url]"
 
