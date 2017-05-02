@@ -64,14 +64,6 @@ fi
 
 $ROOT_DIR/compile-extensions/bin/check_stack_support
 
-# The ROOT_DIR is read only so we can't install dependencies in it
-# Move the ROOT_DIR contents to tmp and point ROOT_DIR to the new root
-TMP_ROOT=/tmp/buildpack
-rm -rf $TMP_ROOT
-cp -rs $ROOT_DIR $TMP_ROOT
-ROOT_DIR=$TMP_ROOT
-cd $ROOT_DIR
-
 DEFAULT_PYTHON_VERSION="python-$($BUILDPACK_PATH/compile-extensions/bin/default_version_for $BUILDPACK_PATH/manifest.yml python)"
 PYTHON_EXE="/app/.cloudfoundry/python/bin/python"
 PIP_VERSION="9.0.1"
@@ -157,14 +149,14 @@ fi
 mkdir -p $CACHE_DIR
 
 # Restore old artifacts from the cache.
+# (Move cache dirs to build dir (will copy back after build))
 mkdir -p .cloudfoundry
-
-cp -Rl $CACHE_DIR/.cloudfoundry/python .cloudfoundry/ &> /dev/null || true
-cp -R $CACHE_DIR/.cloudfoundry/python-stack .cloudfoundry/ &> /dev/null || true
-cp -R $CACHE_DIR/.cloudfoundry/python-version .cloudfoundry/ &> /dev/null || true
-cp -R $CACHE_DIR/.cloudfoundry/vendor .cloudfoundry/ &> /dev/null || true
+mv $CACHE_DIR/.cloudfoundry/python .cloudfoundry/ &> /dev/null || true
+mv $CACHE_DIR/.cloudfoundry/python-stack .cloudfoundry/ &> /dev/null || true
+mv $CACHE_DIR/.cloudfoundry/python-version .cloudfoundry/ &> /dev/null || true
+mv $CACHE_DIR/.cloudfoundry/vendor .cloudfoundry/ &> /dev/null || true
 if [[ -d $CACHE_DIR/.cloudfoundry/src ]]; then
-	cp -R $CACHE_DIR/.cloudfoundry/src .cloudfoundry/ &> /dev/null || true
+	mv $CACHE_DIR/.cloudfoundry/src .cloudfoundry/ &> /dev/null || true
 fi
 
 mkdir -p $(dirname $PROFILE_PATH)
@@ -235,20 +227,14 @@ set +e
 find .cloudfoundry/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$(pwd)#/app#" &> /dev/null
 set -e
 
-# Store new artifacts in cache.
-rm -rf $CACHE_DIR/.cloudfoundry/python
-rm -rf $CACHE_DIR/.cloudfoundry/python-version
-rm -rf $CACHE_DIR/.cloudfoundry/python-stack
-rm -rf $CACHE_DIR/.cloudfoundry/vendor
-rm -rf $CACHE_DIR/.cloudfoundry/src
-
+# Copy from build dir to cache (Using hard links for performance and lower disk usage)
 mkdir -p $CACHE_DIR/.cloudfoundry
 cp -Rl .cloudfoundry/python $CACHE_DIR/.cloudfoundry/
-cp -R .cloudfoundry/python-version $CACHE_DIR/.cloudfoundry/
-cp -R .cloudfoundry/python-stack $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
-cp -R .cloudfoundry/vendor $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+cp -Rl .cloudfoundry/python-version $CACHE_DIR/.cloudfoundry/
+cp -Rl .cloudfoundry/python-stack $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+cp -Rl .cloudfoundry/vendor $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
 if [[ -d .cloudfoundry/src ]]; then
-	cp -R .cloudfoundry/src $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
+	cp -Rl .cloudfoundry/src $CACHE_DIR/.cloudfoundry/ &> /dev/null || true
 fi
 
 # Fin.
