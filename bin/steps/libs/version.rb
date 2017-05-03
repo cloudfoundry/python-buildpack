@@ -5,7 +5,12 @@ require 'pathname'
 
 manifest = ARGV[0]
 
-version = ARGV[1].gsub('python-', '')
+version = ARGV[1].to_s.strip.gsub('python-', '')
+
+if version == ''
+  default_version = YAML.load_file(manifest)['default_versions']
+  version = default_version.detect { |a| a['name'] == 'python' }.fetch('version')
+end
 
 if version.match(/\.x$/)
   v = version.gsub(/\.x$/, '.')
@@ -20,4 +25,4 @@ else
   full_version = "python-#{version}"
 end
 
-puts full_version
+STDOUT.write full_version

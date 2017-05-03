@@ -3,15 +3,13 @@ language: python
 default_versions:
 - name: python
   version: 2.7.13
-url_to_dependency_map:
-- match: python-(\d+\.\d+\.\d+).tar
-  name: python
-  version: "$1"
-- match: libmemcache
-  name: libmemcache
+- name: pip
+  version: 9.0.1
+- name: setuptools
+  version: 32.1.0
+- name: libmemcache
   version: 1.0.18
-- match: libffi
-  name: libffi
+- name: libffi
   version: 3.2.1
 dependency_deprecation_dates:
 - match: 2.7.\d+
@@ -35,6 +33,18 @@ dependency_deprecation_dates:
   name: python
   date: 2021-12-23
 dependencies:
+- name: pip
+  version: 9.0.1
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip/pip-9.0.1-35f01da3.tar.gz
+  md5: 35f01da33009719497f01a4ba69d63c9
+- name: setuptools
+  version: 32.1.0
+  cf_stacks:
+  - cflinuxfs2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/setuptools/setuptools-32.1.0-44054eaa.tar.gz
+  md5: 44054eaaa39420983abfbdfa1ae17aa7
 - name: libmemcache
   version: 1.0.18
   cf_stacks:

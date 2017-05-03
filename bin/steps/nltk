@@ -4,7 +4,7 @@
 # [**Python Buildpack**](https://github.com/cloudfoundry/python-buildpack)
 # compiler.
 #
-# This script is invoked by [`bin/compile`](/).
+# This script is invoked by [`bin/finalize`](/).
 
 # Syntax sugar.
 source $BIN_DIR/utils
@@ -17,8 +17,8 @@ if [ $? -eq 0 ]; then
     if [ -f "$nltk_packages_definition" ]; then
         nltk_packages=$(tr "\n" " " < "$nltk_packages_definition")
         puts-step "Downloading NLTK packages: $nltk_packages"
-        python -m nltk.downloader -d $BUILD_DIR/.cloudfoundry/python/nltk_data $nltk_packages  | indent
-        set-env NLTK_DATA "/app/.cloudfoundry/python/nltk_data"
+        python -m nltk.downloader -d $DEPS_DIR/$DEPS_IDX/python/nltk_data $nltk_packages  | indent
+        echo "export NLTK_DATA=\$DEPS_DIR/$DEPS_IDX/python/nltk_data" > $DEPS_DIR/$DEPS_IDX/profile.d/python.nltk.sh
     else
         puts-warn "nltk.txt not found, not downloading any corpora"
     fi

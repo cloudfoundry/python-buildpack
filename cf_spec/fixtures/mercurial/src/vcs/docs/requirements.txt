@@ -1,0 +1,5 @@
+# for https://readthedocs.org/
+mock
+pygments
+dulwich
+mercurial

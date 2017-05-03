@@ -1,27 +1,36 @@
 # Install dependencies with Pip.
 puts-cmd "pip install -r requirements.txt"
 
-set +e
-# delete any existing egg links, to uninstall exisisting installations.
-find .cloudfoundry/python/lib/python*/site-packages/ -name "*.egg-link" -delete 2> /dev/null
-find .cloudfoundry/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#/$(pwd)/#" &> /dev/null
-set -e
+if [ -f $CACHE_DIR/egg-path-prefix ]; then
+  prefix=$(cat $CACHE_DIR/egg-path-prefix)
 
-set +e
-# Support for the above, for PyPy.
-find .cloudfoundry/python/lib-python/*/site-packages/ -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#$(pwd)/#" &> /dev/null
-find .cloudfoundry/python/lib-python/*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#/app/#/$(pwd)/#" &> /dev/null
-set -e
+  set +e
+  # delete any existing egg links, to uninstall existing installations.
+  find $DEPS_DIR/$DEPS_IDX/python/lib/python*/site-packages/ -name "*.egg-link" -delete 2> /dev/null
+  find $DEPS_DIR/$DEPS_IDX/python/lib/python*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$prefix#$DEPS_DIR/$DEPS_IDX#" &> /dev/null
+
+  # Support for the above, for PyPy.
+  find $DEPS_DIR/$DEPS_IDX/python/lib-python/*/site-packages/ -name "*.egg-link" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$prefix#$DEPS_DIR/$DEPS_IDX#" &> /dev/null
+  find $DEPS_DIR/$DEPS_IDX/python/lib-python/*/site-packages/ -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$prefix#$DEPS_DIR/$DEPS_IDX#" &> /dev/null
+  set -e
+fi
 
 if test -d $BUILD_DIR/vendor; then
-  /app/.cloudfoundry/python/bin/pip install -r requirements.txt --exists-action=w --src=/app/.cloudfoundry/src --no-index --find-links=file://$BUILD_DIR/vendor | cleanup | indent
-  cp requirements.txt .cloudfoundry/python/requirements-declared.txt
-  /app/.cloudfoundry/python/bin/pip freeze --find-links=file://$BUILD_DIR/vendor --disable-pip-version-check > .cloudfoundry/python/requirements-installed.txt
+  pip install -r requirements.txt --exists-action=w --src=$DEPS_DIR/$DEPS_IDX/src --no-index --find-links=file://$BUILD_DIR/vendor | cleanup | indent
+  cp requirements.txt $DEPS_DIR/$DEPS_IDX/python/requirements-declared.txt
+  pip freeze --find-links=file://$BUILD_DIR/vendor --disable-pip-version-check > $DEPS_DIR/$DEPS_IDX/python/requirements-installed.txt
 else
-  /app/.cloudfoundry/python/bin/pip install -r requirements.txt --exists-action=w --src=/app/.cloudfoundry/src | cleanup | indent
+  pip install -r requirements.txt --exists-action=w --src=$DEPS_DIR/$DEPS_IDX/src | cleanup | indent
 
-  cp requirements.txt .cloudfoundry/python/requirements-declared.txt
-  /app/.cloudfoundry/python/bin/pip freeze > .cloudfoundry/python/requirements-installed.txt
+  cp requirements.txt $DEPS_DIR/$DEPS_IDX/python/requirements-declared.txt
+  pip freeze > $DEPS_DIR/$DEPS_IDX/python/requirements-installed.txt
 fi
+
+pushd $DEPS_DIR/$DEPS_IDX/bin >/dev/null
+  ln -sf ../python/bin/* .
+popd >/dev/null
+
+# Record for future reference.
+echo $DEPS_DIR/$DEPS_IDX > "$CACHE_DIR/egg-path-prefix"
 
 echo

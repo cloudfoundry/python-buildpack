@@ -102,15 +102,9 @@ describe 'CF Python Buildpack' do
     end
 
     context 'Warning when pip has mercurial dependencies' do
-      let(:log_file) { File.open('log/integration.log', 'r') }
       let(:app_name) { 'mercurial' }
 
-      before do
-        log_file.readlines
-      end
-
-      specify do
-        expect(app).not_to be_running(0)
+      it 'logs a warning that it may not work offline' do
         expect(app).to have_logged 'Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.'
       end
     end
@@ -118,21 +112,37 @@ describe 'CF Python Buildpack' do
 
   context 'without cached buildpack dependencies', :uncached do
     context 'app has dependencies' do
+      context 'with mercurial dependencies' do
+        let(:app_name) { 'mercurial' }
+
+        it "starts successfully" do
+          expect(app).to be_running
+          expect(app).not_to have_logged 'Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.'
+
+          browser.visit_path('/')
+          expect(browser).to have_body('Hello, World!')
+        end
+      end
+
       context 'with Python 2' do
-        context 'deploy a flask web app' do
+        context 'deploy a flask web app without runtime.txt' do
           let(:app_name) { 'flask' }
 
           subject(:app) do
-            Machete.deploy_app(app_name, env: {'BP_DEBUG' => '1'})
+            Machete.deploy_app(app_name)
           end
 
-          specify do
+          before do
+            default_versions = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'manifest.yml'))['default_versions']
+            @default = default_versions.detect { |a| a['name'] == 'python' }.fetch('version')
+          end
+
+          it "uses the default python version" do
             expect(app).to be_running(60)
 
             browser.visit_path('/')
             expect(browser).to have_body('Hello, World!')
-            expect(app).to have_logged(/Downloaded \[https:\/\/.*\]/)
-            expect(app).to have_logged('DEBUG: default_version_for python is')
+            expect(app).to have_logged("-----> Installing python-#{@default}")
           end
         end
 

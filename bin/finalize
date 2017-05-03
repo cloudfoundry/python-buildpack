@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+# The Cloud Foundry Python Buildpack. This script accepts parameters for a build
+# directory, a cache directory, and a directory for app environment variables.
+
+# Usage:
+#
+#     $ bin/finalize <build-dir> <cache-dir> <deps_dir> <deps_index>
+
+# Fail fast and fail hard.
+set -euo pipefail
+
+# Paths.
+export BUILDPACK_PATH=$(dirname $(readlink -f ${BASH_SOURCE%/*}))
+export BIN_DIR=$BUILDPACK_PATH/bin
+export BUILD_DIR=$1
+export CACHE_DIR=$2
+export DEPS_DIR=$3
+export DEPS_IDX=$4
+
+env_vars=$($BUILDPACK_PATH/compile-extensions/bin/build_path_from_supply $DEPS_DIR)
+for env_var in $env_vars; do
+  export $env_var
+done
+$BUILDPACK_PATH/compile-extensions/bin/write_profiled_from_supply $DEPS_DIR $BUILD_DIR
+
+# Syntax sugar.
+source $BIN_DIR/utils
+
+# Use miniconda if environment.yml exists and exit
+if [ -f $BUILD_DIR/environment.yml ]; then
+
+  $BIN_DIR/steps/conda-finalize
+
+  # Experimental post_compile hook.
+  pushd $BUILD_DIR >/dev/null
+    source $BIN_DIR/steps/hooks/post_compile
+  popd >/dev/null
+
+  $BUILDPACK_PATH/compile-extensions/bin/write_profiled_from_supply $DEPS_DIR $BUILD_DIR
+  $BUILDPACK_PATH/compile-extensions/bin/store_buildpack_metadata $BUILDPACK_PATH $CACHE_DIR
+
+  exit 0
+fi
+
+# Switch to the repo's context.
+cd $BUILD_DIR
+
+source $BIN_DIR/steps/mercurial
+
+# Uninstall removed dependencies with Pip.
+source $BIN_DIR/steps/pip-uninstall
+
+# Install dependencies with Pip (where the magic happens).
+source $BIN_DIR/steps/pip-install
+
+# Make sure all Pip installed dependencies use #!/usr/bin/env python
+$BIN_DIR/steps/rewrite-shebang
+
+# Support for NLTK corpora.
+$BIN_DIR/steps/nltk
+
+# Django collectstatic support.
+$BIN_DIR/steps/collectstatic
+
+# Experimental post_compile hook.
+source $BIN_DIR/steps/hooks/post_compile
+
+# rewrite build dir in egg links to runtime $DEPS_DIR/app so things can be found
+cat << EOF > $DEPS_DIR/$DEPS_IDX/profile.d/python.fix-eggs.sh
+find \$DEPS_DIR/$DEPS_IDX/python/lib/python*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$DEPS_DIR/$DEPS_IDX#\$DEPS_DIR/$DEPS_IDX#" &> /dev/null
+find \$DEPS_DIR/$DEPS_IDX/python/lib-python/*/site-packages/  -name "*.pth" -print0 2> /dev/null | xargs -r -0 -n 1 sed -i -e "s#$DEPS_DIR/$DEPS_IDX#\$DEPS_DIR/$DEPS_IDX#" &> /dev/null
+EOF
+
+# cache everything
+cp -Rl $DEPS_DIR/$DEPS_IDX/python $CACHE_DIR/
+if [[ -d $DEPS_DIR/$DEPS_IDX/src ]]; then
+  cp -Rl $DEPS_DIR/$DEPS_IDX/src $CACHE_DIR/ &> /dev/null || true
+fi
+
+$BUILDPACK_PATH/compile-extensions/bin/write_profiled_from_supply $DEPS_DIR $BUILD_DIR
+$BUILDPACK_PATH/compile-extensions/bin/store_buildpack_metadata $BUILDPACK_PATH $CACHE_DIR
+# Fin.

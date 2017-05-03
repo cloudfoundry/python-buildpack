@@ -1,0 +1,6 @@
+repo: b986218ba1c9b0d6a259fac9b050b1724ed8e545
+node: 2876a2f542792d997d5344bcd7f82c938be070d1
+branch: default
+latesttag: v0.2.0
+latesttagdistance: 186
+changessincelatesttag: 224

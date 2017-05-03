@@ -1,0 +1,18 @@
+language: python
+python:
+ - 2.5
+ - 2.6
+ - 2.7
+
+install:
+  - pip install -q dulwich mercurial==2.5.2 mock pygments
+  - pip install . --use-mirrors
+
+script: python vcs/tests/__main__.py
+
+notifications:
+    email:
+        - lukaszbalcerzak@gmail.com
+        - marcinkuz@gmail.com
+    irc: "irc.freenode.org#vcs"
+

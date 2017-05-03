@@ -6,29 +6,34 @@
 #
 # This script is invoked by [`bin/compile`](/).
 
-# The location of the pre-compiled libmemcached binary.
-VENDORED_MEMCACHED="https://lang-python.s3.amazonaws.com/$STACK/libraries/vendor/libmemcache.tar.gz"
-
 # Syntax sugar.
 source $BIN_DIR/utils
 
 # If pylibmc exists within requirements, use vendored libmemcached.
 if (pip-grep -s requirements.txt pylibmc &> /dev/null) then
 
-  if [ ! -d ".cloudfoundry/vendor/lib/sasl2" ]; then
-    echo "-----> Noticed pylibmc. Bootstrapping libmemcached."
-    mkdir -p .cloudfoundry/vendor
- 
-    # Download and extract libmemcached into target vendor directory.
-    exit_code=0
-    filtered_url=$($ROOT_DIR/compile-extensions/bin/download_dependency $VENDORED_MEMCACHED /tmp)
-    $ROOT_DIR/compile-extensions/bin/warn_if_newer_patch $VENDORED_MEMCACHED "$ROOT_DIR/manifest.yml"
-    echo "Downloaded [$filtered_url]"
+  echo "-----> Noticed pylibmc. Bootstrapping libmemcached."
+  mkdir -p $DEPS_DIR/$DEPS_IDX/libmemcache
 
-    downloaded_file=/tmp/libmemcache.tar.gz
-    tar zxvf $downloaded_file -C .cloudfoundry/vendor &> /dev/null
-    rm $downloaded_file
-  fi
+  LIBMEMCACHE_VERSION=$($BUILDPACK_PATH/compile-extensions/bin/default_version_for $BUILDPACK_PATH/manifest.yml libmemcache)
 
-  export LIBMEMCACHED=$(pwd)/vendor
+  # Download and extract libffi into target vendor directory.
+  filtered_url=$($BUILDPACK_PATH/compile-extensions/bin/download_dependency_by_name libmemcache $LIBMEMCACHE_VERSION /tmp/libmemcache.tgz)
+  echo "Downloaded [$filtered_url]"
+
+  tar zxvf /tmp/libmemcache.tgz -C $DEPS_DIR/$DEPS_IDX/libmemcache &> /dev/null
+
+  export LIBMEMCACHED=$DEPS_DIR/$DEPS_IDX/libmemcache
+  echo $LIBMEMCACHED > $DEPS_DIR/$DEPS_IDX/env/LIBMEMCACHED
+
+  pushd $DEPS_DIR/$DEPS_IDX/lib >/dev/null
+    ln -s ../libmemcache/lib/lib*.* .
+    ln -s ../libmemcache/lib/sasl2/* .
+  popd >/dev/null
+  pushd $DEPS_DIR/$DEPS_IDX/pkgconfig >/dev/null
+    ln -s ../libmemcache/lib/pkgconfig/* .
+  popd >/dev/null
+  pushd $DEPS_DIR/$DEPS_IDX/include >/dev/null
+    ln -s ../libmemcache/include/* .
+  popd >/dev/null
 fi

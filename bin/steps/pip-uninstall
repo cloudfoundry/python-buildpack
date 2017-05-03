@@ -1,14 +1,14 @@
 # Install dependencies with Pip.
-if [[ -f .cloudfoundry/python/requirements-declared.txt ]]; then
+if [[ -f $DEPS_DIR/$DEPS_IDX/python/requirements-declared.txt ]]; then
 
-  cp .cloudfoundry/python/requirements-declared.txt requirements-declared.txt
+  cp $DEPS_DIR/$DEPS_IDX/python/requirements-declared.txt requirements-declared.txt
 
-  pip-diff --stale requirements-declared.txt requirements.txt --exclude setuptools pip wheel > .cloudfoundry/python/requirements-stale.txt
+  pip-diff --stale requirements-declared.txt requirements.txt --exclude setuptools pip wheel > $DEPS_DIR/$DEPS_IDX/python/requirements-stale.txt
 
   rm -fr requirements-declared.txt
 
-  if [[ -s .cloudfoundry/python/requirements-stale.txt ]]; then
+  if [[ -s $DEPS_DIR/$DEPS_IDX/python/requirements-stale.txt ]]; then
     puts-step "Uninstalling stale dependencies"
-    /app/.cloudfoundry/python/bin/pip uninstall -r .cloudfoundry/python/requirements-stale.txt -y --exists-action=w | cleanup | indent
+    pip uninstall -r .cloudfoundry/python/requirements-stale.txt -y --exists-action=w | cleanup | indent
   fi
 fi

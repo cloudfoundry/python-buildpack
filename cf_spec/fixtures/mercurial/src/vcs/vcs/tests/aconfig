@@ -1,0 +1,10 @@
+[user]
+name = Foo Bar
+email = foo.bar@example.com
+
+[ui]
+username = Foo Bar foo.bar@example.com
+
+[universal]
+foo = bar
+

@@ -1,70 +1,104 @@
-PYTHON_VERSION=$(cat runtime.txt)
-PYTHON_VERSION=$($ROOT_DIR/bin/steps/libs/version.rb $ROOT_DIR/manifest.yml $PYTHON_VERSION)
+source $BIN_DIR/utils
+
+PYTHON_VERSION=''
+if [ -f runtime.txt ]; then
+  PYTHON_VERSION=$(cat runtime.txt)
+fi
+PYTHON_VERSION=$($BUILDPACK_PATH/bin/steps/libs/version.rb $BUILDPACK_PATH/manifest.yml $PYTHON_VERSION)
+PYTHON_DIR=$DEPS_DIR/$DEPS_IDX/python
 
 # Install Python.
-if [ -f .cloudfoundry/python-version ]; then
-  if [ ! $(cat .cloudfoundry/python-version) = $PYTHON_VERSION ]; then
-    puts-step "Found $(cat .cloudfoundry/python-version), removing"
-    rm -fr .cloudfoundry/python
+if [ -f $CACHE_DIR/python-stack ]; then
+  if [ ! $(cat $CACHE_DIR/python-stack) = $CF_STACK ]; then
+    rm -fr $PYTHON_DIR $CACHE_DIR/python-version $CACHE_DIR/python-stack $CACHE_DIR/vendor
+    unset SKIP_INSTALL
+  fi
+fi
+if [ -f $CACHE_DIR/python-version ]; then
+  if [ ! $(cat $CACHE_DIR/python-version) = $PYTHON_VERSION ]; then
+    puts-step "Found $(cat $CACHE_DIR/python-version), removing"
+    rm -fr $PYTHON_DIR $CACHE_DIR/python-version $CACHE_DIR/python-stack $CACHE_DIR/vendor
   else
     SKIP_INSTALL=1
   fi
 fi
 
-if [ ! $STACK = $CACHED_PYTHON_STACK ]; then
-  rm -fr .cloudfoundry/python .cloudfoundry/python-stack .cloudfoundry/vendor
-  unset SKIP_INSTALL
-fi
-
-
-if [ ! "$SKIP_INSTALL" ]; then
+if [ -z "${SKIP_INSTALL:-}" ]; then
   puts-step "Installing $PYTHON_VERSION"
 
   # Prepare destination directory.
-  mkdir -p .cloudfoundry/python
+  mkdir $PYTHON_DIR
 
   exit_code=0
-  url="https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz"
-
-  filtered_url=$($ROOT_DIR/compile-extensions/bin/download_dependency $url /tmp) || exit_code=$?
+  SHORT_PYTHON_VERSION=$(echo $PYTHON_VERSION | sed "s|python-||")
+  filtered_url=$($BUILDPACK_PATH/compile-extensions/bin/download_dependency_by_name python $SHORT_PYTHON_VERSION /tmp/python.tar.gz) || exit_code=$?
   if [ $exit_code -ne 0 ]; then
-    $ROOT_DIR/compile-extensions/bin/recommend_dependency $url
+    $BUILDPACK_PATH/compile-extensions/bin/recommend_dependency_by_name python $SHORT_PYTHON_VERSION
     exit 1
   fi
-  $ROOT_DIR/compile-extensions/bin/warn_if_newer_patch $url "$ROOT_DIR/manifest.yml"
+  $BUILDPACK_PATH/compile-extensions/bin/warn_if_newer_patch_by_name python $SHORT_PYTHON_VERSION
 
-  downloaded_file=/tmp/$PYTHON_VERSION.tar.gz
-  tar zxvf $downloaded_file -C .cloudfoundry/python &> /dev/null
-  rm $downloaded_file
+  tar zxvf /tmp/python.tar.gz -C $PYTHON_DIR &> /dev/null
   echo "Downloaded [$filtered_url]"
-
-  # Record for future reference.
-  echo $PYTHON_VERSION > .cloudfoundry/python-version
-  echo $STACK > .cloudfoundry/python-stack
   FRESH_PYTHON=true
-
-  hash -r
 fi
+
+# Link
+pushd $DEPS_DIR/$DEPS_IDX/bin >/dev/null
+  ln -s ../python/bin/* .
+popd >/dev/null
+
+pushd $DEPS_DIR/$DEPS_IDX/lib >/dev/null
+  ln -s ../python/lib/* .
+popd >/dev/null
+
+# Record for future reference.
+echo $PYTHON_VERSION > "$CACHE_DIR/python-version"
+echo $CF_STACK > "$CACHE_DIR/python-stack"
+
+hash -r
+
+PIP_VERSION=$($BUILDPACK_PATH/compile-extensions/bin/default_version_for $BUILDPACK_PATH/manifest.yml pip)
+SETUPTOOLS_VERSION=$($BUILDPACK_PATH/compile-extensions/bin/default_version_for $BUILDPACK_PATH/manifest.yml setuptools)
 
 # If Pip isn't up to date:
-if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
-  WORKING_DIR=$(pwd)
-
+if [ -n "${FRESH_PYTHON:-}" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
   TMPTARDIR=$(mktemp -d)
-  trap "rm -rf $TMPTARDIR" RETURN
 
   # Prepare it for the real world
-  # puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
-  tar zxf $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION.tar.gz -C $TMPTARDIR
-  cd $TMPTARDIR/setuptools-$SETUPTOOLS_VERSION/
-  python setup.py install &> /dev/null
-  cd $WORKING_DIR
+  puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
+  filtered_url=$($BUILDPACK_PATH/compile-extensions/bin/download_dependency_by_name setuptools $SETUPTOOLS_VERSION /tmp/setuptools.tgz)
+  echo "Downloaded [$filtered_url]"
 
-  # puts-step "Installing Pip ($PIP_VERSION)"
-  tar zxf $ROOT_DIR/vendor/pip-$PIP_VERSION.tar.gz -C $TMPTARDIR
-  cd $TMPTARDIR/pip-$PIP_VERSION/
-  python setup.py install &> /dev/null
-  cd $WORKING_DIR
+  tar zxf /tmp/setuptools.tgz -C $TMPTARDIR
+
+  pushd $TMPTARDIR/setuptools-$SETUPTOOLS_VERSION/ >/dev/null
+    python setup.py install --prefix=$DEPS_DIR/$DEPS_IDX/python &> /dev/null
+  popd >/dev/null
+
+  puts-step "Installing Pip ($PIP_VERSION)"
+  filtered_url=$($BUILDPACK_PATH/compile-extensions/bin/download_dependency_by_name pip $PIP_VERSION /tmp/pip.tgz)
+  echo "Downloaded [$filtered_url]"
+  tar zxf /tmp/pip.tgz -C $TMPTARDIR
+
+  pushd $TMPTARDIR/pip-$PIP_VERSION/ >/dev/null
+    python setup.py install --prefix=$DEPS_DIR/$DEPS_IDX/python &> /dev/null
+  popd >/dev/null
+
+  pushd $DEPS_DIR/$DEPS_IDX/bin >/dev/null
+    ln -sf ../python/bin/* .
+  popd >/dev/null
+
+  pushd $DEPS_DIR/$DEPS_IDX/lib >/dev/null
+    ln -sf ../python/lib/* .
+  popd >/dev/null
 fi
+
+pushd $DEPS_DIR/$DEPS_IDX/include >/dev/null
+  ln -sf ../python/include/* .
+popd >/dev/null
+pushd $DEPS_DIR/$DEPS_IDX/pkgconfig >/dev/null
+  ln -sf ../python/lib/pkgconfig/* .
+popd >/dev/null
 
 hash -r

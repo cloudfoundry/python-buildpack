@@ -7,5 +7,4 @@ itsdangerous==0.24
 pylibmc==1.4.2
 cffi==0.9.2
 requests
-distribute==0.6.49
 -e hg+https://bitbucket.org/marcinkuzminski/vcs#egg=vcs
