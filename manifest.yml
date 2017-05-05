@@ -7,9 +7,6 @@ url_to_dependency_map:
 - match: python-(\d+\.\d+\.\d+).tar
   name: python
   version: "$1"
-- match: python-(\d+\.\d+\.\d+)-ucs2.tar
-  name: python-ucs2
-  version: "$1"
 - match: libmemcache
   name: libmemcache
   version: 1.0.18
@@ -50,18 +47,6 @@ dependencies:
   - cflinuxfs2
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64-5f5bf32c.tgz
   md5: 5f5bf32ccfc9bf6d59ccee1cccd60f54
-- name: python-ucs2
-  version: 2.7.12
-  cf_stacks:
-  - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.12-linux-x64-38fa0667.tgz
-  md5: 38fa0667f9662c34c73be36df2b5b21d
-- name: python-ucs2
-  version: 2.7.13
-  cf_stacks:
-  - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.13-linux-x64-f10ace51.tgz
-  md5: f10ace51cc91429beacf201ab0d06049
 - name: python
   version: 2.7.12
   cf_stacks:

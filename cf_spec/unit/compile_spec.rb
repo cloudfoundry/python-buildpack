@@ -45,29 +45,5 @@ describe 'Compile' do
         expect(output.chomp).to eq('python-2.7.14')
       end
     end
-
-    context 'runtime.txt contains "python" prefix and ucs2 suffix' do
-      it 'fully specified line passes through' do
-        output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.12-ucs2")
-        expect(output.chomp).to eq('python-2.7.12-ucs2')
-      end
-
-      it 'finds latest of a line' do
-        output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.x-ucs2")
-        expect(output.chomp).to eq('python-2.7.14-ucs2')
-      end
-    end
-
-    context 'runtime.txt contains the version and usc2 suffix' do
-      it 'fully specified line passes through' do
-        output = run("./bin/steps/libs/version.rb #{manifest} 2.7.12-ucs2")
-        expect(output.chomp).to eq('python-2.7.12-ucs2')
-      end
-
-      it 'finds latest of a line' do
-        output = run("./bin/steps/libs/version.rb #{manifest} 2.7.x-ucs2")
-        expect(output.chomp).to eq('python-2.7.14-ucs2')
-      end
-    end
   end
 end
