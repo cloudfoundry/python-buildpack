@@ -16,22 +16,27 @@ dependency_deprecation_dates:
   version_line: "2.7"
   name: python
   date: 2020-01-01
+  link: https://docs.python.org/devguide/index.html#branchstatus
 - match: 3.3.\d+
   version_line: "3.3"
   name: python
   date: 2017-09-29
+  link: https://docs.python.org/devguide/index.html#branchstatus
 - match: 3.4.\d+
   version_line: "3.4"
   name: python
   date: 2019-03-16
+  link: https://docs.python.org/devguide/index.html#branchstatus
 - match: 3.5.\d+
   version_line: "3.5"
   name: python
   date: 2020-09-13
+  link: https://docs.python.org/devguide/index.html#branchstatus
 - match: 3.6.\d+
   version_line: "3.6"
   name: python
   date: 2021-12-23
+  link: https://docs.python.org/devguide/index.html#branchstatus
 dependencies:
 - name: pip
   version: 9.0.1
