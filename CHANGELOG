@@ -1,3 +1,18 @@
+v1.5.19 Jun 05, 2017
+=====================
+
+* Add pipenv support
+  (https://www.pivotaltracker.com/story/show/141616409)
+
+* Add miniconda 4.3.14, remove miniconda 4.3.11
+  (https://www.pivotaltracker.com/story/show/145532683)
+
+* Add multi-buildpack support
+  (https://www.pivotaltracker.com/story/show/142852045)
+
+* Remove ucs2 python 2.7.x versions
+  (https://www.pivotaltracker.com/story/show/137791203)
+
 v1.5.18 Apr 11, 2017
 =====================
 
