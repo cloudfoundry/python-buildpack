@@ -1,0 +1,3 @@
+echo 'Echo from app post compile'
+sleep 1
+echo

@@ -68,6 +68,16 @@ describe 'CF Python Buildpack' do
     expect(app).to_not have_logged 'DEPRECATION: --allow-all-external has been deprecated and will be removed in the future'
   end
 
+  context "app has pre and post scripts" do
+    let(:app_name) { 'with_hooks' }
+
+    specify do
+      expect(app).to be_running(60)
+      expect(app).to have_logged(/Echo from app pre compile/)
+      expect(app).to have_logged(/Echo from app post compile/)
+    end
+  end
+
   context 'with cached buildpack dependencies', :cached do
     context 'app has dependencies' do
       context 'with Python 2' do
