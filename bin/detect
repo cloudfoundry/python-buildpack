@@ -1,20 +1,12 @@
 #!/usr/bin/env bash
-
-# This script serves as the
-# [**Python Buildpack**](https://github.com/cloudfoundry/python-buildpack)
-# detector.
-#
-# ## Usage
-# Compiling an app into a slug is simple:
-#
-#     $ bin/detect <build-dir> <cache-dir>
+# bin/detect <build-dir>
 
 BUILD_DIR=$1
-BP=$(dirname $(dirname $0))
+BP=$(dirname "$(dirname $0)")
 
-# Exit early if app is clearly not Python.
-if [ ! -f $BUILD_DIR/requirements.txt ] && [ ! -f $BUILD_DIR/setup.py ] && [ ! -f $BUILD_DIR/environment.yml ] && [ ! -f $BUILD_DIR/Pipfile ]; then
-  exit 1
+if [ -f $BUILD_DIR/requirements.txt ] || [ -f $BUILD_DIR/setup.py ] || [ -f $BUILD_DIR/environment.yml ] || [ -f $BUILD_DIR/Pipfile ]; then
+  echo "python "$(cat "$BP/VERSION")""
+  exit 0
 fi
 
-echo "python `cat $BP/VERSION`"
+exit 1

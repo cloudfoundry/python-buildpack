@@ -138,6 +138,7 @@ dependencies:
   - cflinuxfs2
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.1-linux-x64-d8e1dbc6.tgz
   md5: d8e1dbc67436d294890536c99dcda0f0
+pre_package: scripts/build.sh
 exclude_files:
 - ".git/"
 - ".gitignore"
@@ -148,3 +149,9 @@ exclude_files:
 - bin/package
 - buildpack-packager/
 - python_buildpack-*v*.zip
+- ".envrc"
+- cf.Gemfile
+- cf.Gemfile.lock
+- pkg/
+- src/
+- scripts/

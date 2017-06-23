@@ -1,20 +1,10 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
 
-BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
-BUILD_DIR=$1
+echo 'default_process_types:'
 
-MANAGE_FILE=$(cd $BUILD_DIR && find . -maxdepth 3 -type f -name 'manage.py' | head -1)
-MANAGE_FILE=${MANAGE_FILE:2}
-
-cat <<EOF
----
-config_vars:
-
-EOF
-
-
-if [[ $MANAGE_FILE ]]; then
-cat <<EOF
-EOF
+if [[ "${OPTIMIZE_MEMORY:-}" = "true" ]]; then
+  echo '  web: npm start --optimize_for_size --always_compact --max_old_space_size=$(( $MEMORY_AVAILABLE * 75 / 100 ))'
+else
+  echo '  web: npm start'
 fi
