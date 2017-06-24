@@ -1,6 +1,11 @@
 package supply
 
 import (
+	"errors"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack"
@@ -92,7 +97,7 @@ func Run(s *Supplier) error {
 }
 
 func (s *Supplier) WarnNoStart() error {
-	procfileExists, err := libbuildpack.FileExists(filepath.Join(f.Stager.BuildDir(), "Procfile"))
+	procfileExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "Procfile"))
 	if err != nil {
 		return err
 	}
@@ -100,7 +105,7 @@ func (s *Supplier) WarnNoStart() error {
 	if !procfileExists {
 		warning := "Your application is missing a Procfile. This file tells Cloud Foundry how to run your application.\n"
 		warning += "Learn more: https://docs.cloudfoundry.org/buildpacks/prod-server.html#procfile"
-		f.Log.Warning(warning)
+		s.Log.Warning(warning)
 	}
 
 	return nil
@@ -108,16 +113,16 @@ func (s *Supplier) WarnNoStart() error {
 
 // Move cache dirs to build dir (will copy back after build)
 func (s *Supplier) RestoreCache() error {
-	if err := os.Rename(filepath.Join(s.Stager.CacheDir(), "python), filepath.Join(s.Stager.DepDir(), "python)); err != nil {
+	if err := os.Rename(filepath.Join(s.Stager.CacheDir(), "python"), filepath.Join(s.Stager.DepDir(), "python")); err != nil {
 		return err
 	}
 
-	srcDirExists, err := libbuildpack.FileExists(filepath.Join(f.Stager.CacheDir(), "src"))
+	srcDirExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.CacheDir(), "src"))
 	if err != nil {
 		return err
 	}
 	if srcDirExists {
-		if err := os.Rename(filepath.Join(s.Stager.CacheDir(), "src), filepath.Join(s.Stager.DepDir(), "src)); err != nil {
+		if err := os.Rename(filepath.Join(s.Stager.CacheDir(), "src"), filepath.Join(s.Stager.DepDir(), "src")); err != nil {
 			return err
 		}
 	}
@@ -130,6 +135,9 @@ func (s *Supplier) InstallPython() error {
 	dep := libbuildpack.Dependency{Name: "python"}
 
 	installDir := filepath.Join(s.Stager.DepDir(), "python")
+
+	// TODO set from runtime.txt if exists
+	desiredVersion := ""
 
 	if desiredVersion != "" {
 		versions := s.Manifest.AllDependencyVersions(dep.Name)
@@ -171,7 +179,7 @@ func (s *Supplier) InstallPip() error {
 		return err
 	}
 
-	if err := s.Stager.InstallOnlyVersion("setuptools", dir); err != nil {
+	if err := s.Manifest.InstallOnlyVersion("setuptools", dir); err != nil {
 		return err
 	}
 
@@ -180,7 +188,7 @@ func (s *Supplier) InstallPip() error {
 		return errors.New("Could not find expected extracted directory")
 	}
 
-	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--install=" + filepath.Join(s.Stager.DepDir(), "python")); err != nil {
+	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--install="+filepath.Join(s.Stager.DepDir(), "python")); err != nil {
 		return err
 	}
 
@@ -188,23 +196,25 @@ func (s *Supplier) InstallPip() error {
 
 	s.Log.BeginStep("Installing Pip")
 
-	dir, err := ioutil.TempDir("", "pip")
+	dir, err = ioutil.TempDir("", "pip")
 	if err != nil {
 		return err
 	}
 
-	if err := s.Stager.InstallOnlyVersion("pip", dir); err != nil {
+	if err := s.Manifest.InstallOnlyVersion("pip", dir); err != nil {
 		return err
 	}
 
-	matches, err := filepath.Glob(filepath.Join(dir, "pip-*"))
+	matches, err = filepath.Glob(filepath.Join(dir, "pip-*"))
 	if err != nil || len(matches) != 1 {
 		return errors.New("Could not find expected extracted directory")
 	}
 
-	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--install=" + filepath.Join(s.Stager.DepDir(), "python")); err != nil {
+	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--install="+filepath.Join(s.Stager.DepDir(), "python")); err != nil {
 		return err
 	}
+
+	installDir := filepath.Join(s.Stager.DepDir(), "python")
 
 	for _, dir := range []string{"bin", "lib", "include", "pkgconfig"} {
 		if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(installDir, dir), dir); err != nil {
@@ -214,7 +224,6 @@ func (s *Supplier) InstallPip() error {
 
 	return nil
 }
-
 
 // func (s *Supplier) CreateDefaultEnv() error {
 // 	var environmentDefaults = map[string]string{
