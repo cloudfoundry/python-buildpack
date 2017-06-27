@@ -96,8 +96,15 @@ func (s *Stager) LinkDirectoryInDepDir(destDir, depSubDir string) error {
 			return err
 		}
 
-		if err := os.Symlink(relPath, filepath.Join(srcDir, file.Name())); err != nil {
+		exists, err := FileExists(filepath.Join(srcDir, file.Name()))
+		if err != nil {
 			return err
+		}
+
+		if !exists {
+			if err := os.Symlink(relPath, filepath.Join(srcDir, file.Name())); err != nil {
+				return err
+			}
 		}
 	}
 

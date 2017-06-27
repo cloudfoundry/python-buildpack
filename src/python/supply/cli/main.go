@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	_ "python/hooks"
 	"python/supply"
 	"time"
@@ -33,6 +34,13 @@ func main() {
 	if err != nil {
 		logger.Error("Before Compile: %s", err.Error())
 		os.Exit(12)
+	}
+
+	for _, dir := range []string{"bin", "lib", "include", "pkgconfig"} {
+		if err := os.Mkdir(filepath.Join(stager.DepDir(), dir), 0755); err != nil {
+			logger.Error("Dir creation: %s", err.Error())
+			os.Exit(12)
+		}
 	}
 
 	err = stager.SetStagingEnvironment()

@@ -26,10 +26,10 @@ type Stager interface {
 	BuildDir() string
 	CacheDir() string
 	DepDir() string
-	// DepsIdx() string
+	DepsIdx() string
 	LinkDirectoryInDepDir(string, string) error
-	// WriteEnvFile(string, string) error
-	// WriteProfileD(string, string) error
+	WriteEnvFile(string, string) error
+	WriteProfileD(string, string) error
 }
 
 type Supplier struct {
@@ -40,6 +40,10 @@ type Supplier struct {
 }
 
 func Run(s *Supplier) error {
+	if os.Getenv("LANG") == "" {
+		os.Setenv("LANG", "en_US.UTF-8")
+	}
+
 	// TODO: Conda
 
 	if err := s.WarnNoStart(); err != nil {
@@ -65,33 +69,24 @@ func Run(s *Supplier) error {
 		return err
 	}
 
-	// s.Log.BeginStep("Installing binaries")
-	// if err := s.LoadPackageJSON(); err != nil {
-	// 	s.Log.Error("Unable to load package.json: %s", err.Error())
-	// 	return err
-	// }
+	for _, name := range []string{"pip-pop", "pipenv"} {
+		if err := s.InstallViaPip(name); err != nil {
+			s.Log.Error("Unable to install %s: %s", name, err.Error())
+			return err
+		}
+	}
 
-	// s.WarnNodeEngine()
+	// TODO "Generating 'requirements.txt' with pipenv"
+	// https://github.com/cloudfoundry/python-buildpack/blob/1588bd4099b9b2f75448c62bcea80e38dd5795a8/bin/steps/pipenv#L16-L30
 
-	// if err := s.InstallNode("/tmp/node"); err != nil {
-	// 	s.Log.Error("Unable to install node: %s", err.Error())
-	// 	return err
-	// }
+	// TODO bin/steps/cryptography
 
-	// if err := s.InstallNPM(); err != nil {
-	// 	s.Log.Error("Unable to install npm: %s", err.Error())
-	// 	return err
-	// }
+	// TODO bin/steps/pylibmc
 
-	// if err := s.InstallYarn(); err != nil {
-	// 	s.Log.Error("Unable to install yarn: %s", err.Error())
-	// 	return err
-	// }
-
-	// if err := s.CreateDefaultEnv(); err != nil {
-	// 	s.Log.Error("Unable to setup default environment: %s", err.Error())
-	// 	return err
-	// }
+	if err := s.CreateDefaultEnv(); err != nil {
+		s.Log.Error("Unable to setup default environment: %s", err.Error())
+		return err
+	}
 
 	return nil
 }
@@ -113,17 +108,15 @@ func (s *Supplier) WarnNoStart() error {
 
 // Move cache dirs to build dir (will copy back after build)
 func (s *Supplier) RestoreCache() error {
-	if err := os.Rename(filepath.Join(s.Stager.CacheDir(), "python"), filepath.Join(s.Stager.DepDir(), "python")); err != nil {
-		return err
-	}
-
-	srcDirExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.CacheDir(), "src"))
-	if err != nil {
-		return err
-	}
-	if srcDirExists {
-		if err := os.Rename(filepath.Join(s.Stager.CacheDir(), "src"), filepath.Join(s.Stager.DepDir(), "src")); err != nil {
+	for _, name := range []string{"python", "src"} {
+		srcDirExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.CacheDir(), name))
+		if err != nil {
 			return err
+		}
+		if srcDirExists {
+			if err := os.Rename(filepath.Join(s.Stager.CacheDir(), name), filepath.Join(s.Stager.DepDir(), name)); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -156,23 +149,22 @@ func (s *Supplier) InstallPython() error {
 		return err
 	}
 
-	for _, dir := range []string{"bin", "lib", "include", "pkgconfig"} {
-		if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(installDir, dir), dir); err != nil {
-			return err
-		}
+	if err := s.symlinkAll(); err != nil {
+		return err
 	}
 
 	// TODO Record for future reference.
 	// echo $PYTHON_VERSION > "$CACHE_DIR/python-version"
 	// echo $CF_STACK > "$CACHE_DIR/python-stack"
 
+	if err := os.Setenv("PYTHONPATH", s.Stager.DepDir()); err != nil {
+		return err
+	}
 	return os.Setenv("PATH", fmt.Sprintf("%s:%s", os.Getenv("PATH"), filepath.Join(s.Stager.DepDir(), "bin")))
 }
 
 func (s *Supplier) InstallPip() error {
 	// TODO Only do if required -- https://github.com/cloudfoundry/python-buildpack/blob/master/bin/steps/python
-
-	s.Log.BeginStep("Installing Setuptools")
 
 	dir, err := ioutil.TempDir("", "setuptools")
 	if err != nil {
@@ -188,13 +180,11 @@ func (s *Supplier) InstallPip() error {
 		return errors.New("Could not find expected extracted directory")
 	}
 
-	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--install="+filepath.Join(s.Stager.DepDir(), "python")); err != nil {
+	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--prefix="+filepath.Join(s.Stager.DepDir(), "python")); err != nil {
 		return err
 	}
 
 	// TODO refactor this since above and below are the same
-
-	s.Log.BeginStep("Installing Pip")
 
 	dir, err = ioutil.TempDir("", "pip")
 	if err != nil {
@@ -210,50 +200,78 @@ func (s *Supplier) InstallPip() error {
 		return errors.New("Could not find expected extracted directory")
 	}
 
-	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--install="+filepath.Join(s.Stager.DepDir(), "python")); err != nil {
+	if err := s.Command.Execute(matches[0], ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", "--prefix="+filepath.Join(s.Stager.DepDir(), "python")); err != nil {
 		return err
 	}
 
+	return s.symlinkAll()
+}
+
+func (s *Supplier) symlinkAll() error {
 	installDir := filepath.Join(s.Stager.DepDir(), "python")
 
 	for _, dir := range []string{"bin", "lib", "include", "pkgconfig"} {
-		if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(installDir, dir), dir); err != nil {
+		exists, err := libbuildpack.FileExists(filepath.Join(installDir, dir))
+		if err != nil {
 			return err
 		}
+		if exists {
+			if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(installDir, dir), dir); err != nil {
+				return err
+			}
+		}
 	}
-
 	return nil
 }
 
-// func (s *Supplier) CreateDefaultEnv() error {
-// 	var environmentDefaults = map[string]string{
-// 		"NODE_ENV":              "production",
-// 		"NPM_CONFIG_PRODUCTION": "true",
-// 		"NPM_CONFIG_LOGLEVEL":   "error",
-// 		"NODE_MODULES_CACHE":    "true",
-// 		"NODE_VERBOSE":          "false",
-// 	}
+func (s *Supplier) InstallViaPip(name string) error {
+	dir, err := ioutil.TempDir("", name)
+	if err != nil {
+		return err
+	}
 
-// 	s.Log.BeginStep("Creating runtime environment")
+	if err := s.Manifest.InstallOnlyVersion(name, dir); err != nil {
+		return err
+	}
 
-// 	for envVar, envDefault := range environmentDefaults {
-// 		if os.Getenv(envVar) == "" {
-// 			if err := s.Stager.WriteEnvFile(envVar, envDefault); err != nil {
-// 				return err
-// 			}
-// 		}
-// 	}
+	if err := s.Command.Execute("", ioutil.Discard, ioutil.Discard, "pip", "install", name, "--exists-action=w", "--no-index", "--find-links="+dir); err != nil {
+		return err
+	}
 
-// 	if err := s.Stager.WriteEnvFile("NODE_HOME", filepath.Join(s.Stager.DepDir(), "node")); err != nil {
-// 		return err
-// 	}
+	return s.symlinkAll()
+}
 
-// 	scriptContents := `export NODE_HOME=%s
-// export NODE_ENV=${NODE_ENV:-production}
-// export MEMORY_AVAILABLE=$(echo $VCAP_APPLICATION | jq '.limits.mem')
-// export WEB_MEMORY=512
-// export WEB_CONCURRENCY=1
-// `
+func (s *Supplier) CreateDefaultEnv() error {
+	if err := s.Stager.WriteProfileD("python.gunicorn.sh", "'*'"); err != nil {
+		return err
+	}
 
-// 	return s.Stager.WriteProfileD("node.sh", fmt.Sprintf(scriptContents, filepath.Join("$DEPS_DIR", s.Stager.DepsIdx(), "node")))
-// }
+	var environmentDefaults = map[string]string{
+		"PYTHONHASHSEED":   "random",
+		"PYTHONPATH":       "$DEPS_DIR/$DEPS_IDX",
+		"LANG":             os.Getenv("LANG"),
+		"PYTHONHOME":       "$DEPS_DIR/$DEPS_IDX/python",
+		"PYTHONUNBUFFERED": "1",
+	}
+	for envVar, envDefault := range environmentDefaults {
+		if os.Getenv(envVar) == "" {
+			if err := s.Stager.WriteEnvFile(envVar, envDefault); err != nil {
+				return err
+			}
+		}
+	}
+
+	if err := s.Stager.WriteProfileD("python.gunicorn.sh", "export FORWARDED_ALLOW_IPS='*'\n"); err != nil {
+		return err
+	}
+
+	scriptContents := `
+export PYTHONHASHSEED=${PYTHONHASHSEED:-random}
+export PYTHONPATH=${PYTHONPATH:-$DEPS_DIR/%s}
+export LANG=${LANG:-en_US.UTF-8}
+export PYTHONHOME=${PYTHONHOME:-$DEPS_DIR/%s/python}
+export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+`
+
+	return s.Stager.WriteProfileD("python.supply.sh", fmt.Sprintf(scriptContents, s.Stager.DepsIdx(), s.Stager.DepsIdx()))
+}

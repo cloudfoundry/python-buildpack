@@ -1,30 +1,16 @@
 package main
 
 import (
-	"io"
-	"io/ioutil"
-	"nodejs/cache"
-	"nodejs/finalize"
-	_ "nodejs/hooks"
-	"nodejs/npm"
-	"nodejs/yarn"
 	"os"
+	"python/finalize"
+	_ "python/hooks"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
 )
 
 func main() {
-	logfile, err := ioutil.TempFile("", "cloudfoundry.nodejs-buildpack.finalize")
-	defer logfile.Close()
-	if err != nil {
-		logger := libbuildpack.NewLogger(os.Stdout)
-		logger.Error("Unable to create log file: %s", err.Error())
-		os.Exit(8)
-	}
-
-	stdout := io.MultiWriter(os.Stdout, logfile)
-	logger := libbuildpack.NewLogger(stdout)
+	logger := libbuildpack.NewLogger(os.Stdout)
 
 	buildpackDir, err := libbuildpack.GetBuildpackDir()
 	if err != nil {
@@ -45,25 +31,10 @@ func main() {
 	}
 
 	f := finalize.Finalizer{
-		Stager: stager,
-		Yarn: &yarn.Yarn{
-			BuildDir: stager.BuildDir(),
-			Command:  &libbuildpack.Command{},
-			Log:      logger,
-		},
-		NPM: &npm.NPM{
-			BuildDir: stager.BuildDir(),
-			Command:  &libbuildpack.Command{},
-			Log:      logger,
-		},
+		Stager:   stager,
 		Manifest: manifest,
+		Command:  &libbuildpack.Command{},
 		Log:      logger,
-		Logfile:  logfile,
-		Cache: &cache.Cache{
-			Stager:  stager,
-			Command: &libbuildpack.Command{},
-			Log:     logger,
-		},
 	}
 
 	if err := finalize.Run(&f); err != nil {
