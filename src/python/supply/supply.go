@@ -248,9 +248,9 @@ func (s *Supplier) CreateDefaultEnv() error {
 
 	var environmentDefaults = map[string]string{
 		"PYTHONHASHSEED":   "random",
-		"PYTHONPATH":       "$DEPS_DIR/$DEPS_IDX",
+		"PYTHONPATH":       s.Stager.DepDir(),
 		"LANG":             os.Getenv("LANG"),
-		"PYTHONHOME":       "$DEPS_DIR/$DEPS_IDX/python",
+		"PYTHONHOME":       filepath.Join(s.Stager.DepDir(), "python"),
 		"PYTHONUNBUFFERED": "1",
 	}
 	for envVar, envDefault := range environmentDefaults {

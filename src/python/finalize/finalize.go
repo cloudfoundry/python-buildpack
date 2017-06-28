@@ -82,7 +82,7 @@ func (f *Finalizer) PipInstall() error {
 	}
 	// TODO OUTPUT for all below should '| cleanup | indent'
 	if exists {
-		if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, ioutil.Discard, "pip", "install", "-r", "requirements.txt", "--exists-action=w", "--src="+filepath.Join(f.Stager.DepDir(), "src"), "--no-index", "--find-links=file:/"+f.Stager.BuildDir()+"/vendor"); err != nil {
+		if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stdout, "pip", "install", "-r", "requirements.txt", "--exists-action=w", "--src="+filepath.Join(f.Stager.DepDir(), "src"), "--no-index", "--find-links=file:/"+f.Stager.BuildDir()+"/vendor"); err != nil {
 			return err
 		}
 		if err := libbuildpack.CopyFile(filepath.Join(f.Stager.BuildDir(), "requirements.txt"), filepath.Join(f.Stager.DepDir(), "python", "requirements-declared.txt")); err != nil {
@@ -97,7 +97,7 @@ func (f *Finalizer) PipInstall() error {
 		}
 		f2.Close()
 	} else {
-		if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, ioutil.Discard, "pip", "install", "-r", "requirements.txt", "--exists-action=w", "--src="+filepath.Join(f.Stager.DepDir(), "src")); err != nil {
+		if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stdout, "pip", "install", "-r", "requirements.txt", "--exists-action=w", "--src="+filepath.Join(f.Stager.DepDir(), "src")); err != nil {
 			return err
 		}
 		if err := libbuildpack.CopyFile(filepath.Join(f.Stager.BuildDir(), "requirements.txt"), filepath.Join(f.Stager.DepDir(), "python", "requirements-declared.txt")); err != nil {
