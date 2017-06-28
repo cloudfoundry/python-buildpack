@@ -1,3 +1,9 @@
+v1.5.20 Jun 28, 2017
+=====================
+
+* Fix app based pre and post compile hooks
+  (https://www.pivotaltracker.com/story/show/147611093)
+
 v1.5.19 Jun 05, 2017
 =====================
 
