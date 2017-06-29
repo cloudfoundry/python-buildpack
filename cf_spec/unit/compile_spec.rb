@@ -4,7 +4,7 @@ require 'tmpdir'
 
 describe 'Compile' do
   def run(cmd, env: {})
-    if RUBY_PLATFORM =~ /darwin/i
+    if RUBY_PLATFORM =~ /darwin/i || RUBY_PLATFORM =~ /x86_64-linux/i
       env_flags = env.map{|k,v| "-e #{k}=#{v}"}.join(' ')
       `docker run --rm #{env_flags} -v #{Dir.pwd}:/buildpack -w /buildpack cloudfoundry/cflinuxfs2 #{cmd}`
     else
@@ -25,12 +25,27 @@ describe 'Compile' do
     context 'runtime.txt contains "python" prefix' do
 
       it 'fully specified line passes through' do
-        output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.12")
+        output = run("./bin/steps/libs/version.rb #{manifest} \"python-2.7.12\"")
         expect(output).to eq('python-2.7.12')
       end
 
       it 'finds latest of a line' do
         output = run("./bin/steps/libs/version.rb #{manifest} python-2.7.x")
+        expect(output).to eq('python-2.7.14')
+      end
+    end
+
+    context 'runtime.txt contains any number of whitespace charcter' do
+
+      it 'version does not contain whitespace charcters' do
+        python_version_string = "\r\r\n\npython-2.7.12\r\r\n\n"
+        output = run("./bin/steps/libs/version.rb #{manifest} \"#{python_version_string}\"")
+        expect(output).to eq('python-2.7.12')
+      end
+
+      it 'finds latest of a line' do
+        python_version_string = "\r\r\n\npython-2.7.x\r\r\n\n"
+        output = run("./bin/steps/libs/version.rb #{manifest} \"#{python_version_string}\"")
         expect(output).to eq('python-2.7.14')
       end
     end

@@ -5,7 +5,7 @@ require 'pathname'
 
 manifest = ARGV[0]
 
-version = ARGV[1].to_s.strip.gsub('python-', '')
+version = ARGV[1].to_s.strip.gsub('python-', '').gsub(/\\n/,'').gsub(/\\r/,'')
 
 if version == ''
   default_version = YAML.load_file(manifest)['default_versions']
