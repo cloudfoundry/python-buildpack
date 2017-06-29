@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack"
@@ -79,9 +80,15 @@ func Run(s *Supplier) error {
 	// TODO "Generating 'requirements.txt' with pipenv"
 	// https://github.com/cloudfoundry/python-buildpack/blob/1588bd4099b9b2f75448c62bcea80e38dd5795a8/bin/steps/pipenv#L16-L30
 
-	// TODO bin/steps/cryptography
+	if err := s.InstallCryptography(); err != nil {
+		s.Log.Error("Unable to install pip: %s", err.Error())
+		return err
+	}
 
-	// TODO bin/steps/pylibmc
+	if err := s.InstallPylibmc(); err != nil {
+		s.Log.Error("Unable to install pip: %s", err.Error())
+		return err
+	}
 
 	if err := s.CreateDefaultEnv(); err != nil {
 		s.Log.Error("Unable to setup default environment: %s", err.Error())
@@ -239,6 +246,76 @@ func (s *Supplier) InstallViaPip(name string) error {
 	}
 
 	return s.symlinkAll()
+}
+
+func (s *Supplier) pipGrepHas(name string) (bool, error) {
+	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", name); err != nil {
+		if _, ok := err.(*exec.ExitError); ok {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (s *Supplier) InstallPylibmc() error {
+	hasPylibmc, err := s.pipGrepHas("pylibmc")
+	if err != nil {
+		return err
+	}
+
+	if hasPylibmc {
+		s.Log.Info("Noticed pylibmc. Bootstrapping libmemcached.")
+		installDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
+
+		if err := s.Manifest.InstallOnlyVersion("libmemcache", installDir); err != nil {
+			return err
+		}
+
+		if err := os.Setenv("LIBMEMCACHED", installDir); err != nil {
+			return err
+		}
+
+		if err := s.Stager.WriteEnvFile("LIBMEMCACHED", installDir); err != nil {
+			return err
+		}
+
+		return s.symlinkAll()
+	}
+
+	return nil
+}
+
+func (s *Supplier) InstallCryptography() error {
+	// TODO needs to check any of
+	// argon2-cffi bcrypt cffi cryptography django[argon2] Django[argon2] django[bcrypt] Django[bcrypt] PyNaCl pyOpenSSL PyOpenSSL requests[security] misaka
+
+	needsCrypto, err := s.pipGrepHas("bcrypt")
+	if err != nil {
+		return err
+	}
+
+	if needsCrypto {
+		s.Log.Info("Noticed pylibmc. Bootstrapping libmemcached.")
+		installDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
+
+		if err := s.Manifest.InstallOnlyVersion("libmemcache", installDir); err != nil {
+			return err
+		}
+
+		if err := os.Setenv("LIBMEMCACHED", installDir); err != nil {
+			return err
+		}
+
+		if err := s.Stager.WriteEnvFile("LIBMEMCACHED", installDir); err != nil {
+			return err
+		}
+
+		return s.symlinkAll()
+	}
+
+	return nil
 }
 
 func (s *Supplier) CreateDefaultEnv() error {
