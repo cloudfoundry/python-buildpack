@@ -156,7 +156,7 @@ func (s *Supplier) InstallPython() error {
 		return err
 	}
 
-	if err := s.symlinkAll(); err != nil {
+	if err := s.symlinkAll("python"); err != nil {
 		return err
 	}
 
@@ -211,11 +211,11 @@ func (s *Supplier) InstallPip() error {
 		return err
 	}
 
-	return s.symlinkAll()
+	return s.symlinkAll("python")
 }
 
-func (s *Supplier) symlinkAll() error {
-	installDir := filepath.Join(s.Stager.DepDir(), "python")
+func (s *Supplier) symlinkAll(name string) error {
+	installDir := filepath.Join(s.Stager.DepDir(), name)
 
 	for _, dir := range []string{"bin", "lib", "include", "pkgconfig"} {
 		exists, err := libbuildpack.FileExists(filepath.Join(installDir, dir))
@@ -245,7 +245,7 @@ func (s *Supplier) InstallViaPip(name string) error {
 		return err
 	}
 
-	return s.symlinkAll()
+	return s.symlinkAll("python")
 }
 
 func (s *Supplier) pipGrepHas(name string) (bool, error) {
@@ -281,7 +281,7 @@ func (s *Supplier) InstallPylibmc() error {
 			return err
 		}
 
-		return s.symlinkAll()
+		return s.symlinkAll("libmemcache")
 	}
 
 	return nil
@@ -291,28 +291,28 @@ func (s *Supplier) InstallCryptography() error {
 	// TODO needs to check any of
 	// argon2-cffi bcrypt cffi cryptography django[argon2] Django[argon2] django[bcrypt] Django[bcrypt] PyNaCl pyOpenSSL PyOpenSSL requests[security] misaka
 
-	needsCrypto, err := s.pipGrepHas("bcrypt")
+	needsCrypto, err := s.pipGrepHas("cffi")
 	if err != nil {
 		return err
 	}
 
 	if needsCrypto {
-		s.Log.Info("Noticed pylibmc. Bootstrapping libmemcached.")
-		installDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
+		s.Log.Info("Noticed pylibmc. Bootstrapping libffi.")
+		installDir := filepath.Join(s.Stager.DepDir(), "libffi")
 
-		if err := s.Manifest.InstallOnlyVersion("libmemcache", installDir); err != nil {
+		if err := s.Manifest.InstallOnlyVersion("libffi", installDir); err != nil {
 			return err
 		}
 
-		if err := os.Setenv("LIBMEMCACHED", installDir); err != nil {
+		if err := os.Setenv("LIBFFI", installDir); err != nil {
 			return err
 		}
 
-		if err := s.Stager.WriteEnvFile("LIBMEMCACHED", installDir); err != nil {
+		if err := s.Stager.WriteEnvFile("LIBFFI", installDir); err != nil {
 			return err
 		}
 
-		return s.symlinkAll()
+		return s.symlinkAll("libffi")
 	}
 
 	return nil
