@@ -197,6 +197,7 @@ func (s *Stager) DepsIdx() string {
 var stagingEnvVarDirs = map[string]string{
 	"PATH":            "bin",
 	"LD_LIBRARY_PATH": "lib",
+	"LIBRARY_PATH":    "lib",
 	"INCLUDE_PATH":    "include",
 	"CPATH":           "include",
 	"CPPPATH":         "include",

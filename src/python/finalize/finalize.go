@@ -33,6 +33,23 @@ type Finalizer struct {
 func Run(f *Finalizer) error {
 	// TODO: Conda
 
+	// TODO: The following line should be irrelevant
+	if err := os.Setenv("LDFLAGS", "-L"+filepath.Join(f.Stager.DepDir(), "lib")+" -I"+filepath.Join(f.Stager.DepDir(), "include")); err != nil {
+		f.Log.Error("Unable to set LDFLAGS: %s", err.Error())
+		return err
+	}
+	if err := os.Setenv("CFLAGS", "-I"+filepath.Join(f.Stager.DepDir(), "include")); err != nil {
+		f.Log.Error("Unable to set LDFLAGS: %s", err.Error())
+		return err
+	}
+	if err := os.Setenv("CPPFLAGS", "-I"+filepath.Join(f.Stager.DepDir(), "include")); err != nil {
+		f.Log.Error("Unable to set LDFLAGS: %s", err.Error())
+		return err
+	}
+	if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stdout, "env"); err != nil {
+		return err
+	}
+
 	// source $BIN_DIR/steps/mercurial
 
 	// TODO: Uninstall removed dependencies with Pip.

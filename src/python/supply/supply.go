@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack"
@@ -156,7 +157,7 @@ func (s *Supplier) InstallPython() error {
 		return err
 	}
 
-	if err := s.symlinkAll("python"); err != nil {
+	if err := s.symlinkAll([]string{"python"}); err != nil {
 		return err
 	}
 
@@ -211,20 +212,22 @@ func (s *Supplier) InstallPip() error {
 		return err
 	}
 
-	return s.symlinkAll("python")
+	return s.symlinkAll([]string{"python"})
 }
 
-func (s *Supplier) symlinkAll(name string) error {
-	installDir := filepath.Join(s.Stager.DepDir(), name)
+func (s *Supplier) symlinkAll(names []string) error {
+	for _, name := range names {
+		installDir := filepath.Join(s.Stager.DepDir(), name)
 
-	for _, dir := range []string{"bin", "lib", "include", "pkgconfig"} {
-		exists, err := libbuildpack.FileExists(filepath.Join(installDir, dir))
-		if err != nil {
-			return err
-		}
-		if exists {
-			if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(installDir, dir), dir); err != nil {
+		for _, dir := range []string{"bin", "lib", "include", "pkgconfig", "lib/pkgconfig"} {
+			exists, err := libbuildpack.FileExists(filepath.Join(installDir, dir))
+			if err != nil {
 				return err
+			}
+			if exists {
+				if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(installDir, dir), path.Base(dir)); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -245,7 +248,7 @@ func (s *Supplier) InstallViaPip(name string) error {
 		return err
 	}
 
-	return s.symlinkAll("python")
+	return s.symlinkAll([]string{"python"})
 }
 
 func (s *Supplier) pipGrepHas(name string) (bool, error) {
@@ -281,7 +284,11 @@ func (s *Supplier) InstallPylibmc() error {
 			return err
 		}
 
-		return s.symlinkAll("libmemcache")
+		if err := s.symlinkAll([]string{"libmemcache"}); err != nil {
+			return err
+		}
+
+		return s.Stager.LinkDirectoryInDepDir(filepath.Join(installDir, "lib/sasl2"), "lib")
 	}
 
 	return nil
@@ -312,7 +319,7 @@ func (s *Supplier) InstallCryptography() error {
 			return err
 		}
 
-		return s.symlinkAll("libffi")
+		return s.symlinkAll([]string{"libffi", "libffi/lib/libffi-3.2.1"})
 	}
 
 	return nil
