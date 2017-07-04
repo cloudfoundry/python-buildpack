@@ -38,17 +38,6 @@ func Run(f *Finalizer) error {
 		f.Log.Error("Unable to set LDFLAGS: %s", err.Error())
 		return err
 	}
-	if err := os.Setenv("CFLAGS", "-I"+filepath.Join(f.Stager.DepDir(), "include")); err != nil {
-		f.Log.Error("Unable to set LDFLAGS: %s", err.Error())
-		return err
-	}
-	if err := os.Setenv("CPPFLAGS", "-I"+filepath.Join(f.Stager.DepDir(), "include")); err != nil {
-		f.Log.Error("Unable to set LDFLAGS: %s", err.Error())
-		return err
-	}
-	if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stdout, "env"); err != nil {
-		return err
-	}
 
 	// source $BIN_DIR/steps/mercurial
 
