@@ -51,6 +51,10 @@ func Run(f *Finalizer) error {
 
 	// TODO: Make sure all Pip installed dependencies use #!/usr/bin/env python
 	// $BIN_DIR/steps/rewrite-shebang
+	if err := f.RewriteShebang(); err != nil {
+		f.Log.Error("Unable to perform shebang rewrite: %s", err.Error())
+		return err
+	}
 
 	// TODO: Support for NLTK corpora.
 	// $BIN_DIR/steps/nltk
@@ -126,5 +130,9 @@ func (f *Finalizer) PipInstall() error {
 	// # Record for future reference.
 	// echo $DEPS_DIR/$DEPS_IDX > "$CACHE_DIR/egg-path-prefix"
 
+	return nil
+}
+
+func (f *Finalizer) RewriteShebang() error {
 	return nil
 }
