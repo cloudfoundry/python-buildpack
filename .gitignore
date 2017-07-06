@@ -5,3 +5,7 @@ log/
 **/.DS_Store
 /python_buildpack-*.zip
 .bundle/
+/.bin/
+/.envrc
+/pkg/
+/tags
