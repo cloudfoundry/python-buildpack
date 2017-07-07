@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"nodejs/supply"
 	"os"
 	"path/filepath"
+	"python/supply"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"
@@ -37,10 +37,10 @@ var _ = Describe("Supply", func() {
 	)
 
 	BeforeEach(func() {
-		depsDir, err = ioutil.TempDir("", "nodejs-buildpack.deps.")
+		depsDir, err = ioutil.TempDir("", "python-buildpack.deps.")
 		Expect(err).To(BeNil())
 
-		buildDir, err = ioutil.TempDir("", "nodejs-buildpack.build.")
+		buildDir, err = ioutil.TempDir("", "python-buildpack.build.")
 		Expect(err).To(BeNil())
 
 		depsIdx = "14"
@@ -279,7 +279,7 @@ var _ = Describe("Supply", func() {
 
 		BeforeEach(func() {
 			nodeInstallDir = filepath.Join(depsDir, depsIdx, "node")
-			nodeTmpDir, err = ioutil.TempDir("", "nodejs-buildpack.temp")
+			nodeTmpDir, err = ioutil.TempDir("", "python-buildpack.temp")
 			Expect(err).To(BeNil())
 		})
 

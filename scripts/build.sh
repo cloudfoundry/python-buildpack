@@ -7,5 +7,5 @@ BINDIR=$ROOTDIR/bin
 export GOPATH=$ROOTDIR
 export GOOS=linux
 
-go build -o $BINDIR/supply nodejs/supply/cli
-go build -o $BINDIR/finalize nodejs/finalize/cli
+go build -o $BINDIR/supply python/supply/cli
+go build -o $BINDIR/finalize python/finalize/cli
