@@ -2,6 +2,7 @@ package finalize_test
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -23,6 +24,7 @@ var _ = Describe("Finalize", func() {
 		buildDir     string
 		depsDir      string
 		depsIdx      string
+		binDir       string
 		finalizer    *finalize.Finalizer
 		logger       *libbuildpack.Logger
 		buffer       *bytes.Buffer
@@ -40,6 +42,8 @@ var _ = Describe("Finalize", func() {
 
 		depsIdx = "7"
 		Expect(os.MkdirAll(filepath.Join(depsDir, depsIdx), 0755)).To(Succeed())
+
+		binDir = filepath.Join(depsDir, depsIdx, "bin")
 
 		buffer = new(bytes.Buffer)
 
@@ -72,13 +76,22 @@ var _ = Describe("Finalize", func() {
 
 	Describe("RewriteShebang", func() {
 		BeforeEach(func() {
-			Expect(os.MkdirAll(filepath.Join(depsDir, depsIdx, "bin"), 0755)).To(BeNil())
-
+			Expect(os.MkdirAll(binDir, 0755)).To(Succeed())
 		})
 
-		It("converts files with python shebang", func() {
-			Expect(finalizer.RewriteShebang()).To(BeNil())
-			Expect(buffer.String()).To(Equal(""))
+		Context("single file with specific path shebang", func() {
+			BeforeEach(func() {
+				contents := fmt.Sprintf("#!%s/python\n\nPython code\n", binDir)
+				Expect(ioutil.WriteFile(filepath.Join(binDir, "afile"), []byte(contents), 0755)).To(Succeed())
+			})
+
+			It("converted to #!/usr/bin/env python", func() {
+				Expect(finalizer.RewriteShebang()).To(Succeed())
+				contents, err := ioutil.ReadFile(filepath.Join(binDir, "afile"))
+				Expect(err).To(BeNil())
+				Expect(string(contents)).To(Equal("#!/usr/bin/env python\n\nPython code\n"))
+			})
 		})
+
 	})
 })

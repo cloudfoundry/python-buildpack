@@ -1,9 +1,12 @@
 package finalize
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack"
@@ -134,5 +137,49 @@ func (f *Finalizer) PipInstall() error {
 }
 
 func (f *Finalizer) RewriteShebang() error {
+	files, err := ioutil.ReadDir(filepath.Join(f.Stager.DepDir(), "bin"))
+	if err != nil {
+		return err
+	}
+
+	oldShebang := []byte(fmt.Sprintf("#!%s/python", filepath.Join(f.Stager.DepDir(), "bin")))
+	newShebang := []byte("#!/usr/bin/env python")
+	for _, file := range files {
+		filename := filepath.Join(f.Stager.DepDir(), "bin", file.Name())
+		if err := replaceStringInFile(filename, oldShebang, newShebang); err != nil {
+			return err
+		}
+	}
+
 	return nil
+}
+
+func replaceStringInFile(filename string, old, new []byte) error {
+	f, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	buf := make([]byte, len(old))
+	n, err := f.Read(buf)
+
+	if err == nil && n == len(old) && bytes.Equal(buf, old) {
+		g, err := ioutil.TempFile(path.Dir(filename), path.Base(filename))
+		if err != nil {
+			return err
+		}
+		defer g.Close()
+		if _, err := g.Write(new); err != nil {
+			return err
+		}
+		if _, err := io.Copy(g, f); err != nil {
+			return err
+		}
+		if err := os.Rename(g.Name(), filename); err != nil {
+			return err
+		}
+	}
+
+	return err
 }
