@@ -155,6 +155,11 @@ func (f *Finalizer) RewriteShebang() error {
 }
 
 func replaceStringInFile(filename string, old, new []byte) error {
+	filename, err := filepath.EvalSymlinks(filename)
+	if err != nil {
+		return err
+	}
+
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -165,11 +170,18 @@ func replaceStringInFile(filename string, old, new []byte) error {
 	n, err := f.Read(buf)
 
 	if err == nil && n == len(old) && bytes.Equal(buf, old) {
+		info, err := os.Stat(filename)
+		if err != nil {
+			return err
+		}
 		g, err := ioutil.TempFile(path.Dir(filename), path.Base(filename))
 		if err != nil {
 			return err
 		}
 		defer g.Close()
+		if err := os.Chmod(g.Name(), info.Mode()); err != nil {
+			return err
+		}
 		if _, err := g.Write(new); err != nil {
 			return err
 		}

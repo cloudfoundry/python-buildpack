@@ -93,5 +93,31 @@ var _ = Describe("Finalize", func() {
 			})
 		})
 
+		Context("symlink to file with specific path shebang", func() {
+			var otherdir string
+			BeforeEach(func() {
+				otherdir = filepath.Join(depsDir, depsIdx, "adir")
+				Expect(os.MkdirAll(otherdir, 0755)).To(Succeed())
+				contents := fmt.Sprintf("#!%s/python\n\nPython code\n", binDir)
+				Expect(ioutil.WriteFile(filepath.Join(otherdir, "afile"), []byte(contents), 0715)).To(Succeed())
+				Expect(os.Symlink(filepath.Join(otherdir, "afile"), filepath.Join(binDir, "afile"))).To(Succeed())
+			})
+
+			It("converted to #!/usr/bin/env python", func() {
+				Expect(finalizer.RewriteShebang()).To(Succeed())
+
+				contents, err := ioutil.ReadFile(filepath.Join(otherdir, "afile"))
+				Expect(err).To(BeNil())
+				Expect(string(contents)).To(Equal("#!/usr/bin/env python\n\nPython code\n"))
+			})
+
+			It("retains permissions", func() {
+				Expect(finalizer.RewriteShebang()).To(Succeed())
+
+				info, err := os.Stat(filepath.Join(otherdir, "afile"))
+				Expect(err).To(BeNil())
+				Expect(info.Mode()).To(Equal(os.FileMode(0715)))
+			})
+		})
 	})
 })
