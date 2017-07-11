@@ -27,7 +27,7 @@ if test -f $BUILD_DIR/runtime.txt && grep 'python=' $BUILD_DIR/environment.yml; 
 fi
 
 # Get the runtime version and download appropriate Miniconda
-MINICONDA_VERSION="4.3.14"
+MINICONDA_VERSION="4.3.21"
 if [ -f $RUNTIME ]; then
     PYTHON_VERSION=$(cut -d- -f2 $RUNTIME)
     if [ ${PYTHON_VERSION:0:1} -eq 3 ]; then
