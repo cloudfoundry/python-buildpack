@@ -95,7 +95,7 @@ func (f *Finalizer) PipInstall() error {
 	}
 	// TODO OUTPUT for all below should '| cleanup | indent'
 	if exists {
-		if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stdout, "pip", "install", "-r", "requirements.txt", "--exists-action=w", "--src="+filepath.Join(f.Stager.DepDir(), "src"), "--no-index", "--find-links=file:/"+f.Stager.BuildDir()+"/vendor"); err != nil {
+		if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stdout, "pip", "install", "-r", "requirements.txt", "--exists-action=w", "--src="+filepath.Join(f.Stager.DepDir(), "src"), "--no-index", "--find-links=file://"+f.Stager.BuildDir()+"/vendor"); err != nil {
 			return err
 		}
 		if err := libbuildpack.CopyFile(filepath.Join(f.Stager.BuildDir(), "requirements.txt"), filepath.Join(f.Stager.DepDir(), "python", "requirements-declared.txt")); err != nil {
@@ -105,7 +105,7 @@ func (f *Finalizer) PipInstall() error {
 		if err != nil {
 			return err
 		}
-		if err := f.Command.Execute(f.Stager.BuildDir(), f2, ioutil.Discard, "pip", "freeze", "--find-links=file:/"+f.Stager.BuildDir()+"/vendor", "--disable-pip-version-check"); err != nil {
+		if err := f.Command.Execute(f.Stager.BuildDir(), f2, ioutil.Discard, "pip", "freeze", "--find-links=file://"+f.Stager.BuildDir()+"/vendor", "--disable-pip-version-check"); err != nil {
 			return err
 		}
 		f2.Close()
