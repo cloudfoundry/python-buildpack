@@ -6,6 +6,5 @@ log/
 /python_buildpack-*.zip
 .bundle/
 /.bin/
-/.envrc
 /pkg/
 /tags
