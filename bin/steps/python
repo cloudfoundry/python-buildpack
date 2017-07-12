@@ -14,7 +14,7 @@ if [ -f $CACHE_DIR/python-stack ]; then
     unset SKIP_INSTALL
   fi
 fi
-if [ -f $CACHE_DIR/python-version ]; then
+if [ -f $CACHE_DIR/python-version ] && [ -f $DEPS_DIR/$DEPS_IDX/python/bin/python ]; then
   if [ ! $(cat $CACHE_DIR/python-version) = $PYTHON_VERSION ]; then
     puts-step "Found $(cat $CACHE_DIR/python-version), removing"
     rm -fr $PYTHON_DIR $CACHE_DIR/python-version $CACHE_DIR/python-stack $CACHE_DIR/vendor

@@ -97,6 +97,9 @@ source $BIN_DIR/steps/cryptography
 
 source $BIN_DIR/steps/pylibmc
 
+# Make sure all installed python binaries use #!/usr/bin/env python
+$BIN_DIR/steps/rewrite-shebang
+
 # Automatic configuration for Gunicorn's ForwardedAllowIPS setting.
 echo "export FORWARDED_ALLOW_IPS='*'" > $DEPS_DIR/$DEPS_IDX/profile.d/python.gunicorn.sh
 
