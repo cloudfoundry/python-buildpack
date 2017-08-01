@@ -56,3 +56,40 @@ fi
 echo "-----> Installing Miniconda..."
 rm -rf $CONDA_HOME
 $MINICONDA_CACHE -b -p $CONDA_HOME #&> /dev/null
+
+CONDA_BIN="$CONDA_HOME/bin"
+CONDA_ENVS="$CONDA_HOME/envs"
+CONDA_ENVS_CACHE="$CACHE_DIR/envs"
+
+if [ -e $CONDA_ENVS_CACHE ] ; then
+  echo "-----> Using dependency cache at $CONDA_ENVS_CACHE"
+  mkdir -p $CONDA_ENVS
+  mv $CONDA_ENVS_CACHE/* $CONDA_ENVS
+  prefix=$(cat $CACHE_DIR/conda_prefix)
+  grep -rlI $prefix $DEPS_DIR/$DEPS_IDX/conda | xargs sed -i -e "s|$prefix|$DEPS_DIR/$DEPS_IDX|g"
+else
+  mkdir -p $CONDA_ENVS_CACHE
+fi
+
+CONDA_ENV="dep_env"
+
+echo "-----> Installing Dependencies..."
+echo "-----> Installing conda environment from environment.yml..."
+$CONDA_BIN/conda env update --quiet -n $CONDA_ENV -f "$BUILD_DIR/environment.yml"
+$CONDA_BIN/conda clean -pt
+
+echo "-----> Caching dependencies to $CONDA_ENVS_CACHE"
+cp -Rl $CONDA_ENVS/* $CONDA_ENVS_CACHE
+echo $DEPS_DIR/$DEPS_IDX > $CACHE_DIR/conda_prefix
+
+# Add Conda path to profile
+PROFILE_PATH=$DEPS_DIR/$DEPS_IDX/profile.d/conda.sh
+
+cat << EOF > $PROFILE_PATH
+grep -rlI $DEPS_DIR/$DEPS_IDX \$DEPS_DIR/$DEPS_IDX/conda | xargs sed -i -e "s|$DEPS_DIR/$DEPS_IDX|\$DEPS_DIR/$DEPS_IDX|g"
+EOF
+
+echo "export PATH=\$DEPS_DIR/$DEPS_IDX/conda/bin:\$PATH" >> $PROFILE_PATH
+echo "source activate $CONDA_ENV" >> $PROFILE_PATH
+
+echo "-----> Done"

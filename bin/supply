@@ -97,9 +97,6 @@ source $BIN_DIR/steps/cryptography
 
 source $BIN_DIR/steps/pylibmc
 
-# Make sure all installed python binaries use #!/usr/bin/env python
-$BIN_DIR/steps/rewrite-shebang
-
 # Automatic configuration for Gunicorn's ForwardedAllowIPS setting.
 echo "export FORWARDED_ALLOW_IPS='*'" > $DEPS_DIR/$DEPS_IDX/profile.d/python.gunicorn.sh
 
@@ -122,3 +119,27 @@ echo "$DEPS_DIR/$DEPS_IDX/lib" > $DEPS_DIR/$DEPS_IDX/env/LIBRARY_PATH
 
 # Write config.yml
 $BUILDPACK_PATH/compile-extensions/bin/write_config_yml $BUILDPACK_PATH $DEPS_DIR/$DEPS_IDX
+
+env_vars=$($BUILDPACK_PATH/compile-extensions/bin/build_path_from_supply $DEPS_DIR)
+for env_var in $env_vars; do
+  export $env_var
+done
+
+source $BIN_DIR/steps/mercurial
+
+# Uninstall removed dependencies with Pip.
+source $BIN_DIR/steps/pip-uninstall
+
+# Install dependencies with Pip (where the magic happens).
+source $BIN_DIR/steps/pip-install
+
+# Support for NLTK corpora.
+$BIN_DIR/steps/nltk
+
+$BIN_DIR/steps/rewrite-shebang
+
+# cache everything
+cp -Rlf $DEPS_DIR/$DEPS_IDX/python $CACHE_DIR/
+if [[ -d $DEPS_DIR/$DEPS_IDX/src ]]; then
+  cp -Rlf $DEPS_DIR/$DEPS_IDX/src $CACHE_DIR/ &> /dev/null || true
+fi
