@@ -29,7 +29,7 @@ source $BIN_DIR/utils
 # Switch to the repo's context.
 cd $BUILD_DIR
 
-# Use miniconda if environment.yml exists and exit
+# Collect static and fix eggs if not using miniconda
 if [ ! -f $BUILD_DIR/environment.yml ]; then
 
   # Django collectstatic support.
@@ -46,10 +46,12 @@ fi
 # Experimental post_compile hook.
 source $BIN_DIR/steps/hooks/post_compile
 
-# cache everything
-cp -Rlf $DEPS_DIR/$DEPS_IDX/python $CACHE_DIR/
-if [[ -d $DEPS_DIR/$DEPS_IDX/src ]]; then
-  cp -Rlf $DEPS_DIR/$DEPS_IDX/src $CACHE_DIR/ &> /dev/null || true
+# cache python when not using miniconda (which caches envs)
+if [ ! -f $BUILD_DIR/environment.yml ]; then
+  cp -Rlf $DEPS_DIR/$DEPS_IDX/python $CACHE_DIR/
+  if [[ -d $DEPS_DIR/$DEPS_IDX/src ]]; then
+    cp -Rlf $DEPS_DIR/$DEPS_IDX/src $CACHE_DIR/ &> /dev/null || true
+  fi
 fi
 
 $BUILDPACK_PATH/compile-extensions/bin/write_profiled_from_supply $DEPS_DIR $BUILD_DIR
