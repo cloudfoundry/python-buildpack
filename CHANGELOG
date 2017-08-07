@@ -1,3 +1,9 @@
+v1.5.23 Aug 07, 2017
+=====================
+
+* Provide pip/conda packages and nltk corpora during supply
+  (https://www.pivotaltracker.com/story/show/149435387)
+
 v1.5.22 Jul 24, 2017
 =====================
 
