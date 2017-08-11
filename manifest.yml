@@ -109,11 +109,11 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.6-linux-x64-34658f54.tgz
   md5: 34658f5466c673b5efc26d4f5cc291b6
 - name: python
-  version: 3.4.5
+  version: 3.4.7
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.5-linux-x64-3e8b3520.tgz
-  md5: 3e8b3520b1b8a946a239c1f9c31db665
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.7-linux-x64-9999d92f.tgz
+  md5: 9999d92fb7e51968f239bcd5cc1fcc1a
 - name: python
   version: 3.5.3
   cf_stacks:
