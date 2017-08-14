@@ -1,3 +1,12 @@
+v1.5.24 Aug 14, 2017
+=====================
+
+* Add python 3.5.4, remove python 3.5.2
+  (https://www.pivotaltracker.com/story/show/150040567)
+
+* Add python 3.4.7, remove python 3.4.5
+  (https://www.pivotaltracker.com/story/show/150077510)
+
 v1.5.23 Aug 07, 2017
 =====================
 
