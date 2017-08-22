@@ -139,19 +139,18 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.1-linux-x64-d8e1dbc6.tgz
   md5: d8e1dbc67436d294890536c99dcda0f0
 pre_package: scripts/build.sh
-exclude_files:
-- ".git/"
-- ".gitignore"
-- ".gitmodules"
-- cf_spec/
-- log/
-- test/
-- bin/package
-- buildpack-packager/
-- python_buildpack-*v*.zip
-- ".envrc"
-- cf.Gemfile
-- cf.Gemfile.lock
-- pkg/
-- src/
-- scripts/
+include_files:
+- CHANGELOG
+- CONTRIBUTING.md
+- ISSUE_TEMPLATE
+- LICENSE
+- NOTICE
+- PULL_REQUEST_TEMPLATE
+- README.md
+- VERSION
+- bin/compile
+- bin/detect
+- bin/finalize
+- bin/release
+- bin/supply
+- manifest.yml
