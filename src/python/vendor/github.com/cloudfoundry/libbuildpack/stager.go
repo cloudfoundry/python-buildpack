@@ -96,15 +96,8 @@ func (s *Stager) LinkDirectoryInDepDir(destDir, depSubDir string) error {
 			return err
 		}
 
-		exists, err := FileExists(filepath.Join(srcDir, file.Name()))
-		if err != nil {
+		if err := os.Symlink(relPath, filepath.Join(srcDir, file.Name())); err != nil {
 			return err
-		}
-
-		if !exists {
-			if err := os.Symlink(relPath, filepath.Join(srcDir, file.Name())); err != nil {
-				return err
-			}
 		}
 	}
 
@@ -197,6 +190,7 @@ func (s *Stager) DepsIdx() string {
 var stagingEnvVarDirs = map[string]string{
 	"PATH":            "bin",
 	"LD_LIBRARY_PATH": "lib",
+	"LIBRARY_PATH":    "lib",
 	"INCLUDE_PATH":    "include",
 	"CPATH":           "include",
 	"CPPPATH":         "include",
@@ -206,6 +200,7 @@ var stagingEnvVarDirs = map[string]string{
 var launchEnvVarDirs = map[string]string{
 	"PATH":            "bin",
 	"LD_LIBRARY_PATH": "lib",
+	"LIBRARY_PATH":    "lib",
 }
 
 func (s *Stager) SetStagingEnvironment() error {
