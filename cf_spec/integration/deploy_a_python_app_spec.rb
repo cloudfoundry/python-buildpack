@@ -27,29 +27,29 @@ describe 'CF Python Buildpack' do
     File.open(filename, 'w') { |file| file.write(contents) }
   end
 
-  context 'with an unsupported dependency' do
-    let(:app_name) { 'unsupported_version' }
+  # context 'with an unsupported dependency' do
+  #   let(:app_name) { 'unsupported_version' }
 
-    it 'displays a nice error messages and gracefully fails' do
-      expect(app).to_not be_running
-      expect(app).to_not have_logged 'Downloaded ['
-      expect(app).to have_logged 'DEPENDENCY MISSING IN MANIFEST: python 99.99.99'
-    end
-  end
+  #   it 'displays a nice error messages and gracefully fails' do
+  #     expect(app).to_not be_running
+  #     expect(app).to_not have_logged 'Downloaded ['
+  #     expect(app).to have_logged 'DEPENDENCY MISSING IN MANIFEST: python 99.99.99'
+  #   end
+  # end
 
-  context 'deploy a web app with -e in requirements.txt' do
-    let(:app_name) { 'flask_git_req' }
+  # context 'deploy a web app with -e in requirements.txt' do
+  #   let(:app_name) { 'flask_git_req' }
 
-    specify do
-      expect(app).to be_running(60)
+  #   specify do
+  #     expect(app).to be_running(60)
 
-      browser.visit_path('/')
-      expect(browser).to have_body('Hello, World!')
-      expect(app).to_not have_logged(/Error while running/)
-      expect(app).to_not have_logged(/ImportError:/)
+  #     browser.visit_path('/')
+  #     expect(browser).to have_body('Hello, World!')
+  #     expect(app).to_not have_logged(/Error while running/)
+  #     expect(app).to_not have_logged(/ImportError:/)
 
-    end
-  end
+  #   end
+  # end
 
   context 'deploy a web app that uses an nltk corpus' do
     let(:app_name) { 'nltk_flask' }
@@ -97,42 +97,42 @@ describe 'CF Python Buildpack' do
         end
       end
 
-      context 'with Python 3' do
-        let(:app_name) { 'flask_python_3' }
+      # context 'with Python 3' do
+      #   let(:app_name) { 'flask_python_3' }
 
-        specify do
-          expect(app).to be_running(120)
+      #   specify do
+      #     expect(app).to be_running(120)
 
-          browser.visit_path('/')
-          expect(browser).to have_body('Hello, World!')
+      #     browser.visit_path('/')
+      #     expect(browser).to have_body('Hello, World!')
 
-          expect(app).not_to have_internet_traffic
-        end
-      end
+      #     expect(app).not_to have_internet_traffic
+      #   end
+      # end
     end
 
-    context 'Warning when pip has mercurial dependencies' do
-      let(:app_name) { 'mercurial' }
+    # context 'Warning when pip has mercurial dependencies' do
+    #   let(:app_name) { 'mercurial' }
 
-      it 'logs a warning that it may not work offline' do
-        expect(app).to have_logged 'Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.'
-      end
-    end
+    #   it 'logs a warning that it may not work offline' do
+    #     expect(app).to have_logged 'Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.'
+    #   end
+    # end
   end
 
   context 'without cached buildpack dependencies', :uncached do
     context 'app has dependencies' do
-      context 'with mercurial dependencies' do
-        let(:app_name) { 'mercurial' }
+      # context 'with mercurial dependencies' do
+      #   let(:app_name) { 'mercurial' }
 
-        it "starts successfully" do
-          expect(app).to be_running
-          expect(app).not_to have_logged 'Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.'
+      #   it "starts successfully" do
+      #     expect(app).to be_running
+      #     expect(app).not_to have_logged 'Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.'
 
-          browser.visit_path('/')
-          expect(browser).to have_body('Hello, World!')
-        end
-      end
+      #     browser.visit_path('/')
+      #     expect(browser).to have_body('Hello, World!')
+      #   end
+      # end
 
       context 'with Python 2' do
         context 'deploy a flask web app without runtime.txt' do
@@ -156,20 +156,20 @@ describe 'CF Python Buildpack' do
           end
         end
 
-        context 'deploy a django web app' do
-          let(:app_name) { 'django_web_app' }
+        # context 'deploy a django web app' do
+        #   let(:app_name) { 'django_web_app' }
 
-          specify do
-            expect(app).to be_running(60)
+        #   specify do
+        #     expect(app).to be_running(60)
 
-            browser.visit_path('/')
-            expect(browser).to have_body('It worked!')
-            # Check that collectstatic ran
-            expect(app).to_not have_logged(/Error while running/)
-            expect(app).to have_logged(/collectstatic --noinput/)
+        #     browser.visit_path('/')
+        #     expect(browser).to have_body('It worked!')
+        #     # Check that collectstatic ran
+        #     expect(app).to_not have_logged(/Error while running/)
+        #     expect(app).to have_logged(/collectstatic --noinput/)
 
-          end
-        end
+        #   end
+        # end
       end
 
       context 'with Python 3' do
@@ -184,38 +184,38 @@ describe 'CF Python Buildpack' do
           end
         end
 
-        context 'deploy a django web app' do
-          let(:app_name) { 'django_python_3' }
+        # context 'deploy a django web app' do
+        #   let(:app_name) { 'django_python_3' }
 
-          specify do
-            expect(app).to be_running(60)
-            expect(app).to have_logged '-----> Installing python-3.5.'
+        #   specify do
+        #     expect(app).to be_running(60)
+        #     expect(app).to have_logged '-----> Installing python-3.5.'
 
-            browser.visit_path('/')
-            expect(browser).to have_body('It worked!')
-            # Check that collectstatic ran
-            expect(app).to_not have_logged(/Error while running/)
-            expect(app).to have_logged(/collectstatic --noinput/)
+        #     browser.visit_path('/')
+        #     expect(browser).to have_body('It worked!')
+        #     # Check that collectstatic ran
+        #     expect(app).to_not have_logged(/Error while running/)
+        #     expect(app).to have_logged(/collectstatic --noinput/)
 
-          end
-        end
+        #   end
+        # end
       end
     end
 
-    context 'app has non-vendored dependencies' do
-      let(:app_name) { 'flask_not_vendored' }
+    # context 'app has non-vendored dependencies' do
+    #   let(:app_name) { 'flask_not_vendored' }
 
-      specify do
-        expect(app).to be_running(60)
+    #   specify do
+    #     expect(app).to be_running(60)
 
-        browser.visit_path('/')
-        expect(browser).to have_body('Hello, World!')
-      end
+    #     browser.visit_path('/')
+    #     expect(browser).to have_body('Hello, World!')
+    #   end
 
-      it "uses a proxy during staging if present", :uncached do
-        expect(app).to use_proxy_during_staging
-      end
-    end
+    #   it "uses a proxy during staging if present", :uncached do
+    #     expect(app).to use_proxy_during_staging
+    #   end
+    # end
 
     context 'an app that uses miniconda and python 2' do
       let(:app_name) { 'miniconda_python_2' }

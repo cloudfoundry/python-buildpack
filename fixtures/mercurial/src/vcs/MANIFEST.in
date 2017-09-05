@@ -1,0 +1,5 @@
+include README.rst 
+include MANIFEST.in
+recursive-include vcs *
+recursive-include docs *
+recursive-exclude docs/build *

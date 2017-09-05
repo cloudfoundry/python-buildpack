@@ -1,6 +1,8 @@
 *.pyc
 site
 .idea
+.bin/
+pkg/
 log/
 **/.DS_Store
 /python_buildpack-*.zip

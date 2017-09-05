@@ -1,0 +1,23 @@
+syntax: regexp
+^\.settings$
+syntax: regexp
+^\.project$
+syntax: regexp
+^\.pydevproject$
+syntax: glob
+*.pyc
+*.orig
+*.log
+*.egg
+*.egg-info
+*.swp
+*.bak
+*.db
+*.tox
+.coverage
+pip-log.txt
+dist
+.DS_Store
+.coverage
+build
+.ropeproject
