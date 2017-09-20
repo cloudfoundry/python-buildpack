@@ -42,13 +42,14 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(app.Stdout.String()).NotTo(ContainSubstring("ImportError:"))
 	})
 
-	// FIt("deploy a web app that uses an nltk corpus", func() {
-	// 	app = cutlass.New(filepath.Join(bpDir, "fixtures", "nltk_flask"))
-	// 	PushAppAndConfirm(app)
+	It("deploy a web app that uses an nltk corpus", func() {
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "nltk_flask"))
+		app.Memory = "256M"
+		PushAppAndConfirm(app)
 
-	// 	Expect(app.GetBody("/")).To(ContainSubstring("The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced"))
-	// 	Expect(app.Stdout.String()).To(ContainSubstring("Downloading NLTK packages: brown"))
-	// })
+		Expect(app.GetBody("/")).To(ContainSubstring("The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced"))
+		Expect(app.Stdout.String()).To(ContainSubstring("Downloading NLTK packages: brown"))
+	})
 
 	Context("uncached buildpack", func() {
 		BeforeEach(func() {

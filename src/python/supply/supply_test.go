@@ -2,6 +2,7 @@ package supply_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -308,8 +309,80 @@ var _ = Describe("Supply", func() {
 export PYTHONHASHSEED=${PYTHONHASHSEED:-random}
 export PYTHONPATH=$DEPS_DIR/%s
 export PYTHONHOME=$DEPS_DIR/%s/python
-export PYTHONUNBUFFERED=1`, depsIdx, depsIdx))
+export PYTHONUNBUFFERED=1
+`, depsIdx, depsIdx))
 			Expect(supplier.CreateDefaultEnv()).To(Succeed())
+		})
+
+		Context("HasNltkData=true", func() {
+			BeforeEach(func() {
+				supplier.HasNltkData = true
+			})
+			It("writes an env file for NLTK_DATA", func() {
+				mockStager.EXPECT().WriteEnvFile("NLTK_DATA", filepath.Join(depDir, "python", "nltk_data"))
+				mockStager.EXPECT().WriteEnvFile(gomock.Any(), gomock.Any()).AnyTimes()
+
+				mockStager.EXPECT().WriteProfileD(gomock.Any(), gomock.Any())
+
+				Expect(supplier.CreateDefaultEnv()).To(Succeed())
+			})
+
+			It("writes the profile.d", func() {
+				mockStager.EXPECT().WriteEnvFile(gomock.Any(), gomock.Any()).AnyTimes()
+				mockStager.EXPECT().WriteProfileD("python.sh", gomock.Any()).Do(func(_, actual string) {
+					expected := fmt.Sprintf("export NLTK_DATA=$DEPS_DIR/%s/python/nltk_data", depsIdx)
+					Expect(actual).To(ContainSubstring(expected))
+				})
+				Expect(supplier.CreateDefaultEnv()).To(Succeed())
+			})
+		})
+	})
+
+	Describe("DownloadNLTKCorpora", func() {
+		Context("NLTK not installed", func() {
+			BeforeEach(func() {
+				mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), "python", "-m", "nltk.downloader", "-h").Return(errors.New(""))
+			})
+			It("should not do anything", func() {
+				Expect(supplier.DownloadNLTKCorpora()).To(Succeed())
+				Expect(buffer.String()).To(Equal(""))
+			})
+		})
+
+		Context("NLTK installed", func() {
+			BeforeEach(func() {
+				mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), "python", "-m", "nltk.downloader", "-h").Return(nil)
+			})
+			It("logs downloading", func() {
+				Expect(supplier.DownloadNLTKCorpora()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("Downloading NLTK corpora"))
+				Expect(supplier.HasNltkData).To(BeFalse())
+			})
+
+			Context("nltk.txt is not in app", func() {
+				BeforeEach(func() {
+					Expect(filepath.Join(buildDir, "nltk.txt")).ToNot(BeARegularFile())
+				})
+				It("warns the user", func() {
+					Expect(supplier.DownloadNLTKCorpora()).To(Succeed())
+					Expect(buffer.String()).To(ContainSubstring("nltk.txt not found, not downloading any corpora"))
+					Expect(supplier.HasNltkData).To(BeFalse())
+				})
+			})
+
+			Context("nltk.txt exists in app", func() {
+				BeforeEach(func() {
+					Expect(ioutil.WriteFile(filepath.Join(buildDir, "nltk.txt"), []byte("brown\nred\n"), 0644)).To(Succeed())
+				})
+				It("downloads nltk", func() {
+					mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), "python", "-m", "nltk.downloader", "-d", filepath.Join(depDir, "python", "nltk_data"), "brown", "red").Return(nil)
+
+					Expect(supplier.DownloadNLTKCorpora()).To(Succeed())
+
+					Expect(buffer.String()).To(ContainSubstring("Downloading NLTK packages: brown red"))
+					Expect(supplier.HasNltkData).To(BeTrue())
+				})
+			})
 		})
 	})
 })

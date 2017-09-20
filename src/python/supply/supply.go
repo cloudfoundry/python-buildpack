@@ -43,6 +43,7 @@ type Supplier struct {
 	Command       Command
 	Log           *libbuildpack.Logger
 	Logfile       *os.File
+	HasNltkData   bool
 }
 
 func Run(s *Supplier) error {
@@ -108,7 +109,10 @@ func Run(s *Supplier) error {
 		return err
 	}
 
-	// TODO: steps/nltk ?
+	if err := s.DownloadNLTKCorpora(); err != nil {
+		s.Log.Error("Could not download NLTK Corpora: %v", err)
+		return err
+	}
 
 	if err := s.RewriteShebangs(); err != nil {
 		s.Log.Error("Unable to rewrite she-bangs: %s", err.Error())
@@ -329,16 +333,56 @@ func (s *Supplier) CreateDefaultEnv() error {
 		"LANG":             "en_US.UTF-8",
 	}
 
+	scriptContents := fmt.Sprintf(`export LANG=${LANG:-en_US.UTF-8}
+export PYTHONHASHSEED=${PYTHONHASHSEED:-random}
+export PYTHONPATH=$DEPS_DIR/%s
+export PYTHONHOME=$DEPS_DIR/%s/python
+export PYTHONUNBUFFERED=1
+`, s.Stager.DepsIdx(), s.Stager.DepsIdx())
+
+	if s.HasNltkData {
+		scriptContents += fmt.Sprintf(`export NLTK_DATA=$DEPS_DIR/%s/python/nltk_data`, s.Stager.DepsIdx())
+		environmentVars["NLTK_DATA"] = filepath.Join(s.Stager.DepDir(), "python", "nltk_data")
+	}
+
 	for envVar, envValue := range environmentVars {
 		if err := s.Stager.WriteEnvFile(envVar, envValue); err != nil {
 			return err
 		}
 	}
 
-	scriptContents := `export LANG=${LANG:-en_US.UTF-8}
-export PYTHONHASHSEED=${PYTHONHASHSEED:-random}
-export PYTHONPATH=$DEPS_DIR/%s
-export PYTHONHOME=$DEPS_DIR/%s/python
-export PYTHONUNBUFFERED=1`
-	return s.Stager.WriteProfileD("python.sh", fmt.Sprintf(scriptContents, s.Stager.DepsIdx(), s.Stager.DepsIdx()))
+	return s.Stager.WriteProfileD("python.sh", scriptContents)
+}
+
+func (s *Supplier) DownloadNLTKCorpora() error {
+	if err := s.Command.Execute("/", ioutil.Discard, ioutil.Discard, "python", "-m", "nltk.downloader", "-h"); err != nil {
+		return nil
+	}
+
+	s.Log.BeginStep("Downloading NLTK corpora...")
+
+	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "nltk.txt")); err != nil {
+		return fmt.Errorf("Couldn't check nltk.txt existence: %v", err)
+	} else if !exists {
+		s.Log.Info("nltk.txt not found, not downloading any corpora")
+		return nil
+	}
+
+	bPackages, err := ioutil.ReadFile(filepath.Join(s.Stager.BuildDir(), "nltk.txt"))
+	if err != nil {
+		return err
+	}
+	sPackages := strings.TrimSpace(strings.NewReplacer("\r", " ", "\n", " ").Replace(string(bPackages)))
+	args := []string{"-m", "nltk.downloader", "-d", filepath.Join(s.Stager.DepDir(), "python", "nltk_data")}
+	args = append(args, strings.Split(sPackages, " ")...)
+
+	s.Log.BeginStep("Downloading NLTK packages: %s", sPackages)
+
+	if err := s.Command.Execute("/", os.Stdout, os.Stderr, "python", args...); err != nil {
+		return err
+	}
+
+	s.HasNltkData = true
+
+	return nil
 }
