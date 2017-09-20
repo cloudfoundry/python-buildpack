@@ -2,7 +2,7 @@
 language: python
 default_versions:
 - name: python
-  version: 2.7.13
+  version: 2.7.14
 - name: pip
   version: 9.0.1
 - name: setuptools
@@ -79,11 +79,11 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64-5f5bf32c.tgz
   md5: 5f5bf32ccfc9bf6d59ccee1cccd60f54
 - name: python
-  version: 2.7.12
+  version: 2.7.14
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.12-linux-x64-33dd191e.tgz
-  md5: 33dd191ef8c6de4b982f8e53cb0acffa
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.14-linux-x64-970d20be.tgz
+  md5: 970d20be9d32f686686f655d022689ff
 - name: python
   version: 2.7.13
   cf_stacks:
