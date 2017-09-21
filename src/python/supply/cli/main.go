@@ -41,11 +41,11 @@ func main() {
 		os.Exit(11)
 	}
 
-	// err = libbuildpack.RunBeforeCompile(stager)
-	// if err != nil {
-	// 	logger.Error("Before Compile: %s", err.Error())
-	// 	os.Exit(12)
-	// }
+	err = libbuildpack.RunBeforeCompile(stager)
+	if err != nil {
+		logger.Error("Before Compile: %s", err.Error())
+		os.Exit(12)
+	}
 
 	for _, dir := range []string{"bin", "lib", "include", "pkgconfig"} {
 		if err := os.Mkdir(filepath.Join(stager.DepDir(), dir), 0755); err != nil {

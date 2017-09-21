@@ -51,6 +51,19 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(app.Stdout.String()).To(ContainSubstring("Downloading NLTK packages: brown"))
 	})
 
+	It("should not display the allow-all-external deprecation message", func() {
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
+		PushAppAndConfirm(app)
+		Expect(app.Stdout.String()).ToNot(ContainSubstring("DEPRECATION: --allow-all-external has been deprecated and will be removed in the future"))
+	})
+
+	It("app has pre and post scripts", func() {
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "with_hooks"))
+		PushAppAndConfirm(app)
+		Expect(app.Stdout.String()).To(ContainSubstring("Echo from app pre compile"))
+		Expect(app.Stdout.String()).To(ContainSubstring("Echo from app post compile"))
+	})
+
 	Context("uncached buildpack", func() {
 		BeforeEach(func() {
 			if cutlass.Cached {

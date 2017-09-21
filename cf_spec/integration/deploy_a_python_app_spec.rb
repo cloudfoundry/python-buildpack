@@ -63,10 +63,10 @@ describe 'CF Python Buildpack' do
   #   end
   # end
 
-  it "should not display the allow-all-external deprecation message" do
-    expect(app).to be_running
-    expect(app).to_not have_logged 'DEPRECATION: --allow-all-external has been deprecated and will be removed in the future'
-  end
+  # it "should not display the allow-all-external deprecation message" do
+  #   expect(app).to be_running
+  #   expect(app).to_not have_logged 'DEPRECATION: --allow-all-external has been deprecated and will be removed in the future'
+  # end
 
   context "app has pre and post scripts" do
     let(:app_name) { 'with_hooks' }
