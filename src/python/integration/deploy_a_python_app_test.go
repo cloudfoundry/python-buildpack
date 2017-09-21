@@ -139,6 +139,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			})
 		})
 	})
+
 	Context("cached buildpack", func() {
 		BeforeEach(func() {
 			if !cutlass.Cached {
@@ -147,16 +148,31 @@ var _ = Describe("CF Python Buildpack", func() {
 		})
 
 		Context("when using flask", func() {
-			BeforeEach(func() {
-				app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
+			Context("with Python 2", func() {
+				BeforeEach(func() {
+					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
+				})
+
+				It("deploys", func() {
+					PushAppAndConfirm(app)
+					Expect(app.Stdout.String()).To(ContainSubstring("Copy [/"))
+					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+				})
+				AssertNoInternetTraffic("flask")
 			})
 
-			It("deploys", func() {
-				PushAppAndConfirm(app)
-				Expect(app.Stdout.String()).To(ContainSubstring("Copy [/"))
-				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+			Context("with Python 3", func() {
+				BeforeEach(func() {
+					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3"))
+				})
+
+				It("deploys", func() {
+					PushAppAndConfirm(app)
+					Expect(app.Stdout.String()).To(ContainSubstring("Copy [/"))
+					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+				})
+				AssertNoInternetTraffic("flask")
 			})
-			AssertNoInternetTraffic("flask")
 		})
 
 		Context("with mercurial dependencies", func() {
