@@ -1,10 +1,11 @@
 package integration_test
 
 import (
+	"fmt"
 	"path/filepath"
 
+	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -70,6 +71,7 @@ var _ = Describe("CF Python Buildpack", func() {
 				Skip("Running uncached tests")
 			}
 		})
+
 		Context("pushing a Python 3 app with a runtime.txt", func() {
 			Context("including flask", func() {
 				BeforeEach(func() {
@@ -95,14 +97,42 @@ var _ = Describe("CF Python Buildpack", func() {
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
 				})
 			})
-
 		})
 
 		Context("pushing a Python app without the runtime.txt", func() {
-			Context("including django but not specified python version", func() {
+			Context("", func() {
+				var defaultV string
+
+				type manifestContent struct {
+					DefaultVersions []struct {
+						Name    string `yaml:"name"`
+						Version string `yaml:"version"`
+					} `yaml:"default_versions"`
+				}
+
+				BeforeEach(func() {
+					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
+					mc := manifestContent{}
+					err := libbuildpack.NewYAML().Load(filepath.Join(bpDir, "manifest.yml"), &mc)
+					Expect(err).To(BeNil())
+					for _, defaultDep := range mc.DefaultVersions {
+						if defaultDep.Name == "python" {
+							defaultV = defaultDep.Version
+						}
+					}
+				})
+
+				It("deploys with default Python version", func() {
+					PushAppAndConfirm(app)
+
+					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+					Expect(app.Stdout.String()).To(ContainSubstring(fmt.Sprintf("-----> Installing python %s", defaultV)))
+				})
+			})
+
+			Context("including django but not specified Python version", func() {
 				BeforeEach(func() {
 					app = cutlass.New(filepath.Join(bpDir, "fixtures", "django_web_app"))
-					app.SetEnv("BP_DEBUG", "1")
 				})
 
 				It("deploys", func() {

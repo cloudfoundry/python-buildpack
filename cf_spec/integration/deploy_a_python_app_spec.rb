@@ -78,24 +78,24 @@ describe 'CF Python Buildpack' do
   #   end
   # end
 
-  context 'with cached buildpack dependencies', :cached do
-    context 'app has dependencies' do
-      context 'with Python 2' do
-        context 'deploy a flask web app' do
-          let(:app_name) { 'flask' }
+  # context 'with cached buildpack dependencies', :cached do
+  #   context 'app has dependencies' do
+  #     context 'with Python 2' do
+  #       context 'deploy a flask web app' do
+  #         let(:app_name) { 'flask' }
 
-          specify do
-            expect(app).to be_running(60)
+  #         specify do
+  #           expect(app).to be_running(60)
 
-            browser.visit_path('/')
-            expect(browser).to have_body('Hello, World!')
-            expect(app).to have_logged(/Downloaded \[file:\/\/.*\]/)
+  #           browser.visit_path('/')
+  #           expect(browser).to have_body('Hello, World!')
+  #           expect(app).to have_logged(/Downloaded \[file:\/\/.*\]/)
 
-            expect(app).not_to have_internet_traffic
+  #           expect(app).not_to have_internet_traffic
 
-          end
-        end
-      end
+  #         end
+  #       end
+  #     end
 
       # context 'with Python 3' do
       #   let(:app_name) { 'flask_python_3' }
@@ -109,7 +109,7 @@ describe 'CF Python Buildpack' do
       #     expect(app).not_to have_internet_traffic
       #   end
       # end
-    end
+    # end
 
     # context 'Warning when pip has mercurial dependencies' do
     #   let(:app_name) { 'mercurial' }
@@ -118,10 +118,10 @@ describe 'CF Python Buildpack' do
     #     expect(app).to have_logged 'Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.'
     #   end
     # end
-  end
+  # end
 
-  context 'without cached buildpack dependencies', :uncached do
-    context 'app has dependencies' do
+  # context 'without cached buildpack dependencies', :uncached do
+    # context 'app has dependencies' do
       # context 'with mercurial dependencies' do
       #   let(:app_name) { 'mercurial' }
 
@@ -134,27 +134,27 @@ describe 'CF Python Buildpack' do
       #   end
       # end
 
-      context 'with Python 2' do
-        context 'deploy a flask web app without runtime.txt' do
-          let(:app_name) { 'flask' }
+      # context 'with Python 2' do
+      #   context 'deploy a flask web app without runtime.txt' do
+      #     let(:app_name) { 'flask' }
 
-          subject(:app) do
-            Machete.deploy_app(app_name)
-          end
+      #     subject(:app) do
+      #       Machete.deploy_app(app_name)
+      #     end
 
-          before do
-            default_versions = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'manifest.yml'))['default_versions']
-            @default = default_versions.detect { |a| a['name'] == 'python' }.fetch('version')
-          end
+      #     before do
+      #       default_versions = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'manifest.yml'))['default_versions']
+      #       @default = default_versions.detect { |a| a['name'] == 'python' }.fetch('version')
+      #     end
 
-          it "uses the default python version" do
-            expect(app).to be_running(60)
+      #     it "uses the default python version" do
+      #       expect(app).to be_running(60)
 
-            browser.visit_path('/')
-            expect(browser).to have_body('Hello, World!')
-            expect(app).to have_logged("-----> Installing python-#{@default}")
-          end
-        end
+      #       browser.visit_path('/')
+      #       expect(browser).to have_body('Hello, World!')
+      #       expect(app).to have_logged("-----> Installing python-#{@default}")
+      #     end
+      #   end
 
         # context 'deploy a django web app' do
         #   let(:app_name) { 'django_web_app' }
@@ -170,7 +170,7 @@ describe 'CF Python Buildpack' do
 
         #   end
         # end
-      end
+      # end
 
       # context 'with Python 3' do
       #   context 'deploy a flask web app' do
@@ -199,8 +199,8 @@ describe 'CF Python Buildpack' do
 
         #   end
         # end
-      end
-    end
+      # end
+    # end
 
     # context 'app has non-vendored dependencies' do
     #   let(:app_name) { 'flask_not_vendored' }
