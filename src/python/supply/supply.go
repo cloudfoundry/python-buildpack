@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"python/pipfile"
 	"regexp"
 	"strings"
 
@@ -56,6 +57,11 @@ func Run(s *Supplier) error {
 	// TODO: handle vv c.f. supply bash script
 	// # # Pipenv Python version support.
 	// # $BIN_DIR/steps/pipenv-python-version.rb $BUILD_DIR
+	if err := s.HandlePipfile(); err != nil {
+		s.Log.Error("Error checking for Pipfile.lock: %v", err)
+		return err
+	}
+
 	if err := s.InstallPython(); err != nil {
 		s.Log.Error("Could not install python: %v", err)
 		return err
@@ -71,7 +77,10 @@ func Run(s *Supplier) error {
 		return err
 	}
 
-	// TODO: pipenv ?
+	if err := s.InstallPipEnv(); err != nil {
+		s.Log.Error("Could not install pipenv: %v", err)
+		return err
+	} //Then bin/steps/pipenv-python-version.rb?
 
 	if err := s.HandlePylibmc(); err != nil {
 		s.Log.Error("Error checking Pylibmc: %v", err)
@@ -145,6 +154,33 @@ func (s *Supplier) HandleMercurial() error {
 
 	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin"); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (s *Supplier) HandlePipfile() error {
+	var pipfileExists, runtimeExists bool
+	var pipfileJson pipfile.Lock
+	var err error
+
+	if pipfileExists, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "Pipfile.lock")); err != nil {
+		return err
+	}
+
+	if runtimeExists, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "runtime.txt")); err != nil {
+		return err
+	}
+
+	if pipfileExists && !runtimeExists {
+		if err = libbuildpack.NewJSON().Load(filepath.Join(s.Stager.BuildDir(), "Pipfile.lock"), &pipfileJson); err != nil {
+			return err
+		}
+
+		formattedVersion := s.formatVersion(pipfileJson.Meta.Requires.Version)
+
+		if err := ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "runtime.txt"), []byte(formattedVersion), 0644); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -243,6 +279,36 @@ func (s *Supplier) InstallPipPop() error {
 
 	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin"); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (s *Supplier) InstallPipEnv() error {
+	if err := s.Manifest.InstallOnlyVersion("pipenv", filepath.Join("/tmp", "pipenv")); err != nil {
+		return err
+	}
+
+	if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip", "install", "pipenv", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+		return err
+	}
+	s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
+
+	requirementsContents, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
+	if err != nil {
+		return err
+	}
+
+	if !requirementsContents {
+		s.Log.Info("Generating 'requirements.txt' with pipenv")
+
+		output, err := s.Command.Output(s.Stager.BuildDir(), "pipenv", "lock", "--requirements")
+		if err != nil {
+			return err
+		}
+
+		if err := ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(output), 0644); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -385,4 +451,15 @@ func (s *Supplier) DownloadNLTKCorpora() error {
 	s.HasNltkData = true
 
 	return nil
+}
+
+func (s *Supplier) formatVersion(version string) string {
+	verSlice := strings.Split(version, ".")
+
+	if len(verSlice) < 3 {
+		return fmt.Sprintf("python-%s.x", version)
+	}
+
+	return fmt.Sprintf("python-%s", version)
+
 }

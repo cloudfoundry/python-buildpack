@@ -105,6 +105,28 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
+	Describe("HandlePipfile", func() {
+		BeforeEach(func() {
+			pipfileContents := `
+			{
+				"_meta":{
+					"requires":{
+						"python_version":"3.6"
+					}
+				}
+			}`
+
+			Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(pipfileContents), 0644)).To(Succeed())
+		})
+
+		It("creates runtime.txt from Pipfile.lock contents if none exists", func() {
+			Expect(supplier.HandlePipfile()).To(Succeed())
+			runtimeContents, err := ioutil.ReadFile(filepath.Join(buildDir, "runtime.txt"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(runtimeContents)).To(ContainSubstring("python-3.6"))
+		})
+	})
+
 	Describe("InstallPip", func() {
 		It("Downloads and installs setuptools", func() {
 			mockManifest.EXPECT().AllDependencyVersions("setuptools").Return([]string{"2.4.6"})
@@ -126,11 +148,39 @@ var _ = Describe("Supply", func() {
 	})
 
 	Describe("InstallPipPop", func() {
-		It("Installs pip-pop", func() {
+		It("installs pip-pop", func() {
 			mockManifest.EXPECT().InstallOnlyVersion("pip-pop", "/tmp/pip-pop")
 			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pip-pop", "--exists-action=w", "--no-index", "--find-links=/tmp/pip-pop")
 			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
 			Expect(supplier.InstallPipPop()).To(Succeed())
+		})
+	})
+
+	Describe("InstallPipEnv", func() {
+		Context("when Pipfile.lock and requirements.txt both exist", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
+			})
+
+			It("installs pipenv and does not generate requirements.txt", func() {
+				mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+				Expect(supplier.InstallPipEnv()).To(Succeed())
+			})
+		})
+
+		Context("when Pipfile.lock exists but requirements.txt does not exist", func() {
+			It("installs pipenv and generates requirements.txt", func() {
+				mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+				mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("test", nil)
+				Expect(supplier.InstallPipEnv()).To(Succeed())
+				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(requirementsContents).To(ContainSubstring("test"))
+			})
 		})
 	})
 
