@@ -48,15 +48,8 @@ type Supplier struct {
 }
 
 func Run(s *Supplier) error {
-	// FIXME handle errors
-
-	// TODO: Procfile warning ?
-
 	// TODO: Restore cache?
 
-	// TODO: handle vv c.f. supply bash script
-	// # # Pipenv Python version support.
-	// # $BIN_DIR/steps/pipenv-python-version.rb $BUILD_DIR
 	if err := s.HandlePipfile(); err != nil {
 		s.Log.Error("Error checking for Pipfile.lock: %v", err)
 		return err
@@ -80,22 +73,22 @@ func Run(s *Supplier) error {
 	if err := s.InstallPipEnv(); err != nil {
 		s.Log.Error("Could not install pipenv: %v", err)
 		return err
-	} //Then bin/steps/pipenv-python-version.rb?
+	}
 
 	if err := s.HandlePylibmc(); err != nil {
 		s.Log.Error("Error checking Pylibmc: %v", err)
 		return err
 	}
 
-	// TODO: handle vv c.f. supply bash script
+	// TODO:
 	// # # Automatic configuration for Gunicorn's ForwardedAllowIPS setting.
 	// # echo "export FORWARDED_ALLOW_IPS='*'" > $DEPS_DIR/$DEPS_IDX/profile.d/python.gunicorn.sh
 
-	// TODO: handle vv c.f. supply bash script
-	// # # If no requirements.txt file given, assume `setup.py develop` is intended.
-	// # if [ ! -f requirements.txt ]; then
-	// #   echo "-e ." > requirements.txt
-	// # fi
+	if err := s.HandleRequirementstxt(); err != nil {
+		s.Log.Error("Error checking requirements.txt: %v", err)
+		return err
+	}
+
 	if err := s.HandleFfi(); err != nil {
 		s.Log.Error("Error checking ffi: %v", err)
 		return err
@@ -103,15 +96,16 @@ func Run(s *Supplier) error {
 
 	// TODO: write config.yml
 
-	// TODO: build PATH and LD_LIBRARY_PATH ? dont think this is necessary?
-
-	// TODO: steps/mercurial ?
 	if err := s.HandleMercurial(); err != nil {
 		s.Log.Error("Could not handle pip mercurial dependencies: %v", err)
 		return err
 	}
 
 	// TODO: steps/pip-uninstall ?
+	if err := s.UninstallUnusedDependencies(); err != nil {
+		s.Log.Error("Error uninstalling unused dependencies: %v", err)
+		return err
+	}
 
 	if err := s.RunPip(); err != nil {
 		s.Log.Error("Could not install pip packages: %v", err)
@@ -293,12 +287,17 @@ func (s *Supplier) InstallPipEnv() error {
 	}
 	s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
 
-	requirementsContents, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
+	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
 	if err != nil {
 		return err
 	}
 
-	if !requirementsContents {
+	pipfileExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "Pipfile"))
+	if err != nil {
+		return err
+	}
+
+	if pipfileExists && !requirementstxtExists {
 		s.Log.Info("Generating 'requirements.txt' with pipenv")
 
 		output, err := s.Command.Output(s.Stager.BuildDir(), "pipenv", "lock", "--requirements")
@@ -326,6 +325,21 @@ func (s *Supplier) HandlePylibmc() error {
 		s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib", "sasl2"), "lib")
 		s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib", "pkgconfig"), "pkgconfig")
 		s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "include"), "include")
+	}
+
+	return nil
+}
+
+func (s *Supplier) HandleRequirementstxt() error {
+	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
+	if err != nil {
+		return err
+	}
+
+	if !requirementstxtExists {
+		if err := ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte("-e ."), 0644); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -368,6 +382,39 @@ func (s *Supplier) InstallPip() error {
 	}
 	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "lib", "pkgconfig"), "pkgconfig"); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *Supplier) UninstallUnusedDependencies() error {
+	requirementsDeclaredExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"))
+	if err != nil {
+		return err
+	}
+
+	if requirementsDeclaredExists {
+		fileContents, _ := ioutil.ReadFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"))
+		s.Log.Info("requirements-declared: %s", string(fileContents))
+
+		staleContents, err := s.Command.Output(s.Stager.BuildDir(), "pip-diff", "--stale", filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"), filepath.Join(s.Stager.BuildDir(), "requirements.txt"), "--exclude", "setuptools", "pip", "wheel")
+		if err != nil {
+			return err
+		}
+
+		if staleContents == "" {
+			return nil
+		}
+
+		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt"), []byte(staleContents), 0644); err != nil {
+			return err
+		}
+
+		s.Log.BeginStep("Uninstalling stale dependencies")
+		if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip", "uninstall", "-r", filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt", "-y", "--exists-action=w")); err != nil {
+			return err
+		}
+
 	}
 
 	return nil

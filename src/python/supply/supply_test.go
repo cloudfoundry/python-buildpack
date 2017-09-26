@@ -159,6 +159,7 @@ var _ = Describe("Supply", func() {
 	Describe("InstallPipEnv", func() {
 		Context("when Pipfile.lock and requirements.txt both exist", func() {
 			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("This is pipfile"), 0644)).To(Succeed())
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
 			})
 
@@ -171,6 +172,10 @@ var _ = Describe("Supply", func() {
 		})
 
 		Context("when Pipfile.lock exists but requirements.txt does not exist", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("This is pipfile"), 0644)).To(Succeed())
+			})
+
 			It("installs pipenv and generates requirements.txt", func() {
 				mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
@@ -213,6 +218,30 @@ var _ = Describe("Supply", func() {
 			It("does not install libmemcache", func() {
 				Expect(supplier.HandlePylibmc()).To(Succeed())
 				Expect(os.Getenv("LIBMEMCACHED")).To(Equal(""))
+			})
+		})
+	})
+
+	Describe("HandleRequirementstxt", func() {
+		Context("when requirements.txt does not exist", func() {
+			It("create requirements.txt with '-e .'", func() {
+				Expect(supplier.HandleRequirementstxt()).To(Succeed())
+				fileContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fileContents).To(Equal([]byte("-e .")))
+			})
+		})
+
+		Context("when requirements.txt exists", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
+			})
+
+			It("does nothing", func() {
+				Expect(supplier.HandleRequirementstxt()).To(Succeed())
+				fileContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fileContents).To(Equal([]byte("blah")))
 			})
 		})
 	})
@@ -311,6 +340,57 @@ var _ = Describe("Supply", func() {
 
 			Expect(string(fileContents)).To(HavePrefix("#!/usr/bin/env python"))
 			Expect(string(secondFileContents)).To(HavePrefix("#!/usr/bin/env python"))
+		})
+	})
+
+	Describe("UninstallUnusedDependencies", func() {
+		Context("when requirements-declared.txt exists", func() {
+
+			requirementsDeclared :=
+				`Flask==0.10.1
+Jinja2==2.7.2
+MarkupSafe==0.21
+Werkzeug==0.10.4
+gunicorn==19.3.0
+itsdangerous==0.24
+pylibmc==1.4.2
+cffi==0.9.2
+`
+			requirements :=
+				`Flask==0.10.1
+Jinja2==2.7.2
+MarkupSafe==0.21
+`
+			requirementsStale :=
+				`Werkzeug==0.10.4
+gunicorn==19.3.0
+itsdangerous==0.24
+pylibmc==1.4.2
+cffi==0.9.2
+`
+			BeforeEach(func() {
+				Expect(os.MkdirAll(filepath.Join(depDir, "python"), 0755)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(depDir, "python", "requirements-declared.txt"), []byte(requirementsDeclared), 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte(requirements), 0644)).To(Succeed())
+			})
+
+			It("creates requirements-stale.txt and uninstalls unused dependencies", func() {
+				mockCommand.EXPECT().Output(buildDir, "pip-diff", "--stale", filepath.Join(depDir, "python", "requirements-declared.txt"), filepath.Join(buildDir, "requirements.txt"), "--exclude", "setuptools", "pip", "wheel").Return(requirementsStale, nil)
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "uninstall", "-r", filepath.Join(depDir, "python", "requirements-stale.txt", "-y", "--exists-action=w"))
+				Expect(supplier.UninstallUnusedDependencies()).To(Succeed())
+				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "python", "requirements-stale.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(fileContents)).To(Equal(requirementsStale))
+			})
+		})
+
+		Context("when requirements-declared.txt does not exist", func() {
+			It("does nothing", func() {
+				fileExists, err := libbuildpack.FileExists(filepath.Join(depDir, "python", "requirements-stale.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fileExists).To(Equal(false))
+				Expect(supplier.UninstallUnusedDependencies()).To(Succeed())
+			})
 		})
 	})
 
