@@ -96,14 +96,11 @@ func Run(s *Supplier) error {
 		return err
 	}
 
-	// TODO: write config.yml
-
 	if err := s.HandleMercurial(); err != nil {
 		s.Log.Error("Could not handle pip mercurial dependencies: %v", err)
 		return err
 	}
 
-	// TODO: steps/pip-uninstall ?
 	if err := s.UninstallUnusedDependencies(); err != nil {
 		s.Log.Error("Error uninstalling unused dependencies: %v", err)
 		return err

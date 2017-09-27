@@ -87,7 +87,6 @@ func (f *Finalizer) HandleCollectstatic() error {
           $ cf set-env <app> DISABLE_COLLECTSTATIC 1
 
        https://devcenter.heroku.com/articles/django-assets`, managePyPath))
-		//TODO: dump environment variables if $DEBUG_COLLECTSTATIC is set???
 		return err
 	}
 

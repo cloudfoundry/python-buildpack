@@ -61,18 +61,8 @@ func main() {
 	}
 
 	s := supply.Supplier{
-		Logfile: logfile,
-		Stager:  stager,
-		// 	Yarn: &yarn.Yarn{
-		// 		BuildDir: stager.BuildDir(),
-		// 		Command:  &libbuildpack.Command{},
-		// 		Log:      logger,
-		// 	},
-		// 	NPM: &npm.NPM{
-		// 		BuildDir: stager.BuildDir(),
-		// 		Command:  &libbuildpack.Command{},
-		// 		Log:      logger,
-		// 	},
+		Logfile:  logfile,
+		Stager:   stager,
 		Manifest: manifest,
 		Log:      logger,
 		Command:  &libbuildpack.Command{},
