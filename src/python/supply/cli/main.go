@@ -78,8 +78,8 @@ func main() {
 		os.Exit(14)
 	}
 
-	// if err := stager.WriteConfigYml(nil); err != nil {
-	// 	logger.Error("Error writing config.yml: %s", err.Error())
-	// 	os.Exit(15)
-	// }
+	if err := stager.WriteConfigYml(nil); err != nil {
+		logger.Error("Error writing config.yml: %s", err.Error())
+		os.Exit(15)
+	}
 }
