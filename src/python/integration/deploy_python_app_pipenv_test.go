@@ -33,4 +33,20 @@ var _ = Describe("deploying a flask web app", func() {
 			Expect(app.Stdout.String()).To(ContainSubstring("Generating 'requirements.txt' with pipenv"))
 		})
 	})
+
+	Context("buildpack is cached", func() {
+		BeforeEach(func() {
+			if !cutlass.Cached {
+				Skip("Running cached tests")
+			}
+			app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv_vendored"))
+		})
+
+		It("should work", func() {
+			PushAppAndConfirm(app)
+			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
+		})
+
+		AssertNoInternetTraffic("flask_python_3_pipenv_vendored")
+	})
 })
