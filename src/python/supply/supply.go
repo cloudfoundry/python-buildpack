@@ -1,6 +1,7 @@
 package supply
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/libbuildpack"
+	"github.com/kr/text"
 )
 
 type Stager interface {
@@ -141,8 +143,7 @@ func (s *Supplier) HandleMercurial() error {
 		s.Log.Warning("Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.")
 	}
 
-	//TODO: output pipe through equivalent of shell: cleanup | indent
-	if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip", "install", "mercurial"); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "install", "mercurial"); err != nil {
 		return err
 	}
 
@@ -266,7 +267,7 @@ func (s *Supplier) InstallPipPop() error {
 		return err
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip", "install", "pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "install", "pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
 		s.Log.Debug("******Path val: %s", os.Getenv("PATH"))
 		return err
 	}
@@ -282,7 +283,7 @@ func (s *Supplier) InstallPipEnv() error {
 		return err
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip", "install", "pipenv", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "install", "pipenv", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
 		return err
 	}
 	s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
@@ -314,7 +315,7 @@ func (s *Supplier) InstallPipEnv() error {
 
 func (s *Supplier) HandlePylibmc() error {
 	memcachedDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
-	if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
 		s.Log.BeginStep("Noticed pylibmc. Bootstrapping libmemcached.")
 		if err := s.Manifest.InstallOnlyVersion("libmemcache", memcachedDir); err != nil {
 			return err
@@ -347,7 +348,7 @@ func (s *Supplier) HandleRequirementstxt() error {
 
 func (s *Supplier) HandleFfi() error {
 	ffiDir := filepath.Join(s.Stager.DepDir(), "libffi")
-	if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
 		s.Log.BeginStep("Noticed dependency requiring libffi. Bootstrapping libffi.")
 		if err := s.Manifest.InstallOnlyVersion("libffi", ffiDir); err != nil {
 			return err
@@ -369,8 +370,9 @@ func (s *Supplier) InstallPip() error {
 			return err
 		}
 		versions := s.Manifest.AllDependencyVersions(name)
-		if output, err := s.Command.Output(filepath.Join("/tmp", name, name+"-"+versions[0]), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s", filepath.Join(s.Stager.DepDir(), "python"))); err != nil {
-			s.Log.Error(output)
+		outWriter := new(bytes.Buffer)
+		if err := s.Command.Execute(filepath.Join("/tmp", name, name+"-"+versions[0]), outWriter, indentWriter(os.Stderr), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s", filepath.Join(s.Stager.DepDir(), "python"))); err != nil {
+			s.Log.Error(outWriter.String())
 			return err
 		}
 	}
@@ -411,7 +413,7 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 		}
 
 		s.Log.BeginStep("Uninstalling stale dependencies")
-		if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip", "uninstall", "-r", filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt", "-y", "--exists-action=w")); err != nil {
+		if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "uninstall", "-r", filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt", "-y", "--exists-action=w")); err != nil {
 			return err
 		}
 
@@ -428,7 +430,7 @@ func (s *Supplier) RunPip() error {
 		installArgs = append(installArgs, "--no-index", "--find-links=file://"+filepath.Join(s.Stager.BuildDir(), "vendor"))
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), os.Stdout, os.Stderr, "pip", installArgs...); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", installArgs...); err != nil {
 		s.Log.Debug("******Path val: %s", os.Getenv("PATH"))
 		return err
 	}
@@ -491,7 +493,7 @@ func (s *Supplier) DownloadNLTKCorpora() error {
 
 	s.Log.BeginStep("Downloading NLTK packages: %s", sPackages)
 
-	if err := s.Command.Execute("/", os.Stdout, os.Stderr, "python", args...); err != nil {
+	if err := s.Command.Execute("/", indentWriter(os.Stdout), indentWriter(os.Stderr), "python", args...); err != nil {
 		return err
 	}
 
@@ -509,4 +511,8 @@ func (s *Supplier) formatVersion(version string) string {
 
 	return fmt.Sprintf("python-%s", version)
 
+}
+
+func indentWriter(writer io.Writer) io.Writer {
+	return text.NewIndentWriter(writer, []byte("       "))
 }

@@ -131,11 +131,11 @@ var _ = Describe("Supply", func() {
 		It("Downloads and installs setuptools", func() {
 			mockManifest.EXPECT().AllDependencyVersions("setuptools").Return([]string{"2.4.6"})
 			mockManifest.EXPECT().InstallOnlyVersion("setuptools", "/tmp/setuptools")
-			mockCommand.EXPECT().Output("/tmp/setuptools/setuptools-2.4.6", "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return("", nil)
+			mockCommand.EXPECT().Execute("/tmp/setuptools/setuptools-2.4.6", gomock.Any(), gomock.Any(), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return(nil)
 
 			mockManifest.EXPECT().AllDependencyVersions("pip").Return([]string{"1.3.4"})
 			mockManifest.EXPECT().InstallOnlyVersion("pip", "/tmp/pip")
-			mockCommand.EXPECT().Output("/tmp/pip/pip-1.3.4", "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return("", nil)
+			mockCommand.EXPECT().Execute("/tmp/pip/pip-1.3.4", gomock.Any(), gomock.Any(), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return(nil)
 
 			pythonInstallDir := filepath.Join(depDir, "python")
 			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")

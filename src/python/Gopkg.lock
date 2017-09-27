@@ -32,6 +32,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/kr/text"
+  packages = ["."]
+  revision = "7cafcd837844e784b526369c9bce262804aebc60"
+
+[[projects]]
+  branch = "master"
   name = "github.com/onsi/ginkgo"
   packages = [".","config","internal/codelocation","internal/containernode","internal/failer","internal/leafnodes","internal/remote","internal/spec","internal/spec_iterator","internal/specrunner","internal/suite","internal/testingtproxy","internal/writer","reporters","reporters/stenographer","reporters/stenographer/support/go-colorable","reporters/stenographer/support/go-isatty","types"]
   revision = "11459a886d9cd66b319dac7ef1e917ee221372c9"
@@ -81,6 +87,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a4243a46f048da30006bf1d1897d16f3a1721b268a90dea288311952ce93809c"
+  inputs-digest = "e16f507d47a7b9cacee3a47d61631ac9b52803960756c0cad7c15125aee60233"
   solver-name = "gps-cdcl"
   solver-version = 1

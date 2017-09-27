@@ -24,3 +24,7 @@
 [[override]]
   name = "github.com/elazarl/goproxy"
   revision = "aacba83f36a55ac31cbb71c06547a328c0cd1604"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/kr/text"
