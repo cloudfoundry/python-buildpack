@@ -1,14 +1,17 @@
 package finalize
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/cloudfoundry/libbuildpack"
+	"github.com/kr/text"
 )
 
 type Manifest interface {
@@ -76,8 +79,8 @@ func (f *Finalizer) HandleCollectstatic() error {
 	}
 
 	f.Log.Info("Running python %s collectstatic --noinput --traceback", managePyPath)
-	//TODO: should filter out empty lines or those starting with Post-processed --OR-- Copying
-	if err = f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stderr, "python", managePyPath, "collectstatic", "--noinput", "--traceback"); err != nil {
+	output := new(bytes.Buffer)
+	if err = f.Command.Execute(f.Stager.BuildDir(), output, text.NewIndentWriter(os.Stderr, []byte("       ")), "python", managePyPath, "collectstatic", "--noinput", "--traceback"); err != nil {
 		f.Log.Error(fmt.Sprintf(` !     Error while running '$ python %s collectstatic --noinput'.
        See traceback above for details.
 
@@ -90,7 +93,22 @@ func (f *Finalizer) HandleCollectstatic() error {
 		return err
 	}
 
+	writeFilteredCollectstaticOutput(output)
+
 	return nil
+}
+
+func writeFilteredCollectstaticOutput(output *bytes.Buffer) {
+	buffer := new(bytes.Buffer)
+	r := regexp.MustCompile("^(Copying |Post-processed ).*$")
+	lines := strings.Split(output.String(), "\n")
+	for _, line := range lines {
+		if len(line) > 0 && !r.MatchString(line) {
+			buffer.WriteString(line)
+			buffer.WriteString("\n")
+		}
+	}
+	os.Stdout.Write(buffer.Bytes())
 }
 
 func (f *Finalizer) ReplaceDepsDirWithLiteral() error {
