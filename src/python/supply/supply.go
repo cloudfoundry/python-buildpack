@@ -80,10 +80,6 @@ func Run(s *Supplier) error {
 		return err
 	}
 
-	// TODO:
-	// # # Automatic configuration for Gunicorn's ForwardedAllowIPS setting.
-	// # echo "export FORWARDED_ALLOW_IPS='*'" > $DEPS_DIR/$DEPS_IDX/profile.d/python.gunicorn.sh
-
 	if err := s.HandleRequirementstxt(); err != nil {
 		s.Log.Error("Error checking requirements.txt: %v", err)
 		return err
@@ -448,6 +444,7 @@ export PYTHONHASHSEED=${PYTHONHASHSEED:-random}
 export PYTHONPATH=$DEPS_DIR/%s
 export PYTHONHOME=$DEPS_DIR/%s/python
 export PYTHONUNBUFFERED=1
+export FORWARDED_ALLOW_IPS='*'
 `, s.Stager.DepsIdx(), s.Stager.DepsIdx())
 
 	if s.HasNltkData {

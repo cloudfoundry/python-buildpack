@@ -440,6 +440,7 @@ export PYTHONHASHSEED=${PYTHONHASHSEED:-random}
 export PYTHONPATH=$DEPS_DIR/%s
 export PYTHONHOME=$DEPS_DIR/%s/python
 export PYTHONUNBUFFERED=1
+export FORWARDED_ALLOW_IPS='*'
 `, depsIdx, depsIdx))
 			Expect(supplier.CreateDefaultEnv()).To(Succeed())
 		})
