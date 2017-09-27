@@ -28,7 +28,6 @@ type Stager interface {
 type Command interface {
 	Execute(string, io.Writer, io.Writer, string, ...string) error
 	Output(dir string, program string, args ...string) (string, error)
-	// Run(cmd *exec.Cmd) error
 }
 
 type ManagePyFinder interface {
@@ -42,7 +41,6 @@ type Finalizer struct {
 	Manifest       Manifest
 	Command        Command
 	ManagePyFinder ManagePyFinder
-	// StartScript string
 }
 
 func Run(f *Finalizer) error {

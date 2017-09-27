@@ -22,7 +22,6 @@ type Stager interface {
 	LinkDirectoryInDepDir(string, string) error
 	WriteEnvFile(string, string) error
 	WriteProfileD(string, string) error
-	// SetStagingEnvironment() error
 }
 
 type Manifest interface {
@@ -36,7 +35,6 @@ type Manifest interface {
 type Command interface {
 	Execute(string, io.Writer, io.Writer, string, ...string) error
 	Output(dir string, program string, args ...string) (string, error)
-	// Run(cmd *exec.Cmd) error
 }
 
 type Supplier struct {
