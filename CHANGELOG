@@ -1,3 +1,9 @@
+v1.5.26 Sep 27, 2017
+=====================
+
+* Add python 2.7.14, remove python 2.7.12
+  (https://www.pivotaltracker.com/story/show/151151348)
+
 v1.5.25 Sep 20, 2017
 =====================
 
