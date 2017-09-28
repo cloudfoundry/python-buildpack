@@ -36,20 +36,24 @@ var _ = Describe("CF Python Buildpack", func() {
 
 	It("deploy a web app with -e in requirements.txt", func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_git_req"))
+		app.SetEnv("BP_DEBUG", "1")
 		PushAppAndConfirm(app)
 
 		Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 		Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
 		Expect(app.Stdout.String()).NotTo(ContainSubstring("ImportError:"))
+		Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 	})
 
 	It("deploy a web app that uses an nltk corpus", func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "nltk_flask"))
+		app.SetEnv("BP_DEBUG", "1")
 		app.Memory = "256M"
 		PushAppAndConfirm(app)
 
 		Expect(app.GetBody("/")).To(ContainSubstring("The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced"))
 		Expect(app.Stdout.String()).To(ContainSubstring("Downloading NLTK packages: brown"))
+		Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 	})
 
 	It("should not display the allow-all-external deprecation message", func() {
@@ -76,17 +80,20 @@ var _ = Describe("CF Python Buildpack", func() {
 			Context("including flask", func() {
 				BeforeEach(func() {
 					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3"))
+					app.SetEnv("BP_DEBUG", "1")
 				})
 
 				It("deploys", func() {
 					PushAppAndConfirm(app)
 					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 				})
 			})
 
 			Context("including django with specified python version", func() {
 				BeforeEach(func() {
 					app = cutlass.New(filepath.Join(bpDir, "fixtures", "django_python_3"))
+					app.SetEnv("BP_DEBUG", "1")
 				})
 
 				It("deploys", func() {
@@ -96,6 +103,7 @@ var _ = Describe("CF Python Buildpack", func() {
 					Expect(app.Stdout.String()).To(ContainSubstring("collectstatic --noinput"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Copying "))
+					Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 				})
 			})
 		})
@@ -147,11 +155,13 @@ var _ = Describe("CF Python Buildpack", func() {
 			Context("including flask without a vendor directory", func() {
 				BeforeEach(func() {
 					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_not_vendored"))
+					app.SetEnv("BP_DEBUG", "1")
 				})
 
 				It("deploys", func() {
 					PushAppAndConfirm(app)
 					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 				})
 				AssertUsesProxyDuringStagingIfPresent("flask_not_vendored")
 			})
@@ -161,12 +171,14 @@ var _ = Describe("CF Python Buildpack", func() {
 		Context("with mercurial dependencies", func() {
 			BeforeEach(func() {
 				app = cutlass.New(filepath.Join(bpDir, "fixtures", "mercurial"))
+				app.SetEnv("BP_DEBUG", "1")
 			})
 
 			It("deploys", func() {
 				PushAppAndConfirm(app)
 				Expect(app.Stdout.String()).NotTo(ContainSubstring("Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work."))
 				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+				Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 			})
 		})
 	})

@@ -21,12 +21,14 @@ var _ = Describe("deploying a flask web app", func() {
 	Context("app has Pipfile.lock and no requirements.txt or runtime.txt", func() {
 		BeforeEach(func() {
 			app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv"))
+			app.SetEnv("BP_DEBUG", "1")
 			PushAppAndConfirm(app)
 		})
 
 		It("gets the python version from pipfile.lock and generates a runtime.txt", func() {
 			Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.6."))
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
+			Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 		})
 
 		It("generates a requirements.txt", func() {

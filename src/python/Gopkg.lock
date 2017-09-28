@@ -16,8 +16,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/cloudfoundry/libbuildpack"
-  packages = [".","ansicleaner","cutlass","packager"]
-  revision = "883fdcaaec73ebca143869dfd4253ec523294750"
+  packages = [".","ansicleaner","cutlass","packager","snapshot"]
+  revision = "31e15be2069b76ed9f97553be94757ff87e1aa0e"
 
 [[projects]]
   name = "github.com/elazarl/goproxy"
@@ -87,6 +87,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e16f507d47a7b9cacee3a47d61631ac9b52803960756c0cad7c15125aee60233"
+  inputs-digest = "bb9c5951d7c7d37822754256157ed6a37e3a0e394bedc3344d6c4437c23d8987"
   solver-name = "gps-cdcl"
   solver-version = 1
