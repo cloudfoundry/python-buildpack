@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-
-Dir.glob("#{ENV['DEPS_DIR']}/#{ENV['DEPS_IDX']}/bin/*").each do |file|
-  if `file -L #{file}`.include?('ASCII text')
-    content = File.read(file)
-    content.gsub!(%r{#!/.*/python.*$}, '#!/usr/bin/env python')
-    File.write(file, content)
-  end
-end

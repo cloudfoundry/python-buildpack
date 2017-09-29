@@ -3,18 +3,6 @@ language: python
 default_versions:
 - name: python
   version: 2.7.14
-- name: pip
-  version: 9.0.1
-- name: setuptools
-  version: 32.1.0
-- name: pip-pop
-  version: 0.1.1
-- name: pipenv
-  version: 4.0.1
-- name: libmemcache
-  version: 1.0.18
-- name: libffi
-  version: 3.2.1
 dependency_deprecation_dates:
 - match: 2.7.\d+
   version_line: "2.7"
@@ -138,16 +126,6 @@ dependencies:
   - cflinuxfs2
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.1-linux-x64-ff595348.tgz
   md5: ff59534890d6eb0b954805c357e1440c
-exclude_files:
-- ".git/"
-- ".gitignore"
-- ".gitmodules"
-- cf_spec/
-- log/
-- test/
-- bin/package
-- buildpack-packager/
-- python_buildpack-*v*.zip
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
