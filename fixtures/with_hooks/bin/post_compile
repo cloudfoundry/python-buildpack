@@ -1,0 +1,2 @@
+echo 'Echo from app post compile'
+echo
