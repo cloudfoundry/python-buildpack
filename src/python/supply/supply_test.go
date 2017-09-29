@@ -451,9 +451,6 @@ cffi==0.9.2
 			})
 			It("installs the vendor directory", func() {
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
-				// FIXME - include below
-				// cp requirements.txt $DEPS_DIR/$DEPS_IDX/python/requirements-declared.txt
-				// mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "freeze", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", ">", fmt.Sprintf("%s/python/requirements-installed.txt"))
 				Expect(supplier.RunPip()).To(Succeed())
 			})
 		})
