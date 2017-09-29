@@ -23,6 +23,7 @@ var _ = Describe("Supply", func() {
 	var (
 		err          error
 		buildDir     string
+		cacheDir     string
 		depsDir      string
 		depsIdx      string
 		depDir       string
@@ -39,6 +40,9 @@ var _ = Describe("Supply", func() {
 		buildDir, err = ioutil.TempDir("", "python-buildpack.build.")
 		Expect(err).To(BeNil())
 
+		cacheDir, err = ioutil.TempDir("", "python-buildpack.cache.")
+		Expect(err).To(BeNil())
+
 		depsDir, err = ioutil.TempDir("", "python-buildpack.deps.")
 		Expect(err).To(BeNil())
 
@@ -50,6 +54,7 @@ var _ = Describe("Supply", func() {
 		mockManifest = NewMockManifest(mockCtrl)
 		mockStager = NewMockStager(mockCtrl)
 		mockStager.EXPECT().BuildDir().AnyTimes().Return(buildDir)
+		mockStager.EXPECT().CacheDir().AnyTimes().Return(cacheDir)
 		mockStager.EXPECT().DepDir().AnyTimes().Return(depDir)
 		mockStager.EXPECT().DepsIdx().AnyTimes().Return(depsIdx)
 		mockCommand = NewMockCommand(mockCtrl)
@@ -548,6 +553,16 @@ export FORWARDED_ALLOW_IPS='*'
 					Expect(supplier.HasNltkData).To(BeTrue())
 				})
 			})
+		})
+	})
+
+	Describe("SetupCacheDir", func() {
+		AfterEach(func() { os.Unsetenv("XDG_CACHE_HOME") })
+
+		It("Sets pip's cache directory", func() {
+			mockStager.EXPECT().WriteEnvFile("XDG_CACHE_HOME", filepath.Join(cacheDir, "pip_cache"))
+			Expect(supplier.SetupCacheDir()).To(Succeed())
+			Expect(os.Getenv("XDG_CACHE_HOME")).To(Equal(filepath.Join(cacheDir, "pip_cache")))
 		})
 	})
 })

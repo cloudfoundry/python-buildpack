@@ -3,6 +3,8 @@ package integration_test
 import (
 	"fmt"
 	"path/filepath"
+	"regexp"
+	"strconv"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
@@ -43,6 +45,16 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
 		Expect(app.Stdout.String()).NotTo(ContainSubstring("ImportError:"))
 		Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
+
+		By("Caching pip files", func() {
+			Expect(app.Stdout.String()).To(ContainSubstring("Size of pip cache dir: "))
+			matches := regexp.MustCompile("(?m)Size of pip cache dir: (\\d+)\\s.*pip_cache$").FindStringSubmatch(app.Stdout.String())
+			Expect(matches).To(HaveLen(2))
+			size, err := strconv.Atoi(matches[1])
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(size).To(BeNumerically(">", 5000))
+		})
 	})
 
 	It("deploy a web app that uses an nltk corpus", func() {

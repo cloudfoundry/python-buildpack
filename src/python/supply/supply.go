@@ -18,6 +18,7 @@ import (
 
 type Stager interface {
 	BuildDir() string
+	CacheDir() string
 	DepDir() string
 	DepsIdx() string
 	LinkDirectoryInDepDir(string, string) error
@@ -51,8 +52,12 @@ type Supplier struct {
 func Run(s *Supplier) error {
 	s.Log.BeginStep("Supplying Python")
 
-	// TODO: Restore cache?
 	dirSnapshot := snapshot.Dir(s.Stager.BuildDir(), s.Log)
+
+	if err := s.SetupCacheDir(); err != nil {
+		s.Log.Error("Error setting up cache: %v", err)
+		return err
+	}
 
 	if err := s.CopyRequirementsAndRuntimeTxt(); err != nil {
 		s.Log.Error("Error copying requirements.txt and runtime.txt to deps dir: %v", err)
@@ -129,7 +134,9 @@ func Run(s *Supplier) error {
 		return err
 	}
 
-	// TODO: caching?
+	if cacheDirSize, err := s.Command.Output(os.Getenv("XDG_CACHE_HOME"), "du", "--summarize", os.Getenv("XDG_CACHE_HOME")); err == nil {
+		s.Log.Debug("Size of pip cache dir: %s", cacheDirSize)
+	}
 
 	dirSnapshot.Diff()
 
@@ -536,4 +543,14 @@ func (s *Supplier) formatVersion(version string) string {
 
 func indentWriter(writer io.Writer) io.Writer {
 	return text.NewIndentWriter(writer, []byte("       "))
+}
+
+func (s *Supplier) SetupCacheDir() error {
+	if err := os.Setenv("XDG_CACHE_HOME", filepath.Join(s.Stager.CacheDir(), "pip_cache")); err != nil {
+		return err
+	}
+	if err := s.Stager.WriteEnvFile("XDG_CACHE_HOME", filepath.Join(s.Stager.CacheDir(), "pip_cache")); err != nil {
+		return err
+	}
+	return nil
 }
