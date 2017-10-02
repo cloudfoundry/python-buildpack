@@ -25,6 +25,18 @@ dependency_deprecation_dates:
   date: 2021-12-23
   link: https://docs.python.org/devguide/index.html#branchstatus
 dependencies:
+- name: miniconda2
+  version: 4.3.21
+  cf_stacks:
+  - cflinuxfs2
+  uri: http://repo.continuum.io/miniconda/Miniconda2-4.3.21-Linux-x86_64.sh
+  md5: 7097150146dd3b83c805223663ebffcc
+- name: miniconda3
+  version: 4.3.21
+  cf_stacks:
+  - cflinuxfs2
+  uri: http://repo.continuum.io/miniconda/Miniconda3-4.3.21-Linux-x86_64.sh
+  md5: c1c15d3baba15bf50293ae963abef853
 - name: pip
   version: 9.0.1
   cf_stacks:

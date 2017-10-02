@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"python/conda"
 	"python/pipfile"
 	"regexp"
 	"strings"
@@ -50,6 +51,17 @@ type Supplier struct {
 }
 
 func Run(s *Supplier) error {
+	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "environment.yml")); err != nil {
+		s.Log.Error("Error checking existence of environment.yml: %v", err)
+		return err
+	} else if exists {
+		return conda.Run(conda.New(s.Manifest, s.Stager, s.Command, s.Log))
+	} else {
+		return RunPython(s)
+	}
+}
+
+func RunPython(s *Supplier) error {
 	s.Log.BeginStep("Supplying Python")
 
 	dirSnapshot := snapshot.Dir(s.Stager.BuildDir(), s.Log)
