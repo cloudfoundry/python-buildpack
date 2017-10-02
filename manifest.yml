@@ -4,28 +4,23 @@ default_versions:
 - name: python
   version: 2.7.14
 dependency_deprecation_dates:
-- match: 2.7.\d+
-  version_line: "2.7"
+- version_line: 2.7.x
   name: python
   date: 2020-01-01
   link: https://docs.python.org/devguide/index.html#branchstatus
-- match: 3.3.\d+
-  version_line: "3.3"
+- version_line: 3.3.x
   name: python
   date: 2017-09-29
   link: https://docs.python.org/devguide/index.html#branchstatus
-- match: 3.4.\d+
-  version_line: "3.4"
+- version_line: 3.4.x
   name: python
   date: 2019-03-16
   link: https://docs.python.org/devguide/index.html#branchstatus
-- match: 3.5.\d+
-  version_line: "3.5"
+- version_line: 3.5.x
   name: python
   date: 2020-09-13
   link: https://docs.python.org/devguide/index.html#branchstatus
-- match: 3.6.\d+
-  version_line: "3.6"
+- version_line: 3.6.x
   name: python
   date: 2021-12-23
   link: https://docs.python.org/devguide/index.html#branchstatus
