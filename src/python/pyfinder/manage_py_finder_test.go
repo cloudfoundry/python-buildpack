@@ -1,10 +1,10 @@
-package manage_py_finder_test
+package pyfinder_test
 
 import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	. "python/manage_py_finder"
+	. "python/pyfinder"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +18,7 @@ var _ = Describe("ManagePyFinder", func() {
 	)
 
 	BeforeEach(func() {
-		tempDir, err = ioutil.TempDir("", "manage_py_finder")
+		tempDir, err = ioutil.TempDir("", "pyfinder")
 		Expect(err).NotTo(HaveOccurred())
 		finder = ManagePyFinder{}
 	})

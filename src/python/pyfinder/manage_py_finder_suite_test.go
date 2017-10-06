@@ -1,4 +1,4 @@
-package manage_py_finder_test
+package pyfinder_test
 
 import (
 	. "github.com/onsi/ginkgo"
