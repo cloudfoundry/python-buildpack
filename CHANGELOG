@@ -1,3 +1,16 @@
+v1.5.27 Oct 10, 2017
+=====================
+
+* Convert buildpack to libbuildpack
+  (https://www.pivotaltracker.com/story/show/150823743)
+  (https://www.pivotaltracker.com/story/show/151599855)
+
+* Add miniconda 4.3.27, Remove miniconda 4.3.21
+  (https://www.pivotaltracker.com/story/show/151551565)
+
+* Don't change build directory during supply
+  (https://www.pivotaltracker.com/story/show/150823743)
+
 v1.5.26 Sep 27, 2017
 =====================
 
