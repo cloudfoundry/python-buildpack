@@ -264,11 +264,25 @@ var _ = Describe("Supply", func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 		})
 		Context("when requirements.txt does not exist", func() {
-			It("create requirements.txt with '-e .'", func() {
-				Expect(supplier.HandleRequirementstxt()).To(Succeed())
-				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(fileContents).To(Equal([]byte("-e .")))
+			Context("when setup.py exists", func() {
+				BeforeEach(func() {
+					Expect(ioutil.WriteFile(filepath.Join(buildDir, "setup.py"), []byte{}, 0644)).To(Succeed())
+				})
+				It("create requirements.txt with '-e .'", func() {
+					Expect(supplier.HandleRequirementstxt()).To(Succeed())
+
+					Expect(filepath.Join(depDir, "requirements.txt")).To(BeARegularFile())
+
+					fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(fileContents).To(Equal([]byte("-e .")))
+				})
+			})
+			Context("when setup.py does not exist", func() {
+				It("does not create requirements.txt file", func() {
+					Expect(supplier.HandleRequirementstxt()).To(Succeed())
+					Expect(filepath.Join(depDir, "requirements.txt")).ToNot(BeARegularFile())
+				})
 			})
 		})
 
@@ -436,25 +450,35 @@ cffi==0.9.2
 
 	Describe("RunPip", func() {
 		BeforeEach(func() {
-			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 		})
-		Context("vendor does not exist", func() {
-			It("Runs and outputs pip", func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
-				Expect(supplier.RunPip()).To(Succeed())
-			})
-		})
-
-		Context("vendor exists", func() {
+		Context("requirements.txt exists in dep dir", func() {
 			BeforeEach(func() {
-				Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
 			})
-			It("installs the vendor directory", func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
+			Context("vendor does not exist", func() {
+				It("Runs and outputs pip", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+					Expect(supplier.RunPip()).To(Succeed())
+				})
+			})
+
+			Context("vendor exists", func() {
+				BeforeEach(func() {
+					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
+				})
+				It("installs the vendor directory", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
+					Expect(supplier.RunPip()).To(Succeed())
+				})
+			})
+		})
+		Context("requirements.txt is NOT in dep dir", func() {
+			It("exits early", func() {
 				Expect(supplier.RunPip()).To(Succeed())
 			})
 		})
-
 	})
 
 	Describe("CreateDefaultEnv", func() {

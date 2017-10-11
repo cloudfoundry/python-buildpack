@@ -174,7 +174,7 @@ func (s *Supplier) CopyRequirementsAndRuntimeTxt() error {
 }
 
 func (s *Supplier) HandleMercurial() error {
-	if err := s.Command.Execute(s.Stager.DepDir(), os.Stdout, os.Stderr, "grep", "-Fiq", "hg+", "requirements.txt"); err != nil {
+	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "grep", "-Fiq", "hg+", "requirements.txt"); err != nil {
 		return nil
 	}
 
@@ -371,23 +371,24 @@ func (s *Supplier) HandlePylibmc() error {
 }
 
 func (s *Supplier) HandleRequirementstxt() error {
-	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt"))
-	if err != nil {
+	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
 		return err
+	} else if exists {
+		return nil
 	}
 
-	if !requirementstxtExists {
-		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "requirements.txt"), []byte("-e ."), 0644); err != nil {
-			return err
-		}
+	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "setup.py")); err != nil {
+		return err
+	} else if !exists {
+		return nil
 	}
 
-	return nil
+	return ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "requirements.txt"), []byte("-e ."), 0644)
 }
 
 func (s *Supplier) HandleFfi() error {
 	ffiDir := filepath.Join(s.Stager.DepDir(), "libffi")
-	if err := s.Command.Execute(s.Stager.DepDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
+	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
 		s.Log.BeginStep("Noticed dependency requiring libffi. Bootstrapping libffi.")
 		if err := s.Manifest.InstallOnlyVersion("libffi", ffiDir); err != nil {
 			return err
@@ -462,6 +463,13 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 }
 
 func (s *Supplier) RunPip() error {
+	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
+		return fmt.Errorf("Couldn't determine existence of requirements.txt")
+	} else if !exists {
+		s.Log.Debug("Skipping pip install since requirements.txt does not exist")
+		return nil
+	}
+
 	installArgs := []string{"install", "-r", filepath.Join(s.Stager.DepDir(), "requirements.txt"), "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
 	if vendorExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "vendor")); err != nil {
 		return fmt.Errorf("Couldn't check vendor existence: %v", err)
@@ -471,7 +479,7 @@ func (s *Supplier) RunPip() error {
 
 	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", installArgs...); err != nil {
 		s.Log.Debug("******Path val: %s", os.Getenv("PATH"))
-		return err
+		return fmt.Errorf("Couldn't run pip: %v", err)
 	}
 
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
