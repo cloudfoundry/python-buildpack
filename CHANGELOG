@@ -1,3 +1,15 @@
+v1.6.1 Oct 17, 2017
+====================
+
+* Allow apps without both requirements.txt and setup.py
+  (https://www.pivotaltracker.com/story/show/151542879)
+
+* Add python 3.6.3, remove python 3.6.1
+  (https://www.pivotaltracker.com/story/show/151657228)
+
+* Add python 3.3.7, remove python 3.3.5
+  (https://www.pivotaltracker.com/story/show/151206742)
+
 v1.5.27 Oct 10, 2017
 =====================
 
