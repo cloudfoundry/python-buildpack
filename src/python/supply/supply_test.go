@@ -196,6 +196,17 @@ var _ = Describe("Supply", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(requirementsContents).To(ContainSubstring("test"))
 			})
+
+			It("removes extraneous pipenv lock output", func() {
+				mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+				mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("Using /tmp/deps/0/bin/python3.6m to create virtualenv…\nline 1\nline 2\n", nil)
+				Expect(supplier.InstallPipEnv()).To(Succeed())
+				requirementsContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(requirementsContents)).To(Equal("line 1\nline 2\n"))
+			})
 		})
 	})
 

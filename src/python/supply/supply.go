@@ -345,6 +345,14 @@ func (s *Supplier) InstallPipEnv() error {
 			return err
 		}
 
+		// Remove output due to virtualenv
+		if strings.HasPrefix(output, "Using ") {
+			reqs := strings.SplitN(output, "\n", 2)
+			if len(reqs) > 0 {
+				output = reqs[1]
+			}
+		}
+
 		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "requirements.txt"), []byte(output), 0644); err != nil {
 			return err
 		}

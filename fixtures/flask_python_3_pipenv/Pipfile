@@ -12,3 +12,9 @@ Werkzeug = "==0.10.4"
 
 [requires]
 python_version='3.6'
+
+[dev-packages]
+tox = "*"
+coverage = "*"
+"flake8" = "*"
+flask-testing = "*"
