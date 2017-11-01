@@ -306,7 +306,7 @@ func (s *Supplier) InstallPipPop() error {
 		return err
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "install", "pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip", "install", "pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
 		s.Log.Debug("******Path val: %s", os.Getenv("PATH"))
 		return err
 	}
@@ -322,7 +322,7 @@ func (s *Supplier) InstallPipEnv() error {
 		return err
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "install", "pipenv", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip", "install", "pipenv", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
 		return err
 	}
 	s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
@@ -354,7 +354,7 @@ func (s *Supplier) InstallPipEnv() error {
 
 func (s *Supplier) HandlePylibmc() error {
 	memcachedDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
-	if err := s.Command.Execute(s.Stager.DepDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
+	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
 		s.Log.BeginStep("Noticed pylibmc. Bootstrapping libmemcached.")
 		if err := s.Manifest.InstallOnlyVersion("libmemcache", memcachedDir); err != nil {
 			return err
@@ -411,7 +411,7 @@ func (s *Supplier) InstallPip() error {
 		}
 		versions := s.Manifest.AllDependencyVersions(name)
 		outWriter := new(bytes.Buffer)
-		if err := s.Command.Execute(filepath.Join("/tmp", name, name+"-"+versions[0]), outWriter, indentWriter(os.Stderr), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s", filepath.Join(s.Stager.DepDir(), "python"))); err != nil {
+		if err := s.Command.Execute(filepath.Join("/tmp", name, name+"-"+versions[0]), ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", fmt.Sprintf("--prefix=%s", filepath.Join(s.Stager.DepDir(), "python"))); err != nil {
 			s.Log.Error(outWriter.String())
 			return err
 		}
