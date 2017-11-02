@@ -323,7 +323,7 @@ func (s *Supplier) InstallPipEnv() error {
 	}
 
 	for _, dep := range []string{"setuptools_scm", "pytest-runner", "pipenv"} {
-		if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip", "install", dep, "--verbose", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+		if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
 			return err
 		}
 	}
