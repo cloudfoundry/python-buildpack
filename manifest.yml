@@ -26,17 +26,17 @@ dependency_deprecation_dates:
   link: https://docs.python.org/devguide/index.html#branchstatus
 dependencies:
 - name: miniconda2
-  version: 4.3.27
+  version: 4.3.30
   cf_stacks:
   - cflinuxfs2
-  uri: http://repo.continuum.io/miniconda/Miniconda2-4.3.27-Linux-x86_64.sh
-  sha256: fbf576da37b515157600e5f5ce264a302b101b72a7cbc97285c8dec323118c51
+  uri: http://repo.continuum.io/miniconda/Miniconda2-4.3.30-Linux-x86_64.sh
+  sha256: 0891000ca28359e63aa77e613c01f7a88855dedfc0ddc8be31829f3139318cf3
 - name: miniconda3
-  version: 4.3.27
+  version: 4.3.30
   cf_stacks:
   - cflinuxfs2
-  uri: http://repo.continuum.io/miniconda/Miniconda3-4.3.27-Linux-x86_64.sh
-  sha256: 371814c483f63e9ec70b3e578d5ac51133fa91ae10d9fdf063f3ffc9d605f1b2
+  uri: http://repo.continuum.io/miniconda/Miniconda3-4.3.30-Linux-x86_64.sh
+  sha256: 66c822dfe76636b4cc2ae5604816e0e723aa01620f50087f06410ecf5bfdf38c
 - name: pip
   version: 9.0.1
   cf_stacks:
