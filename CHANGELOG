@@ -1,3 +1,20 @@
+v1.6.2 Nov 06, 2017
+====================
+
+* Add miniconda 4.3.30, Remove miniconda 4.3.27
+  (https://www.pivotaltracker.com/story/show/152287064)
+
+* Update setuptools and pipenv
+  (https://www.pivotaltracker.com/story/show/152395352)
+
+* Minimize output during pip install
+
+* Verify dependency downloads using sha256 instead of md5
+  (https://www.pivotaltracker.com/story/show/151913767)
+
+* Store profile.d dir outside app directory on recent BAL
+  (https://www.pivotaltracker.com/story/show/151381713)
+
 v1.6.1 Oct 17, 2017
 ====================
 
