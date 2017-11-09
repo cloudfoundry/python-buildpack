@@ -56,7 +56,7 @@ LEGACY_TRIGGER="lib/python2.7"
 DEFAULT_PYTHON_VERSION="python-2.7.11"
 DEFAULT_PYTHON_STACK="cedar-14"
 PYTHON_EXE="/app/.heroku/python/bin/python"
-PIP_VERSION="8.1.1"
+PIP_VERSION="9.0.1"
 SETUPTOOLS_VERSION="20.4"
 
 # Common Problem Warnings
