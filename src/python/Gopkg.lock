@@ -16,7 +16,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/cloudfoundry/libbuildpack"
-  packages = [".","ansicleaner","cutlass","packager","snapshot"]
+  packages = [".","ansicleaner","bratshelper","cutlass","packager","snapshot"]
   revision = "bdb5a4667d406a77bba382c7f1975a50b9494859"
 
 [[projects]]
@@ -62,6 +62,12 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["bcrypt","blowfish"]
+  revision = "6a293f2d4b14b8e6d3f0539e383f6d0d30fce3fd"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = ["context","html","html/atom","html/charset"]
   revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
@@ -87,6 +93,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bb9c5951d7c7d37822754256157ed6a37e3a0e394bedc3344d6c4437c23d8987"
+  inputs-digest = "3cd7a5ab1e1a885d07029d188de7a883d6b30d674e3470a894170781167a0b9b"
   solver-name = "gps-cdcl"
   solver-version = 1
