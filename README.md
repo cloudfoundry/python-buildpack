@@ -1,7 +1,7 @@
 # Cloud Foundry Python Buildpack
 [![CF Slack](https://s3.amazonaws.com/buildpacks-assets/buildpacks-slack.svg)](http://slack.cloudfoundry.org)
 
-**This repository is not being maintained anymore and currently not usable because a file that would get downloaded from an external server is no more available**
+**This repository is not being maintained anymore**
 
 
 A Cloud Foundry [buildpack](http://docs.cloudfoundry.org/buildpacks/) for Python based apps.
