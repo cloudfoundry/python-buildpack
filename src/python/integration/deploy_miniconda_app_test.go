@@ -76,8 +76,11 @@ var _ = Describe("CF Python Buildpack", func() {
 
 		It("doesn't re-download unchanged dependencies", func() {
 			PushAppAndConfirm(app)
-			PushAppAndConfirm(app)
+			Expect(app.Stdout.String()).To(ContainSubstring("scipy"))
 
+			app.Stdout.Reset()
+
+			PushAppAndConfirm(app)
 			// Check that scipy was not re-installed in the logs
 			Expect(app.Stdout.String()).ToNot(ContainSubstring("scipy"))
 		})
