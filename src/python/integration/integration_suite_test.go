@@ -62,10 +62,9 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 var _ = SynchronizedAfterSuite(func() {
 	// Run on all nodes
-	Expect(os.RemoveAll("CF_HOME")).To(Succeed())
 }, func() {
 	// Run once
-	// Expect(cutlass.RemovePackagedBuildpack(packagedBuildpack)).To(Succeed())
+	Expect(cutlass.RemovePackagedBuildpack(packagedBuildpack)).To(Succeed())
 	Expect(cutlass.DeleteOrphanedRoutes()).To(Succeed())
 })
 
