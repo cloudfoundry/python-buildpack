@@ -56,11 +56,11 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pipenv/pipenv-8.3.2-5e84a9b0.tar.gz
   sha256: 5e84a9b0ab2cc1a44b6e196ddb19656e6b5cff1e131d231e51cabf8b4129d4c6
 - name: setuptools
-  version: 36.7.2
+  version: 37.0.0
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/setuptools/setuptools-36.7.2-ad86fd8d.zip
-  sha256: ad86fd8dd09c285c33b4c5b82bbc21d21883637faef78b0ab58fa9984847220d
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/setuptools/setuptools-37.0.0-0b95db16.zip
+  sha256: 0b95db16abf74d435217f17774245fce1ea5a583e5ae8098d98f4ab0145491e3
 - name: libmemcache
   version: 1.0.18
   cf_stacks:
