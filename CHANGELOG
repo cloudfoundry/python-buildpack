@@ -1,3 +1,12 @@
+v1.6.3 Nov 30, 2017
+====================
+
+* Add setuptools 38.2.3, Remove setuptools 36.6.0
+  (https://www.pivotaltracker.com/story/show/153199150)
+
+* Add pipenv 8.3.2, Remove pipenv 8.3.1
+  (https://www.pivotaltracker.com/story/show/152573073)
+
 v1.6.2 Nov 06, 2017
 ====================
 
