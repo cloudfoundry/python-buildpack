@@ -473,7 +473,7 @@ cffi==0.9.2
 			})
 			Context("vendor does not exist", func() {
 				It("Runs and outputs pip", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
 					Expect(supplier.RunPip()).To(Succeed())
 				})
 			})
@@ -483,7 +483,7 @@ cffi==0.9.2
 					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
 				})
 				It("installs the vendor directory", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
 					Expect(supplier.RunPip()).To(Succeed())
 				})
 			})

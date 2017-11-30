@@ -473,6 +473,7 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 }
 
 func (s *Supplier) RunPip() error {
+	s.Log.BeginStep("Running Pip Install")
 	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
 		return fmt.Errorf("Couldn't determine existence of requirements.txt")
 	} else if !exists {
@@ -480,7 +481,7 @@ func (s *Supplier) RunPip() error {
 		return nil
 	}
 
-	installArgs := []string{"install", "-r", filepath.Join(s.Stager.DepDir(), "requirements.txt"), "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
+	installArgs := []string{"install", "-r", filepath.Join(s.Stager.DepDir(), "requirements.txt"), "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
 	if vendorExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "vendor")); err != nil {
 		return fmt.Errorf("Couldn't check vendor existence: %v", err)
 	} else if vendorExists {
