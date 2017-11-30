@@ -53,8 +53,8 @@ dependencies:
   version: 8.3.2
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pipenv/pipenv-8.3.2-5e84a9b0.tar.gz
-  sha256: 5e84a9b0ab2cc1a44b6e196ddb19656e6b5cff1e131d231e51cabf8b4129d4c6
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-8.3.2-20be245a.tar.gz
+  sha256: 20be245ad2a7908a04b302e9568ee26e57f8dacc558468d2a84e699b2622e9af
 - name: setuptools
   version: 38.2.3
   cf_stacks:
