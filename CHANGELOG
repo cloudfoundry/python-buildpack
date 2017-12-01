@@ -1,3 +1,10 @@
+v1.6.4 Dec 01, 2017
+====================
+
+* Allows users to set specific "setuptools" version in requirements.txt
+  Add "--ignore-installed" to pip install
+  (https://www.pivotaltracker.com/story/show/152297106)
+
 v1.6.3 Nov 30, 2017
 ====================
 
