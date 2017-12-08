@@ -77,8 +77,8 @@ dependencies:
   version: 2.7.14
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.14-linux-x64-efdf28e3.tgz
-  sha256: efdf28e3e3a505928f3c2643df731b0047891fa1000cac3cc8a84d4d6c3f8537
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.14-linux-x64-30d9c08f.tgz
+  sha256: 30d9c08fea5f1362d1039c5ebc288d6e70d86d7a5acf82903c4faefadea6bd36
 - name: python
   version: 2.7.13
   cf_stacks:
@@ -89,8 +89,8 @@ dependencies:
   version: 3.3.7
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.7-linux-x64-19f5d22c.tgz
-  sha256: 19f5d22c32651ab9ec578d36866e6320446decc2d20223357d29cd13d7159e8f
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.7-linux-x64-8bed4e0d.tgz
+  sha256: 8bed4e0d992e340159a1adaad8519262ea72c533b3e371c1d066ca60c517b13a
 - name: python
   version: 3.3.6
   cf_stacks:
@@ -107,8 +107,8 @@ dependencies:
   version: 3.4.7
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.7-linux-x64-85278721.tgz
-  sha256: 8527872182b0636d5b97645463ee8d5455b1a411d22a173ea18100c0dda59988
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.7-linux-x64-c2cb934a.tgz
+  sha256: c2cb934a8d90b0d24bef0f515ec14aabe21bddced44796d661de8b5b87d928c7
 - name: python
   version: 3.5.3
   cf_stacks:
@@ -119,8 +119,8 @@ dependencies:
   version: 3.5.4
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.4-linux-x64-96923b58.tgz
-  sha256: 96923b58b199e29a6b3b05d432b0e5a1191fa90787c0686a4ce76c56c284f980
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.4-linux-x64-5c7aa3b0.tgz
+  sha256: 5c7aa3b080032cdcf44d385516d2e53cd9efc27eb75bc305ee01b4981c842ac6
 - name: python
   version: 3.6.2
   cf_stacks:
@@ -131,8 +131,8 @@ dependencies:
   version: 3.6.3
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.3-linux-x64-ab1f6a90.tgz
-  sha256: ab1f6a9094cfbf8297004e0bb8fe4395afa1f60440e56fe3c52a57a5448f90e0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.3-linux-x64-e1d8ecd1.tgz
+  sha256: e1d8ecd1339acc6e4dec3dcb00e40af4d3ddcecf35153f79570fa53626b87e39
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md

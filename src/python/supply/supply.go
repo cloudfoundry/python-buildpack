@@ -262,8 +262,19 @@ func (s *Supplier) InstallPython() error {
 		return err
 	}
 
-	s.Stager.LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")
-	s.Stager.LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
+	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin"); err != nil {
+		return err
+	}
+	if found, err := libbuildpack.FileExists(filepath.Join(pythonInstallDir, "usr", "lib", "x86_64-linux-gnu")); err != nil {
+		return err
+	} else if found {
+		if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "usr", "lib", "x86_64-linux-gnu"), "lib"); err != nil {
+			return err
+		}
+	}
+	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib"); err != nil {
+		return err
+	}
 
 	if err := os.Setenv("PATH", fmt.Sprintf("%s:%s", filepath.Join(s.Stager.DepDir(), "bin"), os.Getenv("PATH"))); err != nil {
 		return err
