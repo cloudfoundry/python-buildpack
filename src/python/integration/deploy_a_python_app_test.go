@@ -68,6 +68,14 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 	})
 
+	It("deploy a web app that uses an tkinter", func() {
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "tkinter"))
+		app.Buildpacks = []string{"python_buildpack"}
+		PushAppAndConfirm(app)
+
+		Expect(app.GetBody("/")).To(ContainSubstring("tkinter was imported"))
+	})
+
 	It("should not display the allow-all-external deprecation message", func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
 		PushAppAndConfirm(app)
