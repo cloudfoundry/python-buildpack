@@ -1,3 +1,13 @@
+v1.6.5 Dec 13, 2017
+====================
+
+* Setup tcl/tk for tkinter support
+  Rebuild python versions: 2.7.14, 3.3.7, 3.4.7, 3.5.4, 3.6.3
+  (https://www.pivotaltracker.com/story/show/153231455)
+
+* Add setuptools 38.2.4, remove setuptools 38.2.3
+  (https://www.pivotaltracker.com/story/show/153374171)
+
 v1.6.4 Dec 01, 2017
 ====================
 
