@@ -128,9 +128,9 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.3-linux-x64-e1d8ecd1.tgz
   sha256: e1d8ecd1339acc6e4dec3dcb00e40af4d3ddcecf35153f79570fa53626b87e39
 - name: setuptools
-  version: 38.3.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-38.3.0-11b4a4d6.zip
-  sha256: 11b4a4d6a25affaf2494443228335cb88f600c96a62feb7d8781f900eba0f4df
+  version: 38.4.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-38.4.0-6501fc32.zip
+  sha256: 6501fc32f505ec5b3ed36ec65ba48f1b975f52cf2ea101c7b73a08583fd12f75
   cf_stacks:
   - cflinuxfs2
 include_files:
