@@ -44,11 +44,11 @@ dependencies:
   uri: http://repo.continuum.io/miniconda/Miniconda2-4.3.30-Linux-x86_64.sh
   sha256: '0891000ca28359e63aa77e613c01f7a88855dedfc0ddc8be31829f3139318cf3'
 - name: miniconda3
-  version: 4.3.30
+  version: 4.3.31
   cf_stacks:
   - cflinuxfs2
-  uri: http://repo.continuum.io/miniconda/Miniconda3-4.3.30-Linux-x86_64.sh
-  sha256: 66c822dfe76636b4cc2ae5604816e0e723aa01620f50087f06410ecf5bfdf38c
+  uri: http://repo.continuum.io/miniconda/Miniconda3-4.3.31-Linux-x86_64.sh
+  sha256: 5551f01f436b6409d467412c33e12ecc4f43b5e029290870f8fdeca403c274e6
 - name: pip
   version: 9.0.1
   cf_stacks:
