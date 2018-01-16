@@ -24,7 +24,7 @@
     "packager",
     "snapshot"
   ]
-  revision = "a4c9782e2cc42c03c3bc8f61fd73c75b1d1a7e3a"
+  revision = "c8c64907cd3915b319021cb1cf835bb60aa39851"
 
 [[projects]]
   name = "github.com/elazarl/goproxy"
@@ -106,7 +106,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "0fcca4842a8d74bfddc2c96a073bd2a4d2a7a2e8"
+  revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
 
 [[projects]]
   branch = "master"
@@ -117,13 +117,13 @@
     "html/atom",
     "html/charset"
   ]
-  revision = "434ec0c7fe3742c984919a691b2018a6e9694425"
+  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "b9cf5f96b68d9eaa53d5db5fef235718767f416a"
+  revision = "fff93fa7cd278d84afc205751523809c464168ab"
 
 [[projects]]
   branch = "master"
