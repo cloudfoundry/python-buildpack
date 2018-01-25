@@ -132,10 +132,25 @@ var _ = Describe("Conda", func() {
 	})
 
 	Describe("UpdateAndClean", func() {
-		It("calls update and clean on conda", func() {
-			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), filepath.Join(depDir, "conda", "bin", "conda"), "env", "update", "--quiet", "-n", "dep_env", "-f", filepath.Join(buildDir, "environment.yml"))
-			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), filepath.Join(depDir, "conda", "bin", "conda"), "clean", "-pt")
-			Expect(subject.UpdateAndClean()).To(Succeed())
+		AfterEach(func() {
+			os.Unsetenv("BP_DEBUG")
+		})
+		Context("BP_DEBUG == false", func() {
+			It("calls update and clean on conda (with quiet flag)", func() {
+				mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), filepath.Join(depDir, "conda", "bin", "conda"), "env", "update", "--quiet", "-n", "dep_env", "-f", filepath.Join(buildDir, "environment.yml"))
+				mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), filepath.Join(depDir, "conda", "bin", "conda"), "clean", "-pt")
+				Expect(subject.UpdateAndClean()).To(Succeed())
+			})
+		})
+		Context("BP_DEBUG == true", func() {
+			BeforeEach(func() {
+				os.Setenv("BP_DEBUG", "1")
+			})
+			It("calls update and clean on conda (with debug and verbose flags)", func() {
+				mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), filepath.Join(depDir, "conda", "bin", "conda"), "env", "update", "--debug", "--verbose", "-n", "dep_env", "-f", filepath.Join(buildDir, "environment.yml"))
+				mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), filepath.Join(depDir, "conda", "bin", "conda"), "clean", "-pt")
+				Expect(subject.UpdateAndClean()).To(Succeed())
+			})
 		})
 	})
 
