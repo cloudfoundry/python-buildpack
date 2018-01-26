@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
@@ -249,5 +250,13 @@ var _ = Describe("CF Python Buildpack", func() {
 				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 			})
 		})
+	})
+
+	It("sets gunicorn to send access logs to stdout by defualt", func() {
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_latest_gunicorn"))
+		PushAppAndConfirm(app)
+
+		Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+		Eventually(app.Stdout.String, 10*time.Second).Should(MatchRegexp(`\[APP/PROC/WEB/0\] .* "GET / HTTP/1.1"`))
 	})
 })
