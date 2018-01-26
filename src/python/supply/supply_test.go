@@ -515,6 +515,7 @@ export PYTHONPATH=$DEPS_DIR/%s
 export PYTHONHOME=$DEPS_DIR/%s/python
 export PYTHONUNBUFFERED=1
 export FORWARDED_ALLOW_IPS='*'
+export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-'--access-logfile -'}
 `, depsIdx, depsIdx))
 			Expect(supplier.CreateDefaultEnv()).To(Succeed())
 		})
