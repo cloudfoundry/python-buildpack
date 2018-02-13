@@ -1,3 +1,19 @@
+v1.6.9 Feb 13, 2018
+====================
+
+* Add python 3.5.5, remove 3.5.3
+  (https://www.pivotaltracker.com/story/show/154908600)
+
+* Add python 3.4.8, remove 3.4.6
+  (https://www.pivotaltracker.com/story/show/154908600)
+
+* Enable manifest override yml
+  (https://www.pivotaltracker.com/story/show/153614649)
+
+* Add setuptools 38.5.1, remove setuptools 38.4.0
+  (https://www.pivotaltracker.com/story/show/154958496)
+  (https://www.pivotaltracker.com/story/show/154919979)
+
 v1.6.8 Jan 29, 2018
 ====================
 
