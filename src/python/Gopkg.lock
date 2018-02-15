@@ -39,6 +39,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/google/subcommands"
+  packages = ["."]
+  revision = "ce3d4cfc062faac7115d44e5befec8b5a08c3faa"
+
+[[projects]]
+  branch = "master"
   name = "github.com/kr/text"
   packages = ["."]
   revision = "7cafcd837844e784b526369c9bce262804aebc60"
@@ -158,6 +164,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3cd7a5ab1e1a885d07029d188de7a883d6b30d674e3470a894170781167a0b9b"
+  inputs-digest = "c3b7f242f4145d6222579881ec9fe3ffba1b7b18d509a651ad669441ab0e7933"
   solver-name = "gps-cdcl"
   solver-version = 1
