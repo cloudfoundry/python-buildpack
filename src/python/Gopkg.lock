@@ -24,7 +24,7 @@
     "packager",
     "snapshot"
   ]
-  revision = "0f142441eedac3e75efbdbf0c28e5a9e516cd7e3"
+  revision = "969f8afd93f9b7dfcfb6d131c3a313f1d1788531"
 
 [[projects]]
   name = "github.com/elazarl/goproxy"
@@ -112,7 +112,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "432090b8f568c018896cd8a0fb0345872bbac6ce"
+  revision = "49796115aa4b964c318aad4f3084fdb41e9aa067"
 
 [[projects]]
   branch = "master"
