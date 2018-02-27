@@ -488,6 +488,33 @@ cffi==0.9.2
 				})
 			})
 		})
+
+		Context("requirements.txt exists in dep dir and pip install fails", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+			})
+			const proTip = "You have a vendor directory, it must contain all of your dependencies."
+			Context("vendor does not exist", func() {
+				BeforeEach(func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
+				})
+				It("does NOT alert the user", func() {
+					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("Couldn't run pip: exit 28")))
+					Expect(buffer.String()).ToNot(ContainSubstring(proTip))
+				})
+			})
+			Context("vendor exists", func() {
+				BeforeEach(func() {
+					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28"))
+				})
+				It("alerts the user", func() {
+					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("Couldn't run pip: exit 28")))
+					Expect(buffer.String()).To(ContainSubstring(proTip))
+				})
+			})
+		})
+
 		Context("requirements.txt is NOT in dep dir", func() {
 			It("exits early", func() {
 				Expect(supplier.RunPip()).To(Succeed())
