@@ -58,6 +58,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(cutlass.CopyCfHome()).To(Succeed())
 	cutlass.SeedRandom()
 	cutlass.DefaultStdoutStderr = GinkgoWriter
+
+	SetDefaultEventuallyTimeout(10 * time.Second)
 })
 
 var _ = SynchronizedAfterSuite(func() {

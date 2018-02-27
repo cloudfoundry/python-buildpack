@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
-	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
@@ -257,6 +256,6 @@ var _ = Describe("CF Python Buildpack", func() {
 		PushAppAndConfirm(app)
 
 		Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
-		Eventually(app.Stdout.String, 10*time.Second).Should(MatchRegexp(`\[APP/PROC/WEB/0\] .* "GET / HTTP/1.1"`))
+		Eventually(app.Stdout.String).Should(MatchRegexp(`\[APP/PROC/WEB/0\] .* "GET / HTTP/1.1"`))
 	})
 })
