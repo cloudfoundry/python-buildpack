@@ -1,3 +1,19 @@
+v1.6.10 Feb 28, 2018
+=====================
+
+* Add pipenv 10.1.0, remove pipenv 9.0.3
+  (https://www.pivotaltracker.com/story/show/155490051)
+  (https://www.pivotaltracker.com/story/show/155362492)
+
+* Add miniconda 4.4.10, remove 4.3.30, 4.3.31
+  (https://www.pivotaltracker.com/story/show/155375170)
+
+* Document new buildpack-packager build command
+  (https://www.pivotaltracker.com/story/show/155223266)
+
+* Suggest a fix to user if pip fails and vendor exists
+  (https://www.pivotaltracker.com/story/show/155449364)
+
 v1.6.9 Feb 13, 2018
 ====================
 
