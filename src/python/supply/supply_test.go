@@ -163,12 +163,37 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
+	// Add the expects for what the installFfi function uses
+	expectInstallFfi := func() string {
+		ffiDir := filepath.Join(depDir, "libffi")
+		mockManifest.EXPECT().AllDependencyVersions("libffi").Return([]string{"1.2.3"})
+		mockManifest.EXPECT().InstallOnlyVersion("libffi", ffiDir)
+		mockStager.EXPECT().WriteEnvFile("LIBFFI", ffiDir)
+		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib"), "lib")
+		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib", "pkgconfig"), "pkgconfig")
+		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib", "libffi-1.2.3", "include"), "include")
+		return ffiDir
+	}
+
+	// Add the expects for functions used to install pipenv
+	// returns ffidir for convenience
+	expectInstallPipEnv := func() string {
+		// install pipenv binary from bp manifest
+		mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
+
+		// install pipenv dependencies
+		ffiDir := expectInstallFfi()
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "setuptools_scm", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pytest-runner", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+
+		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+		return ffiDir
+	}
+
 	Describe("InstallPipEnv", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
-
-			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "setuptools_scm", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pytest-runner", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
 		})
 		Context("when Pipfile.lock and requirements.txt both exist", func() {
 			BeforeEach(func() {
@@ -177,9 +202,7 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("installs pipenv and does not generate requirements.txt", func() {
-				mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+				expectInstallPipEnv()
 				Expect(supplier.InstallPipEnv()).To(Succeed())
 			})
 		})
@@ -190,9 +213,7 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("installs pipenv and generates requirements.txt", func() {
-				mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+				expectInstallPipEnv()
 				mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("test", nil)
 				Expect(supplier.InstallPipEnv()).To(Succeed())
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
@@ -201,9 +222,7 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("removes extraneous pipenv lock output", func() {
-				mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+				expectInstallPipEnv()
 				mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("Using /tmp/deps/0/bin/python3.6m to create virtualenv…\nline 1\nline 2\n", nil)
 				Expect(supplier.InstallPipEnv()).To(Succeed())
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
@@ -325,15 +344,23 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("installs ffi", func() {
-				ffiDir := filepath.Join(depDir, "libffi")
-				mockManifest.EXPECT().AllDependencyVersions("libffi").Return([]string{"1.2.3"})
-				mockManifest.EXPECT().InstallOnlyVersion("libffi", ffiDir)
-				mockStager.EXPECT().WriteEnvFile("LIBFFI", ffiDir)
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib"), "lib")
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib", "pkgconfig"), "pkgconfig")
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib", "libffi-1.2.3", "include"), "include")
+				ffiDir := expectInstallFfi()
 				Expect(supplier.HandleFfi()).To(Succeed())
 				Expect(os.Getenv("LIBFFI")).To(Equal(ffiDir))
+			})
+
+			Context("when pipenv is installed", func() {
+				var ffiDir string
+				BeforeEach(func() {
+					// expect pipenv to be installed, and for it to install ffi
+					ffiDir = expectInstallPipEnv()
+					// install pipenv
+					Expect(supplier.InstallPipEnv()).To(Succeed())
+				})
+				It("it doesn't install ffi a second time", func() {
+					Expect(supplier.HandleFfi()).To(Succeed())
+					Expect(os.Getenv("LIBFFI")).To(Equal(ffiDir))
+				})
 			})
 		})
 		Context("when the app does not use libffi", func() {

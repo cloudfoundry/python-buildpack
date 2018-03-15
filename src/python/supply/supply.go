@@ -333,8 +333,15 @@ func (s *Supplier) InstallPipEnv() error {
 		return err
 	}
 
+	if err := s.installFfi(); err != nil {
+		return err
+	}
+
 	for _, dep := range []string{"setuptools_scm", "pytest-runner", "pipenv"} {
-		if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+		out := &bytes.Buffer{}
+		stderr := &bytes.Buffer{}
+		if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+			s.Log.Debug("Got error running pip install " + dep + "\nSTDOUT: \n" + string(out.Bytes()) + "\nSTDERR: \n" + string(stderr.Bytes()))
 			return err
 		}
 	}
@@ -407,9 +414,14 @@ func (s *Supplier) HandleRequirementstxt() error {
 	return ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "requirements.txt"), []byte("-e ."), 0644)
 }
 
-func (s *Supplier) HandleFfi() error {
+func (s *Supplier) installFfi() error {
 	ffiDir := filepath.Join(s.Stager.DepDir(), "libffi")
-	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
+
+	// Only install libffi if we haven't done so already
+	// This could be installed twice because pipenv installs it, but
+	// we later run HandleFfi, which installs it if a dependency
+	// from requirements.txt needs libffi.
+	if os.Getenv("LIBFFI") != ffiDir {
 		s.Log.BeginStep("Noticed dependency requiring libffi. Bootstrapping libffi.")
 		if err := s.Manifest.InstallOnlyVersion("libffi", ffiDir); err != nil {
 			return err
@@ -421,7 +433,13 @@ func (s *Supplier) HandleFfi() error {
 		s.Stager.LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib", "pkgconfig"), "pkgconfig")
 		s.Stager.LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib", "libffi-"+versions[0], "include"), "include")
 	}
+	return nil
+}
 
+func (s *Supplier) HandleFfi() error {
+	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
+		return s.installFfi()
+	}
 	return nil
 }
 
