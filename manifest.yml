@@ -128,9 +128,9 @@ dependencies:
   cf_stacks:
   - cflinuxfs2
 - name: setuptools
-  version: 38.6.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-38.6.1-85ea002e.zip
-  sha256: 85ea002e0f377fb7f9905d8e157d71f56682601913a7f649795a03739c1ff7b9
+  version: 39.0.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-39.0.0-94dc5662.zip
+  sha256: 94dc566247f35009ed42c0f4422f2b4f0a032fab1372c8308b864c8f26d93388
   cf_stacks:
   - cflinuxfs2
 include_files:
