@@ -27,6 +27,7 @@ var _ = Describe("deploying a flask web app", func() {
 
 		It("gets the python version from pipfile.lock and generates a runtime.txt", func() {
 			Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.6."))
+			Expect(app.Stdout.String()).To(ContainSubstring("Installing pipenv"))
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
 			Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 		})
@@ -51,4 +52,33 @@ var _ = Describe("deploying a flask web app", func() {
 
 		AssertNoInternetTraffic("flask_python_3_pipenv_vendored")
 	})
+
+	Context("no Pipfile", func() {
+		BeforeEach(func() {
+			app = cutlass.New(filepath.Join(bpDir, "fixtures", "no_deps"))
+			app.Buildpacks = []string{"python_buildpack"}
+			app.SetEnv("BP_DEBUG", "1")
+		})
+
+		It("deploys without downloading pipenv", func() {
+			PushAppAndConfirm(app)
+			Expect(app.Stdout.String()).NotTo(ContainSubstring("Installing pipenv"))
+			Expect(app.GetBody("/gg")).To(ContainSubstring("Here is your output for /gg"))
+		})
+	})
+
+	Context("When there is a requirements.txt and a Pipfile", func() {
+		BeforeEach(func() {
+			app = cutlass.New(filepath.Join(bpDir, "fixtures", "pipfile_and_requirements"))
+			app.Buildpacks = []string{"python_buildpack"}
+			app.SetEnv("BP_DEBUG", "1")
+		})
+
+		It("deploys without downloading pipenv", func() {
+			PushAppAndConfirm(app)
+			Expect(app.Stdout.String()).NotTo(ContainSubstring("Installing pipenv"))
+			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with no pipenv!"))
+		})
+	})
+
 })

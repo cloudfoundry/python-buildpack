@@ -329,24 +329,6 @@ func (s *Supplier) InstallPipPop() error {
 }
 
 func (s *Supplier) InstallPipEnv() error {
-	if err := s.Manifest.InstallOnlyVersion("pipenv", filepath.Join("/tmp", "pipenv")); err != nil {
-		return err
-	}
-
-	if err := s.installFfi(); err != nil {
-		return err
-	}
-
-	for _, dep := range []string{"setuptools_scm", "pytest-runner", "pipenv"} {
-		out := &bytes.Buffer{}
-		stderr := &bytes.Buffer{}
-		if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
-			s.Log.Debug("Got error running pip install " + dep + "\nSTDOUT: \n" + string(out.Bytes()) + "\nSTDERR: \n" + string(stderr.Bytes()))
-			return err
-		}
-	}
-	s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
-
 	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt"))
 	if err != nil {
 		return err
@@ -358,6 +340,24 @@ func (s *Supplier) InstallPipEnv() error {
 	}
 
 	if pipfileExists && !requirementstxtExists {
+		s.Log.Info("Installing pipenv")
+		if err := s.Manifest.InstallOnlyVersion("pipenv", filepath.Join("/tmp", "pipenv")); err != nil {
+			return err
+		}
+
+		if err := s.installFfi(); err != nil {
+			return err
+		}
+
+		for _, dep := range []string{"setuptools_scm", "pytest-runner", "pipenv"} {
+			out := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
+			if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+				s.Log.Debug("Got error running pip install " + dep + "\nSTDOUT: \n" + string(out.Bytes()) + "\nSTDERR: \n" + string(stderr.Bytes()))
+				return err
+			}
+		}
+		s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
 		s.Log.Info("Generating 'requirements.txt' with pipenv")
 
 		output, err := s.Command.Output(s.Stager.BuildDir(), "pipenv", "lock", "--requirements")
