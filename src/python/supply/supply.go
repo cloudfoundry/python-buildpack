@@ -2,6 +2,7 @@ package supply
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -340,6 +341,9 @@ func (s *Supplier) InstallPipEnv() error {
 	}
 
 	if pipfileExists && !requirementstxtExists {
+		if strings.HasPrefix(s.PythonVersion, "python-3.3.") {
+			return errors.New("pipenv does not support python 3.3.x")
+		}
 		s.Log.Info("Installing pipenv")
 		if err := s.Manifest.InstallOnlyVersion("pipenv", filepath.Join("/tmp", "pipenv")); err != nil {
 			return err
@@ -506,7 +510,7 @@ func (s *Supplier) RunPip() error {
 	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
 		return fmt.Errorf("Couldn't determine existence of requirements.txt")
 	} else if !exists {
-		s.Log.Debug("Skipping pip install since requirements.txt does not exist")
+		s.Log.Debug("Skipping 'pip install' since requirements.txt does not exist")
 		return nil
 	}
 

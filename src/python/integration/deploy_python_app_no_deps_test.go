@@ -18,7 +18,7 @@ var _ = Describe("deploying a web app without dependencies", func() {
 		app = nil
 	})
 
-	const skippingPipInstall = "Skipping pip install since requirements.txt does not exist"
+	const skippingPipInstall = "Skipping 'pip install' since requirements.txt does not exist"
 
 	Context("no requirements.txt or setup.py", func() {
 		BeforeEach(func() {
