@@ -24,7 +24,7 @@
     "packager",
     "snapshot"
   ]
-  revision = "7b8397466e25d977455c53486f42f73b68ae85ab"
+  revision = "6d1936c34b28898171653fb8d2dfca1144499095"
 
 [[projects]]
   name = "github.com/elazarl/goproxy"
@@ -72,7 +72,7 @@
     "reporters/stenographer/support/go-isatty",
     "types"
   ]
-  revision = "ba8e856bb854d6771a72ddf6497a42dad3a0c971"
+  revision = "03ffd3f46debf00c49ed76d5dbb564ef4839adfe"
 
 [[projects]]
   branch = "master"
@@ -91,7 +91,7 @@
     "matchers/support/goraph/util",
     "types"
   ]
-  revision = "de89e61d40b75aa971a9fc3eae7f4fefabd6e0ee"
+  revision = "649b44d988ce182cabcda7dba01fcf3b6179ad19"
 
 [[projects]]
   name = "github.com/tidwall/gjson"
@@ -112,7 +112,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "182114d582623c1caa54f73de9c7224e23a48487"
+  revision = "80db560fac1fb3e6ac81dbc7f8ae4c061f5257bd"
 
 [[projects]]
   branch = "master"
@@ -123,13 +123,13 @@
     "html/atom",
     "html/charset"
   ]
-  revision = "803fdb99c0f72e493c28ef2099d250a9c989d8ff"
+  revision = "6078986fec03a1dcc236c34816c71b0e05018fda"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "8c0ece68c28377f4c326d85b94f8df0dace46f80"
+  revision = "c488ab1dd8481ef762f96a79a9577c27825be697"
 
 [[projects]]
   name = "golang.org/x/text"
