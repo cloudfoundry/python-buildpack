@@ -201,8 +201,7 @@ var _ = Describe("Supply", func() {
 				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
 			})
 
-			It("installs pipenv and does not generate requirements.txt", func() {
-				expectInstallPipEnv()
+			It("does not install Pipenv", func() {
 				Expect(supplier.InstallPipEnv()).To(Succeed())
 			})
 		})
@@ -353,7 +352,11 @@ var _ = Describe("Supply", func() {
 				var ffiDir string
 				BeforeEach(func() {
 					// expect pipenv to be installed, and for it to install ffi
+					Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+					Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("This is pipfile"), 0644)).To(Succeed())
 					ffiDir = expectInstallPipEnv()
+					mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("test", nil)
+
 					// install pipenv
 					Expect(supplier.InstallPipEnv()).To(Succeed())
 				})
