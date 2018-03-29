@@ -25,7 +25,7 @@ func (h AppHook) BeforeCompile(compiler *libbuildpack.Stager) error {
 		if err := os.Chmod(path, 0755); err != nil {
 			return err
 		}
-		cmd := exec.Command("/bin/sh", path)
+		cmd := exec.Command(path)
 		cmd.Dir = compiler.BuildDir()
 		output, err := cmd.Output()
 		if err != nil {
@@ -46,7 +46,7 @@ func (h AppHook) AfterCompile(compiler *libbuildpack.Stager) error {
 		if err := os.Chmod(path, 0755); err != nil {
 			return err
 		}
-		cmd := exec.Command("/bin/sh", path)
+		cmd := exec.Command(path)
 		cmd.Dir = compiler.BuildDir()
 		output, err := cmd.Output()
 		if err != nil {
