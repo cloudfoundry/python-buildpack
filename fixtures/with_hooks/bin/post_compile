@@ -1,6 +1,2 @@
-#!/usr/bin/env bash
-
-set -uexo pipefail
-
 echo 'Echo from app post compile'
 echo
