@@ -1,3 +1,30 @@
+v1.6.12 Apr 04, 2018
+=====================
+
+* Handle pre/post_compile scripts without shebangs.
+  (https://www.pivotaltracker.com/story/show/156381551)
+
+* Respect #! in pre/post_compile hooks
+  (https://www.pivotaltracker.com/story/show/156383007)
+
+* Add python 3.6.5, remove python 3.6.3
+  (https://www.pivotaltracker.com/story/show/156355841)
+
+* Refuse to install pipenv with Python 3.3.x
+  (https://www.pivotaltracker.com/story/show/156106004)
+
+* Only download pipenv when needed
+  (https://www.pivotaltracker.com/story/show/156133859)
+
+* Add pipenv 11.9.0, remove pipenv 11.1.4
+  (https://www.pivotaltracker.com/story/show/156156615)
+
+* Add setuptools 39.0.1, remove setuptools 38.5.2
+  (https://www.pivotaltracker.com/story/show/156110533)
+
+* Install libffi everytime we install pipenv
+  (https://www.pivotaltracker.com/story/show/156016877)
+
 v1.6.11 Mar 09, 2018
 =====================
 
