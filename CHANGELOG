@@ -1,3 +1,9 @@
+v1.6.13 Apr 16, 2018
+=====================
+
+* Add pipenv 11.10.0, remove pipenv 11.9.0
+  (https://www.pivotaltracker.com/story/show/156709510)
+
 v1.6.12 Apr 04, 2018
 =====================
 
