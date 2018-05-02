@@ -87,10 +87,10 @@ dependencies:
   sha256: 3a8976729b3d4e0362e731fbb77128ef80260cf056c787c80175ad8671fbdb2f
 - name: python
   version: 3.3.7
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.7-linux-x64-3f09be20.tgz
+  sha256: 3f09be202374114adb77d37e0d120cdcfa7d5d0affdf12e10eb0916f68c1251c
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.7-linux-x64-8bed4e0d.tgz
-  sha256: 8bed4e0d992e340159a1adaad8519262ea72c533b3e371c1d066ca60c517b13a
 - name: python
   version: 3.4.7
   cf_stacks:
