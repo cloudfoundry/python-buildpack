@@ -51,10 +51,10 @@ dependencies:
   sha256: 0c2e9b992b2edd87eddf954a96e5feae86dd66d69b1f6706a99bd7fa75e7a891
 - name: pip
   version: 9.0.3
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip-9.0.3-7bf48f9a.tar.gz
+  sha256: 7bf48f9a693be1d58f49f7af7e0ae9fe29fd671cde8a55e6edca3581c4ef5796
   cf_stacks:
   - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip/pip-9.0.3-7bf48f9a.tar.gz
-  sha256: 7bf48f9a693be1d58f49f7af7e0ae9fe29fd671cde8a55e6edca3581c4ef5796
 - name: pip-pop
   version: 0.1.1
   cf_stacks:
