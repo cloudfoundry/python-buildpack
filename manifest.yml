@@ -99,8 +99,8 @@ dependencies:
   sha256: c2cb934a8d90b0d24bef0f515ec14aabe21bddced44796d661de8b5b87d928c7
 - name: python
   version: 3.4.8
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.8-linux-x64-11567eea.tgz
-  sha256: 11567eea4aa10973e79d00a33e1ea49e656ca3ed4c7fee15c010d8cfe73ce944
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.8-linux-x64-acd557c2.tgz
+  sha256: acd557c2f486673cdd07d98958baa2c70ca001f4573b95d35a46c27b51f794e7
   cf_stacks:
   - cflinuxfs2
 - name: python
