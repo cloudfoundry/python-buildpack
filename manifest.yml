@@ -123,8 +123,8 @@ dependencies:
   - cflinuxfs2
 - name: python
   version: 3.6.5
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.5-linux-x64-e5a6a0b6.tgz
-  sha256: e5a6a0b6b200379221554bd90cc215e127b08b59fb186f4eaf119494b0c39a6f
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.5-linux-x64-81bdefa8.tgz
+  sha256: 81bdefa8623644a32b89409fa2734d1be7891df282a2baac079eb925ce942163
   cf_stacks:
   - cflinuxfs2
 - name: setuptools
