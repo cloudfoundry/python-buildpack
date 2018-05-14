@@ -8,9 +8,10 @@ import (
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 
 	"fmt"
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
 )
 
 func getEnv(key, fallback string) string {
@@ -128,7 +129,5 @@ var _ = Describe("appdynamics", func() {
 
 		By("unbinding the service")
 		Expect(RunCf("unbind-service", app.Name, serviceName)).To(Succeed())
-
 	})
-
 })
