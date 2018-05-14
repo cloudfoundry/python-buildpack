@@ -74,14 +74,15 @@ func (h AppdynamicsHook) GenerateStartUpCommand(startCommand string) (string, er
 func (h AppdynamicsHook) RewriteProcFile(procFilePath string) error {
 	startCommand, err := ioutil.ReadFile(procFilePath)
 	if err != nil {
+		return fmt.Errorf("Error reading file %s: %v", procFilePath, err)
+	}
+	newCommand, err := h.GenerateStartUpCommand(string(startCommand))
+	if err != nil {
 		return err
 	}
-	if newCommand, err := h.GenerateStartUpCommand(string(startCommand)); err != nil {
-		return err
-	} else {
-		if err := ioutil.WriteFile(procFilePath, []byte(newCommand), 0644); err != nil {
-			return err
-		}
+
+	if err := ioutil.WriteFile(procFilePath, []byte(newCommand), 0644); err != nil {
+		return fmt.Errorf("Error writing file %s: %v", procFilePath, err)
 	}
 	return nil
 }

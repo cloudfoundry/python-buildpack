@@ -80,23 +80,13 @@ var _ = Describe("Appdynamics", func() {
 
 	})
 
-	Describe("RewriteProcFile", func() {
+	Context("RewriteProcFile", func() {
 		var (
 			err         error
 			tempProcDir string
 		)
 		BeforeEach(func() {
 			tempProcDir, err = ioutil.TempDir("", "Procfiles")
-
-			err = createFile(tempProcDir, "Procfile", "web: python app.py", 0644)
-			Expect(err).To(BeNil())
-
-			err = createFile(tempProcDir, "NoPermProcFile", "web: python app.py", 0444)
-			Expect(err).To(BeNil())
-
-			err = createFile(tempProcDir, "WrongFormatProcFile", "python app.py", 0644)
-			Expect(err).To(BeNil())
-
 		})
 
 		AfterEach(func() {
@@ -104,7 +94,10 @@ var _ = Describe("Appdynamics", func() {
 		})
 
 		It("rewrites the procfile with pyagent", func() {
-			err := appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "Procfile"))
+			err = createFile(tempProcDir, "Procfile", "web: python app.py", 0644)
+			Expect(err).To(BeNil())
+
+			err = appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "Procfile"))
 			Expect(err).To(BeNil())
 			startCommand, err := ioutil.ReadFile(filepath.Join(tempProcDir, "Procfile"))
 			Expect(err).To(BeNil())
@@ -113,16 +106,14 @@ var _ = Describe("Appdynamics", func() {
 
 		It("Errors when Procfile doesn't exist", func() {
 			err := appdynamics.RewriteProcFile("/doesnt/exist")
-			Expect(err).NotTo(BeNil())
-		})
-
-		It("Errors with Procfile with no write permissions", func() {
-			err := appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "NoPermProcFile"))
-			Expect(err).NotTo(BeNil())
+			Expect(err).To(MatchError("Error reading file /doesnt/exist: open /doesnt/exist: no such file or directory"))
 		})
 
 		It("Errors with Procfile with wrong format", func() {
-			err := appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "WrongFormatProcFile"))
+			err = createFile(tempProcDir, "WrongFormatProcFile", "python app.py", 0644)
+			Expect(err).To(BeNil())
+
+			err = appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "WrongFormatProcFile"))
 			Expect(err).To(MatchError("improper format found in Procfile"))
 		})
 	})
