@@ -12,6 +12,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"encoding/json"
 )
 
 func getEnv(key, fallback string) string {
@@ -78,29 +79,19 @@ var _ = Describe("appdynamics", func() {
 		By("checking if the application has started fine and has correctly bound to appdynamics")
 		vcapServicesEnv, err := app.GetBody("/vcap")
 		Expect(err).To(BeNil())
-		vcapServicesExpected := `{"appdynamics":[{
-  "name": "appdynamics",
-  "instance_name": "appdynamics",
-  "binding_name": null,
-  "credentials": {
-    "account-access-key": "test-key",
-    "account-name": "test-account",
-    "host-name": "test-sb-host",
-    "port": "1234",
-    "ssl-enabled": true
-  },
-  "syslog_drain_url": null,
-  "volume_mounts": [
+		var vcapServicesEnvUnmarshalled interface{}
+		json.Unmarshal(([]byte)(vcapServicesEnv), &vcapServicesEnvUnmarshalled)
 
-  ],
-  "label": "appdynamics",
-  "provider": null,
-  "plan": "public",
-  "tags": [
-
-  ]
-}]}`
-		Expect(vcapServicesEnv).To(Equal(vcapServicesExpected))
+		appDynamicsJson := vcapServicesEnvUnmarshalled.(map[string]interface{})["appdynamics"].([]interface{})[0]
+		Expect(appDynamicsJson).To(HaveKeyWithValue("credentials", map[string]interface{}{
+			"account-access-key": "test-key",
+			"account-name": "test-account",
+			"host-name": "test-sb-host",
+			"port": "1234",
+			"ssl-enabled": true,
+		}))
+		Expect(appDynamicsJson).To(HaveKeyWithValue("label", "appdynamics"))
+		Expect(appDynamicsJson).To(HaveKeyWithValue("name", "appdynamics"))
 
 		By("Checking if the build pack installed and started appdynamics")
 		logs := app.Stdout.String()

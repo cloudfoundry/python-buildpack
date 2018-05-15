@@ -81,7 +81,7 @@ func (h AppdynamicsHook) RewriteProcFile(procFilePath string) error {
 		return err
 	}
 
-	if err := ioutil.WriteFile(procFilePath, []byte(newCommand), 0644); err != nil {
+	if err := ioutil.WriteFile(procFilePath, []byte(newCommand), 0666); err != nil {
 		return fmt.Errorf("Error writing file %s: %v", procFilePath, err)
 	}
 	return nil
@@ -102,7 +102,7 @@ func (h AppdynamicsHook) RewriteRequirementsFile(stager *libbuildpack.Stager) er
 		packageName = "appdynamics"
 	}
 
-	f, err := os.OpenFile(reqFile, writeFlag, 0644)
+	f, err := os.OpenFile(reqFile, writeFlag, 0666)
 	if err != nil {
 		panic(err)
 	}

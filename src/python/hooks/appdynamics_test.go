@@ -94,7 +94,7 @@ var _ = Describe("Appdynamics", func() {
 		})
 
 		It("rewrites the procfile with pyagent", func() {
-			err = createFile(tempProcDir, "Procfile", "web: python app.py", 0644)
+			err = createFile(tempProcDir, "Procfile", "web: python app.py", 0666)
 			Expect(err).To(BeNil())
 
 			err = appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "Procfile"))
@@ -110,7 +110,7 @@ var _ = Describe("Appdynamics", func() {
 		})
 
 		It("Errors with Procfile with wrong format", func() {
-			err = createFile(tempProcDir, "WrongFormatProcFile", "python app.py", 0644)
+			err = createFile(tempProcDir, "WrongFormatProcFile", "python app.py", 0666)
 			Expect(err).To(BeNil())
 
 			err = appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "WrongFormatProcFile"))

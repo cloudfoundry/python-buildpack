@@ -44,11 +44,11 @@ fake_service = {
 
 
 fake_credentials = {'account-access-key': 'test-key',
-                    'account-name': 'test-account',
-                    'host-name': 'test-sb-host',
-                    'port': '1234',
-                    'ssl-enabled': True
-                    }
+                      'account-name': 'test-account',
+                      'host-name': 'test-sb-host',
+                      'port': '1234',
+                      'ssl-enabled': True
+                      }
 
 
 @broker.route("/")
@@ -78,4 +78,4 @@ def bind_instances(instance_id, binding_id):
 
 
 if __name__ == '__main__':
-    broker.run(host='0.0.0.0', port=int(os.getenv('VCAP_APP_PORT', '5000')))
+    broker.run(host='0.0.0.0', port=int(os.getenv('VCAP_APP_PORT', '8080')))
