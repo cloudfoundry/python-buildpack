@@ -23,7 +23,7 @@ type Stager interface {
 	WriteProfileD(string, string) error
 }
 
-type Manifest interface {
+type Installer interface {
 	InstallOnlyVersion(string, string) error
 }
 
@@ -33,18 +33,18 @@ type Command interface {
 }
 
 type Conda struct {
-	Manifest Manifest
-	Stager   Stager
-	Command  Command
-	Log      *libbuildpack.Logger
+	Installer Installer
+	Stager    Stager
+	Command   Command
+	Log       *libbuildpack.Logger
 }
 
-func New(m Manifest, s Stager, c Command, l *libbuildpack.Logger) *Conda {
+func New(i Installer, s Stager, c Command, l *libbuildpack.Logger) *Conda {
 	return &Conda{
-		Manifest: m,
-		Stager:   s,
-		Command:  c,
-		Log:      l,
+		Installer: i,
+		Stager:    s,
+		Command:   c,
+		Log:       l,
 	}
 }
 
@@ -100,7 +100,7 @@ func (c *Conda) Install(version string) error {
 		defer os.RemoveAll(installerDir)
 	}
 
-	if err := c.Manifest.InstallOnlyVersion(version, installer); err != nil {
+	if err := c.Installer.InstallOnlyVersion(version, installer); err != nil {
 		return fmt.Errorf("Error downloading miniconda: %v", err)
 	}
 	if err := os.Chmod(installer, 0755); err != nil {

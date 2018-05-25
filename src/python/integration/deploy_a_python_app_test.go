@@ -31,8 +31,8 @@ var _ = Describe("CF Python Buildpack", func() {
 			Expect(app.Push()).ToNot(Succeed())
 			Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 
-			Expect(app.Stdout.String()).To(ContainSubstring("Could not install python: no match found for 99.99.99"))
-			Expect(app.Stdout.String()).ToNot(ContainSubstring("-----> Installing"))
+			Eventually(app.Stdout.String()).Should(ContainSubstring("Could not install python: no match found for 99.99.99"))
+			Eventually(app.Stdout.String()).ShouldNot(ContainSubstring("-----> Installing"))
 		})
 	})
 

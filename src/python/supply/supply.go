@@ -31,9 +31,12 @@ type Stager interface {
 type Manifest interface {
 	AllDependencyVersions(string) []string
 	DefaultVersion(string) (libbuildpack.Dependency, error)
+	IsCached() bool
+}
+
+type Installer interface {
 	InstallDependency(libbuildpack.Dependency, string) error
 	InstallOnlyVersion(string, string) error
-	IsCached() bool
 }
 
 type Command interface {
@@ -44,6 +47,7 @@ type Command interface {
 type Supplier struct {
 	PythonVersion string
 	Manifest      Manifest
+	Installer     Installer
 	Stager        Stager
 	Command       Command
 	Log           *libbuildpack.Logger
@@ -56,7 +60,7 @@ func Run(s *Supplier) error {
 		s.Log.Error("Error checking existence of environment.yml: %v", err)
 		return err
 	} else if exists {
-		return conda.Run(conda.New(s.Manifest, s.Stager, s.Command, s.Log))
+		return conda.Run(conda.New(s.Installer, s.Stager, s.Command, s.Log))
 	} else {
 		return RunPython(s)
 	}
@@ -259,7 +263,7 @@ func (s *Supplier) InstallPython() error {
 	}
 
 	pythonInstallDir := filepath.Join(s.Stager.DepDir(), "python")
-	if err := s.Manifest.InstallDependency(dep, pythonInstallDir); err != nil {
+	if err := s.Installer.InstallDependency(dep, pythonInstallDir); err != nil {
 		return err
 	}
 
@@ -314,7 +318,7 @@ func (s *Supplier) RewriteShebangs() error {
 
 func (s *Supplier) InstallPipPop() error {
 	tempPath := filepath.Join("/tmp", "pip-pop")
-	if err := s.Manifest.InstallOnlyVersion("pip-pop", tempPath); err != nil {
+	if err := s.Installer.InstallOnlyVersion("pip-pop", tempPath); err != nil {
 		return err
 	}
 
@@ -345,7 +349,7 @@ func (s *Supplier) InstallPipEnv() error {
 			return errors.New("pipenv does not support python 3.3.x")
 		}
 		s.Log.Info("Installing pipenv")
-		if err := s.Manifest.InstallOnlyVersion("pipenv", filepath.Join("/tmp", "pipenv")); err != nil {
+		if err := s.Installer.InstallOnlyVersion("pipenv", filepath.Join("/tmp", "pipenv")); err != nil {
 			return err
 		}
 
@@ -388,7 +392,7 @@ func (s *Supplier) HandlePylibmc() error {
 	memcachedDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
 	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
 		s.Log.BeginStep("Noticed pylibmc. Bootstrapping libmemcached.")
-		if err := s.Manifest.InstallOnlyVersion("libmemcache", memcachedDir); err != nil {
+		if err := s.Installer.InstallOnlyVersion("libmemcache", memcachedDir); err != nil {
 			return err
 		}
 		os.Setenv("LIBMEMCACHED", memcachedDir)
@@ -427,7 +431,7 @@ func (s *Supplier) installFfi() error {
 	// from requirements.txt needs libffi.
 	if os.Getenv("LIBFFI") != ffiDir {
 		s.Log.BeginStep("Noticed dependency requiring libffi. Bootstrapping libffi.")
-		if err := s.Manifest.InstallOnlyVersion("libffi", ffiDir); err != nil {
+		if err := s.Installer.InstallOnlyVersion("libffi", ffiDir); err != nil {
 			return err
 		}
 		versions := s.Manifest.AllDependencyVersions("libffi")
@@ -449,7 +453,7 @@ func (s *Supplier) HandleFfi() error {
 
 func (s *Supplier) InstallPip() error {
 	for _, name := range []string{"setuptools", "pip"} {
-		if err := s.Manifest.InstallOnlyVersion(name, filepath.Join("/tmp", name)); err != nil {
+		if err := s.Installer.InstallOnlyVersion(name, filepath.Join("/tmp", name)); err != nil {
 			return err
 		}
 		versions := s.Manifest.AllDependencyVersions(name)

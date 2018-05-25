@@ -21,19 +21,20 @@ import (
 
 var _ = Describe("Supply", func() {
 	var (
-		err          error
-		buildDir     string
-		cacheDir     string
-		depsDir      string
-		depsIdx      string
-		depDir       string
-		supplier     *supply.Supplier
-		logger       *libbuildpack.Logger
-		buffer       *bytes.Buffer
-		mockCtrl     *gomock.Controller
-		mockManifest *MockManifest
-		mockStager   *MockStager
-		mockCommand  *MockCommand
+		err           error
+		buildDir      string
+		cacheDir      string
+		depsDir       string
+		depsIdx       string
+		depDir        string
+		supplier      *supply.Supplier
+		logger        *libbuildpack.Logger
+		buffer        *bytes.Buffer
+		mockCtrl      *gomock.Controller
+		mockManifest  *MockManifest
+		mockInstaller *MockInstaller
+		mockStager    *MockStager
+		mockCommand   *MockCommand
 	)
 
 	BeforeEach(func() {
@@ -52,6 +53,7 @@ var _ = Describe("Supply", func() {
 
 		mockCtrl = gomock.NewController(GinkgoT())
 		mockManifest = NewMockManifest(mockCtrl)
+		mockInstaller = NewMockInstaller(mockCtrl)
 		mockStager = NewMockStager(mockCtrl)
 		mockStager.EXPECT().BuildDir().AnyTimes().Return(buildDir)
 		mockStager.EXPECT().CacheDir().AnyTimes().Return(cacheDir)
@@ -63,10 +65,11 @@ var _ = Describe("Supply", func() {
 		logger = libbuildpack.NewLogger(ansicleaner.New(buffer))
 
 		supplier = &supply.Supplier{
-			Manifest: mockManifest,
-			Stager:   mockStager,
-			Command:  mockCommand,
-			Log:      logger,
+			Manifest:  mockManifest,
+			Installer: mockInstaller,
+			Stager:    mockStager,
+			Command:   mockCommand,
+			Log:       logger,
 		}
 	})
 
@@ -101,7 +104,7 @@ var _ = Describe("Supply", func() {
 		Context("runtime.txt sets Python version 3", func() {
 			It("installs Python version 3", func() {
 				mockManifest.EXPECT().AllDependencyVersions("python").Return(versions)
-				mockManifest.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "3.4.2"}, pythonInstallDir)
+				mockInstaller.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "3.4.2"}, pythonInstallDir)
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
 				Expect(supplier.InstallPython()).To(Succeed())
@@ -137,11 +140,11 @@ var _ = Describe("Supply", func() {
 	Describe("InstallPip", func() {
 		It("Downloads and installs setuptools", func() {
 			mockManifest.EXPECT().AllDependencyVersions("setuptools").Return([]string{"2.4.6"})
-			mockManifest.EXPECT().InstallOnlyVersion("setuptools", "/tmp/setuptools")
+			mockInstaller.EXPECT().InstallOnlyVersion("setuptools", "/tmp/setuptools")
 			mockCommand.EXPECT().Execute("/tmp/setuptools/setuptools-2.4.6", gomock.Any(), gomock.Any(), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return(nil)
 
 			mockManifest.EXPECT().AllDependencyVersions("pip").Return([]string{"1.3.4"})
-			mockManifest.EXPECT().InstallOnlyVersion("pip", "/tmp/pip")
+			mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/pip")
 			mockCommand.EXPECT().Execute("/tmp/pip/pip-1.3.4", gomock.Any(), gomock.Any(), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return(nil)
 
 			pythonInstallDir := filepath.Join(depDir, "python")
@@ -156,7 +159,7 @@ var _ = Describe("Supply", func() {
 
 	Describe("InstallPipPop", func() {
 		It("installs pip-pop", func() {
-			mockManifest.EXPECT().InstallOnlyVersion("pip-pop", "/tmp/pip-pop")
+			mockInstaller.EXPECT().InstallOnlyVersion("pip-pop", "/tmp/pip-pop")
 			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pip-pop", "--exists-action=w", "--no-index", "--find-links=/tmp/pip-pop")
 			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
 			Expect(supplier.InstallPipPop()).To(Succeed())
@@ -167,7 +170,7 @@ var _ = Describe("Supply", func() {
 	expectInstallFfi := func() string {
 		ffiDir := filepath.Join(depDir, "libffi")
 		mockManifest.EXPECT().AllDependencyVersions("libffi").Return([]string{"1.2.3"})
-		mockManifest.EXPECT().InstallOnlyVersion("libffi", ffiDir)
+		mockInstaller.EXPECT().InstallOnlyVersion("libffi", ffiDir)
 		mockStager.EXPECT().WriteEnvFile("LIBFFI", ffiDir)
 		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib"), "lib")
 		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(ffiDir, "lib", "pkgconfig"), "pkgconfig")
@@ -179,7 +182,7 @@ var _ = Describe("Supply", func() {
 	// returns ffidir for convenience
 	expectInstallPipEnv := func() string {
 		// install pipenv binary from bp manifest
-		mockManifest.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
+		mockInstaller.EXPECT().InstallOnlyVersion("pipenv", "/tmp/pipenv")
 
 		// install pipenv dependencies
 		ffiDir := expectInstallFfi()
@@ -242,7 +245,7 @@ var _ = Describe("Supply", func() {
 			})
 			It("installs libmemcache", func() {
 				memcachedDir := filepath.Join(depDir, "libmemcache")
-				mockManifest.EXPECT().InstallOnlyVersion("libmemcache", memcachedDir)
+				mockInstaller.EXPECT().InstallOnlyVersion("libmemcache", memcachedDir)
 				mockStager.EXPECT().WriteEnvFile("LIBMEMCACHED", memcachedDir)
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib"), "lib")
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib", "sasl2"), "lib")
