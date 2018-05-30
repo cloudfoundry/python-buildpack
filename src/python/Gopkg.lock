@@ -24,7 +24,7 @@
     "packager",
     "snapshot"
   ]
-  revision = "d011bfaaffe0b569958cdf03fb05ba3795bb8ff7"
+  revision = "58fabdaca5d6831515b31a6be482cfa5ce2267d3"
 
 [[projects]]
   name = "github.com/elazarl/goproxy"
@@ -72,7 +72,7 @@
     "reporters/stenographer/support/go-isatty",
     "types"
   ]
-  revision = "26d21430af911e84459ee38099f0a07e57a7f9b0"
+  revision = "294d8f46a81242ac6473c61faf7ca14fac6f8f15"
 
 [[projects]]
   branch = "master"
@@ -112,7 +112,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "a3beeb748656e13e54256fd2cde19e058f41f60f"
+  revision = "ab813273cd59e1333f7ae7bff5d027d4aadf528c"
 
 [[projects]]
   branch = "master"
@@ -123,7 +123,7 @@
     "html/atom",
     "html/charset"
   ]
-  revision = "dfa909b99c79129e1100513e5cd36307665e5723"
+  revision = "75944861c7512f64725d687546cfbc757626151f"
 
 [[projects]]
   branch = "master"
