@@ -1,22 +1,3 @@
-v1.6.16 May 23, 2018
-=====================
-
-* Add setuptools 39.2.0, remove setuptools 39.1.0
-  (https://www.pivotaltracker.com/story/show/157717519)
-
-* Update appdynamics integration test for lts support
-  (https://www.pivotaltracker.com/story/show/156813786)
-
-* add appdynamics support
-  (https://www.pivotaltracker.com/story/show/156813786)
-
-* Add pipenv 2018.5.18, remove pipenv 11.10.3
-  (https://www.pivotaltracker.com/story/show/157535551)
-  (https://www.pivotaltracker.com/story/show/157411231)
-
-* Add miniconda2 4.5.1, miniconda3 4.5.1, remove miniconda2 4.4.10, miniconda3 4.4.10.
-  (https://www.pivotaltracker.com/story/show/157264923)
-
 v1.6.15 May 08, 2018
 =====================
 
