@@ -38,17 +38,17 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64-6d33aa02.tgz
   sha256: '009a3476197030e30d0ce924cc044ee4851ef27324e132b29fd12d8cde071915'
 - name: miniconda2
-  version: 4.5.1
+  version: 4.5.4
   cf_stacks:
   - cflinuxfs2
-  uri: http://repo.continuum.io/miniconda/Miniconda2-4.5.1-Linux-x86_64.sh
-  sha256: 3b7ccfc29a4e89190172bed29c213ed8535cd887db34bcc14f35f6181c30c21d
+  uri: http://repo.continuum.io/miniconda/Miniconda2-4.5.4-Linux-x86_64.sh
+  sha256: 77d95c99996495b9e44db3c3b7d7981143d32d5e9a58709c51d35bf695fda67d
 - name: miniconda3
-  version: 4.5.1
+  version: 4.5.4
   cf_stacks:
   - cflinuxfs2
-  uri: http://repo.continuum.io/miniconda/Miniconda3-4.5.1-Linux-x86_64.sh
-  sha256: 4b857c96d7aad4b09063224e88f4f62e778a5f1f2a1b211340ba765ce6aa21e5
+  uri: http://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh
+  sha256: 80ecc86f8c2f131c5170e43df489514f80e3971dd105c075935470bbf2476dea
 - name: pip
   version: 9.0.3
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip-9.0.3-7bf48f9a.tar.gz
