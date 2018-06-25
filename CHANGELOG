@@ -1,3 +1,15 @@
+v1.6.18 Jun 25, 2018
+=====================
+
+* Wildcard default version of python
+  (https://www.pivotaltracker.com/story/show/158597509)
+
+* Add pipenv 2018.6.25, remove pipenv 2018.5.18
+  (https://www.pivotaltracker.com/story/show/158602937)
+
+* Add miniconda2, miniconda3 4.5.4, remove miniconda2, miniconda3 4.5.1.
+  (https://www.pivotaltracker.com/story/show/158268924)
+
 v1.6.17 Jun 05, 2018
 =====================
 * Support packaging with associated stacks
