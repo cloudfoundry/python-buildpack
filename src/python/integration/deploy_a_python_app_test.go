@@ -1,11 +1,11 @@
 package integration_test
 
 import (
-	"fmt"
 	"path/filepath"
 	"regexp"
 	"strconv"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 	. "github.com/onsi/ginkgo"
@@ -155,7 +155,14 @@ var _ = Describe("CF Python Buildpack", func() {
 					PushAppAndConfirm(app)
 
 					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
-					Expect(app.Stdout.String()).To(ContainSubstring(fmt.Sprintf("-----> Installing python %s", defaultV)))
+
+					re := regexp.MustCompile("Installing python (.*)[\r\n|\r|\n]")
+					match := re.FindStringSubmatch(app.Stdout.String())
+					foundVersion := match[1]
+
+					versionRange := semver.MustParseRange("<=" + defaultV)
+					v1 := semver.MustParse(foundVersion)
+					Expect(versionRange(v1)).To(BeTrue())
 				})
 			})
 
