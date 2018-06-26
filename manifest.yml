@@ -8,10 +8,6 @@ dependency_deprecation_dates:
   name: python
   date: 2020-01-01
   link: https://docs.python.org/devguide/index.html#branchstatus
-- version_line: 3.3.x
-  name: python
-  date: 2017-09-29
-  link: https://docs.python.org/devguide/index.html#branchstatus
 - version_line: 3.4.x
   name: python
   date: 2019-03-16
@@ -77,18 +73,6 @@ dependencies:
   version: 2.7.15
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.15-linux-x64-d8ee0ad8.tgz
   sha256: d8ee0ad8aee534c3bf325970f3451a6a9d2d0e7b181d2948ebbc6eb24175a0bc
-  cf_stacks:
-  - cflinuxfs2
-- name: python
-  version: 3.3.6
-  cf_stacks:
-  - cflinuxfs2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.6-linux-x64-4b95efa1.tgz
-  sha256: 3a8976729b3d4e0362e731fbb77128ef80260cf056c787c80175ad8671fbdb2f
-- name: python
-  version: 3.3.7
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.3.7-linux-x64-eed7866f.tgz
-  sha256: eed7866ff032849d900b85f0576a946a08f0d0107f3ad75b0f55a95d56ababfa
   cf_stacks:
   - cflinuxfs2
 - name: python
