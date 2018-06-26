@@ -2,7 +2,6 @@ package supply
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -345,9 +344,6 @@ func (s *Supplier) InstallPipEnv() error {
 	}
 
 	if pipfileExists && !requirementstxtExists {
-		if strings.HasPrefix(s.PythonVersion, "python-3.3.") {
-			return errors.New("pipenv does not support python 3.3.x")
-		}
 		s.Log.Info("Installing pipenv")
 		if err := s.Installer.InstallOnlyVersion("pipenv", filepath.Join("/tmp", "pipenv")); err != nil {
 			return err

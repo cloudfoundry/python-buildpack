@@ -80,18 +80,4 @@ var _ = Describe("deploying a flask web app", func() {
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with no pipenv!"))
 		})
 	})
-
-	Context("When there python 3.3.* is used", func() {
-		BeforeEach(func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_3_pipenv"))
-			app.Buildpacks = []string{"python_buildpack"}
-		})
-
-		It("returns an error", func() {
-			Expect(app.Push()).ToNot(Succeed())
-			Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
-
-			Expect(app.Stdout.String()).To(ContainSubstring("Could not install pipenv: pipenv does not support python 3.3.x"))
-		})
-	})
 })
