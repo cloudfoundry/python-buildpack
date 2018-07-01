@@ -58,9 +58,9 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip-pop/pip-pop-0.1.1-d410583a.tar.gz
   sha256: c928ade1cc134d1b67851caf85a856c8fcc8fc960814385eef1fef2482991bc7
 - name: pipenv
-  version: 2018.6.25
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.6.25-7f1be101.tgz
-  sha256: 7f1be101c62d68c50d42ccf2ab0456acb5a1d9bf6d5387dc189b0ee6c8c1131e
+  version: 2018.7.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.7.1-047c2b0f.tgz
+  sha256: 047c2b0fba9017d8fb129982d2fdff7ed4f3c63ad6ada4c1f7678b81891c44f5
   cf_stacks:
   - cflinuxfs2
 - name: python
