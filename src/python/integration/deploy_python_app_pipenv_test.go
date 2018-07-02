@@ -50,7 +50,7 @@ var _ = Describe("deploying a flask web app", func() {
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
 		})
 
-		AssertNoInternetTraffic("flask_python_3_pipenv_vendored")
+		//AssertNoInternetTraffic("flask_python_3_pipenv_vendored")
 	})
 
 	Context("no Pipfile", func() {
