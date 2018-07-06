@@ -454,7 +454,7 @@ func (s *Supplier) InstallPip() error {
 		}
 		versions := s.Manifest.AllDependencyVersions(name)
 		outWriter := new(bytes.Buffer)
-		if err := s.Command.Execute(filepath.Join("/tmp", name, name+"-"+versions[0]), ioutil.Discard, ioutil.Discard, "python", "setup.py", "install", fmt.Sprintf("--prefix=%s", filepath.Join(s.Stager.DepDir(), "python"))); err != nil {
+		if err := s.Command.Execute(filepath.Join("/tmp", name, name+"-"+versions[0]), outWriter, outWriter, "python", "setup.py", "install", fmt.Sprintf("--prefix=%s", filepath.Join(s.Stager.DepDir(), "python"))); err != nil {
 			s.Log.Error(outWriter.String())
 			return err
 		}
