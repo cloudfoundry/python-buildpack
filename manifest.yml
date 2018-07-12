@@ -50,7 +50,7 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip-9.0.3-7bf48f9a.tar.gz
   sha256: 7bf48f9a693be1d58f49f7af7e0ae9fe29fd671cde8a55e6edca3581c4ef5796
   cf_stacks:
-  - builds-new/pip/9.0.3-cflinuxfs3
+  - cflinuxfs2
 - name: pip-pop
   version: 0.1.1
   cf_stacks:
