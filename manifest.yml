@@ -46,6 +46,7 @@ dependencies:
   sha256: 80ecc86f8c2f131c5170e43df489514f80e3971dd105c075935470bbf2476dea
   cf_stacks:
   - cflinuxfs2
+  - cflinuxfs3
 - name: pip
   version: 9.0.3
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip-9.0.3-7bf48f9a.tar.gz
