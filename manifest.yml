@@ -126,6 +126,7 @@ dependencies:
   sha256: 012adb8e25fbfd64c652e99e7bab58799a3aaf05d39ab38561f69190a909015f
   cf_stacks:
   - cflinuxfs2
+  - cflinuxfs3
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
