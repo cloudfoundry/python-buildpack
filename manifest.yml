@@ -110,10 +110,16 @@ dependencies:
   sha256: 5c7aa3b080032cdcf44d385516d2e53cd9efc27eb75bc305ee01b4981c842ac6
 - name: python
   version: 3.5.5
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.5-linux-x64-6d98b7cc.tgz
-  sha256: 6d98b7cc7aafad47364269b49706464c401035933476ef7fb455f522f8a8fbf9
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.5-linux-x64-cflinuxfs2-e15f57df.tgz
+  sha256: e15f57dfb75537bb465b9dd4cd3692060737bccea6172d6416f4dd547f6a2126
   cf_stacks:
   - cflinuxfs2
+- name: python
+  version: 3.5.5
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.5-linux-x64-cflinuxfs3-570cf050.tgz
+  sha256: 570cf05045658c38d6cf94a764f816f185503235e6d8ce241cc4ac3d6f0e3989
+  cf_stacks:
+  - cflinuxfs3
 - name: python
   version: 3.6.5
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.5-linux-x64-81bdefa8.tgz
