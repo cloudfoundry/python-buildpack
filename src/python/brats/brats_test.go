@@ -13,7 +13,7 @@ var _ = Describe("Python buildpack", func() {
 	bratshelper.DeployingAnAppWithAnUpdatedVersionOfTheSameBuildpack(CopyBrats)
 	bratshelper.StagingWithBuildpackThatSetsEOL("python", CopyBrats)
 	bratshelper.StagingWithADepThatIsNotTheLatest("python", CopyBrats)
-	bratshelper.StagingWithCustomBuildpackWithCredentialsInDependencies(`python\-[\d\.]+\-linux\-x64\-[\da-f]+\.tgz`, CopyBrats)
+	bratshelper.StagingWithCustomBuildpackWithCredentialsInDependencies(`python\-[\d\.]+\-linux\-x64\-(cflinuxfs.*-)?[\da-f]+\.tgz`, CopyBrats)
 	bratshelper.DeployAppWithExecutableProfileScript("python", CopyBrats)
 	bratshelper.DeployAnAppWithSensitiveEnvironmentVariables(CopyBrats)
 
