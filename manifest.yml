@@ -62,14 +62,14 @@ dependencies:
   sha256: c928ade1cc134d1b67851caf85a856c8fcc8fc960814385eef1fef2482991bc7
 - name: pipenv
   version: 2018.7.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.7.1-cflinuxfs2-4d294713.tgz
-  sha256: 4d2947131ac8d829097e3dbd24454883a443dbc2c77d962c857582f8d931d9c3
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.7.1-cflinuxfs2-68cd582d.tgz
+  sha256: 68cd582d52e3fcb85a0a229a41c9f8a880fd0c7b6f059ff85eba3b7924ca43d9
   cf_stacks:
   - cflinuxfs2
 - name: pipenv
   version: 2018.7.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.7.1-cflinuxfs3-e9317b9f.tgz
-  sha256: e9317b9f85b2e2eb4c779a93a53d2a77de12cc913ac7ba8ad3e960ed5b9a1689
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.7.1-cflinuxfs3-baf729a0.tgz
+  sha256: baf729a0dbdd97d2f7bdf943cdad6767426e91e6fbad7d2d7153dd80daf69715
   cf_stacks:
   - cflinuxfs3
 - name: python
