@@ -83,14 +83,14 @@ dependencies:
   - cflinuxfs2
 - name: python
   version: 2.7.15
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.15-linux-x64-cflinuxfs2-f848bf31.tgz
-  sha256: f848bf31a99dd022bbf9831143649376f347340aedec7a4027393f95cb874fab
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.15-linux-x64-cflinuxfs2-83fd0c5a.tgz
+  sha256: 83fd0c5a670e31391bb1ae5603531eb097cb286347e296db85dbd26aa4eec5eb
   cf_stacks:
   - cflinuxfs2
 - name: python
   version: 2.7.15
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.15-linux-x64-cflinuxfs3-fbae316e.tgz
-  sha256: fbae316e9db9ad82db8f073c6f120a883a417e12ee67eac326b4b01546bfa17f
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.15-linux-x64-cflinuxfs3-b96a0fc6.tgz
+  sha256: b96a0fc66ee8ab8730d7bc2d63c33329980d7d32e6cc475e423e41852c26c4e6
   cf_stacks:
   - cflinuxfs3
 - name: python
