@@ -93,8 +93,8 @@ dependencies:
   - cflinuxfs3
 - name: python
   version: 3.4.7
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.7-linux-x64-cflinuxfs2-a69edbce.tgz
-  sha256: a69edbce656a146a92e0d0c85ace69adbe4e0898bb964e52e4aa3e5d1272451a
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.7-linux-x64-cflinuxfs2-e81ca458.tgz
+  sha256: e81ca4585ecc93a702afd068bd406aaf501a63b657628d41a92cba05cf0fb608
   cf_stacks:
   - cflinuxfs2
 - name: python
