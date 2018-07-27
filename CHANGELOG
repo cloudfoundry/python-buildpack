@@ -1,3 +1,31 @@
+v1.6.20 Jul 27, 2018
+=====================
+
+* Rebuild python 2.7.14, 2.7.15, 2.4.8, 3.5.5, 3.6.6
+  For stacks cflinuxfs2, cflinuxfs3
+
+* Rebuild pipenv 2018.7.1
+  For stacks cflinuxfs2, cflinuxfs3
+
+* Add setuptools 40.0.0
+  For stacks cflinuxfs3
+
+* Add miniconda2 4.5.4
+  For stacks cflinuxfs3
+
+* Add miniconda3 4.5.4
+  For stacks cflinuxfs3
+
+* Add libmemcache 1.0.18
+  For stacks cflinuxfs3
+
+* Add libffi 3.2.1
+  For stacks cflinuxfs3
+
+* Add pip-pop 0.1.1
+  For stacks cflinuxfs3
+
+
 v1.6.19 Jul 03, 2018
 =====================
 
