@@ -37,6 +37,10 @@ var _ = Describe("appdynamics", func() {
 	}
 
 	BeforeEach(func() {
+		if os.Getenv("CF_STACK") == "cflinuxfs3" {
+			Skip("appdynamics service name causes conflicts when run in parallel")
+		}
+
 		appdServiceBrokerApp = cutlass.New(filepath.Join(bpDir, "fixtures", "fake_appd_service_broker"))
 		Expect(appdServiceBrokerApp.Push()).To(Succeed())
 		Eventually(func() ([]string, error) { return appdServiceBrokerApp.InstanceStates() }, 20*time.Second).Should(Equal([]string{"RUNNING"}))
