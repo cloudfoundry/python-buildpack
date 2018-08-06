@@ -7,7 +7,7 @@ fake_service = {
     "services": [
         {
             "id": "1e3d32a0-c979-11e7-8e98-7bebc67e38ac",
-            "name": "appdynamics",
+            "name": os.environ["OFFERING_NAME"],
             "description": "fake appdynamics broker",
             "bindable": True,
             "tags": [],

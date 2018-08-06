@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-		"github.com/cloudfoundry/libbuildpack/cutlass"
+	"github.com/cloudfoundry/libbuildpack/cutlass"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -163,4 +163,11 @@ func AssertNoInternetTraffic(fixtureName string) {
 		// Expect(built).To(BeTrue())
 		Expect(traffic).To(BeEmpty())
 	})
+}
+
+func RunCf(args ...string) error {
+	command := exec.Command("cf", args...)
+	command.Stdout = GinkgoWriter
+	command.Stderr = GinkgoWriter
+	return command.Run()
 }

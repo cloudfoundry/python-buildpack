@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/libbuildpack"
+	"regexp"
 )
 
 type Command interface {
@@ -152,50 +153,64 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		return nil
 	}
 
-	if val, ok := services["appdynamics"]; ok { // carry the procedure only when Appdynamics service is bound.
-		h.Log.BeginStep("Setting up Appdynamics")
-
-		appdynamicsPlan := val[0].Credentials
-		vcapApplication := os.Getenv("VCAP_APPLICATION")
-		application := VcapApplication{}
-
-		err = json.Unmarshal([]byte(vcapApplication), &application)
-		if err != nil {
-			h.Log.Debug("Could not unmarshall VCAP_APPLICATION JSON")
-		}
-
-		sslFlag := "off"
-
-		if appdynamicsPlan.SslEnabled {
-			sslFlag = "on"
-		}
-
-		appdEnv := map[string]string{
-			"APPD_APP_NAME":           h.getEnv("APPD_APP_NAME", application.ApplicationName),
-			"APPD_TIER_NAME":          h.getEnv("APPD_TIER_NAME", application.ApplicationName),
-			"APPD_NODE_NAME":          h.getEnv("APPD_NODE_NAME", application.ApplicationName),
-			"APPD_CONTROLLER_HOST":    appdynamicsPlan.ControllerHost,
-			"APPD_CONTROLLER_PORT":    appdynamicsPlan.ControllerPort,
-			"APPD_ACCOUNT_ACCESS_KEY": appdynamicsPlan.AccountAccessKey,
-			"APPD_ACCOUNT_NAME":       appdynamicsPlan.AccountName,
-			"APPD_SSL_ENABLED":        sslFlag,
-		}
-
-		if err := h.RewriteRequirementsFile(stager); err != nil {
-			h.Log.Error("Could not write requirements file with Appdynamics packages: %v", err)
-			return err
-		}
-
-		if err := h.CreateAppDynamicsEnv(stager, appdEnv); err != nil {
-			h.Log.Error("Could not create Appdynamics environment: %v", err)
-			return err
-		}
-
-		if err := h.RewriteProcFileWithAppdynamics(stager); err != nil {
-			h.Log.Error("Could not rewrite procfile with Appdynamics start command: %v", err)
-			return err
+	var appdServiceName string
+	for serviceName := range services {
+		if match, err := regexp.MatchString("app(-)?dynamics", serviceName); err != nil {
+			return nil
+		} else if match {
+			appdServiceName = serviceName
+			break
 		}
 	}
+
+	if appdServiceName == "" {
+		return nil
+	}
+
+	h.Log.BeginStep("Setting up Appdynamics")
+
+	val := services[appdServiceName]
+	appdynamicsPlan := val[0].Credentials
+	vcapApplication := os.Getenv("VCAP_APPLICATION")
+	application := VcapApplication{}
+
+	err = json.Unmarshal([]byte(vcapApplication), &application)
+	if err != nil {
+		h.Log.Debug("Could not unmarshall VCAP_APPLICATION JSON")
+	}
+
+	sslFlag := "off"
+
+	if appdynamicsPlan.SslEnabled {
+		sslFlag = "on"
+	}
+
+	appdEnv := map[string]string{
+		"APPD_APP_NAME":           h.getEnv("APPD_APP_NAME", application.ApplicationName),
+		"APPD_TIER_NAME":          h.getEnv("APPD_TIER_NAME", application.ApplicationName),
+		"APPD_NODE_NAME":          h.getEnv("APPD_NODE_NAME", application.ApplicationName),
+		"APPD_CONTROLLER_HOST":    appdynamicsPlan.ControllerHost,
+		"APPD_CONTROLLER_PORT":    appdynamicsPlan.ControllerPort,
+		"APPD_ACCOUNT_ACCESS_KEY": appdynamicsPlan.AccountAccessKey,
+		"APPD_ACCOUNT_NAME":       appdynamicsPlan.AccountName,
+		"APPD_SSL_ENABLED":        sslFlag,
+	}
+
+	if err := h.RewriteRequirementsFile(stager); err != nil {
+		h.Log.Error("Could not write requirements file with Appdynamics packages: %v", err)
+		return err
+	}
+
+	if err := h.CreateAppDynamicsEnv(stager, appdEnv); err != nil {
+		h.Log.Error("Could not create Appdynamics environment: %v", err)
+		return err
+	}
+
+	if err := h.RewriteProcFileWithAppdynamics(stager); err != nil {
+		h.Log.Error("Could not rewrite procfile with Appdynamics start command: %v", err)
+		return err
+	}
+
 	return nil
 }
 

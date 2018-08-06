@@ -1,56 +1,38 @@
 package integration_test
 
 import (
-	"os/exec"
 	"path/filepath"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 
 	"fmt"
-	"os"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"encoding/json"
 )
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
-
 var _ = Describe("appdynamics", func() {
-	var app, appdServiceBrokerApp *cutlass.App
-	var sbUrl string
-	const serviceName = "appdynamics"
-	cfUsername := getEnv("CF_USER_NAME", "username")
-	cfPassword := getEnv("CF_PASSWORD", "password")
-
-	RunCf := func(args ...string) error {
-		command := exec.Command("cf", args...)
-		command.Stdout = GinkgoWriter
-		command.Stderr = GinkgoWriter
-		return command.Run()
-	}
+	var (
+		app, serviceBrokerApp                          *cutlass.App
+		serviceBrokerURL, serviceName, serviceOffering string
+	)
 
 	BeforeEach(func() {
-		if os.Getenv("CF_STACK") == "cflinuxfs3" {
-			Skip("appdynamics service name causes conflicts when run in parallel")
-		}
+		serviceOffering = "appdynamics-" + cutlass.RandStringRunes(20)
+		serviceName = "appdynamics-" + cutlass.RandStringRunes(20)
 
-		appdServiceBrokerApp = cutlass.New(filepath.Join(bpDir, "fixtures", "fake_appd_service_broker"))
-		Expect(appdServiceBrokerApp.Push()).To(Succeed())
-		Eventually(func() ([]string, error) { return appdServiceBrokerApp.InstanceStates() }, 20*time.Second).Should(Equal([]string{"RUNNING"}))
+		serviceBrokerApp = cutlass.New(filepath.Join(bpDir, "fixtures", "fake_appd_service_broker"))
+		serviceBrokerApp.SetEnv("OFFERING_NAME", serviceOffering)
+		Expect(serviceBrokerApp.Push()).To(Succeed())
+		Eventually(func() ([]string, error) { return serviceBrokerApp.InstanceStates() }, 20*time.Second).Should(Equal([]string{"RUNNING"}))
 
 		var err error
-		sbUrl, err = appdServiceBrokerApp.GetUrl("")
+		serviceBrokerURL, err = serviceBrokerApp.GetUrl("")
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(RunCf("create-service-broker", serviceName, cfUsername, cfPassword, sbUrl, "--space-scoped")).To(Succeed())
-		Expect(RunCf("create-service", serviceName, "public", serviceName)).To(Succeed())
+		Expect(RunCf("create-service-broker", serviceBrokerApp.Name, "username", "password", serviceBrokerURL, "--space-scoped")).To(Succeed())
+		Expect(RunCf("create-service", serviceOffering, "public", serviceName)).To(Succeed())
 
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "with_appdynamics"))
 		app.SetEnv("BP_DEBUG", "true")
@@ -63,13 +45,13 @@ var _ = Describe("appdynamics", func() {
 		}
 		app = nil
 
-		RunCf("purge-service-offering", "-f", serviceName)
-		RunCf("delete-service-broker", "-f", serviceName)
+		RunCf("purge-service-offering", "-f", serviceOffering)
+		RunCf("delete-service-broker", "-f", serviceBrokerApp.Name)
 
-		if appdServiceBrokerApp != nil {
-			appdServiceBrokerApp.Destroy()
+		if serviceBrokerApp != nil {
+			serviceBrokerApp.Destroy()
 		}
-		appdServiceBrokerApp = nil
+		serviceBrokerApp = nil
 	})
 
 	It("test if appdynamics was successfully bound", func() {
@@ -86,16 +68,16 @@ var _ = Describe("appdynamics", func() {
 		var vcapServicesEnvUnmarshalled interface{}
 		json.Unmarshal(([]byte)(vcapServicesEnv), &vcapServicesEnvUnmarshalled)
 
-		appDynamicsJson := vcapServicesEnvUnmarshalled.(map[string]interface{})["appdynamics"].([]interface{})[0]
+		appDynamicsJson := vcapServicesEnvUnmarshalled.(map[string]interface{})[serviceOffering].([]interface{})[0]
 		Expect(appDynamicsJson).To(HaveKeyWithValue("credentials", map[string]interface{}{
 			"account-access-key": "test-key",
-			"account-name": "test-account",
-			"host-name": "test-sb-host",
-			"port": "1234",
-			"ssl-enabled": true,
+			"account-name":       "test-account",
+			"host-name":          "test-sb-host",
+			"port":               "1234",
+			"ssl-enabled":        true,
 		}))
-		Expect(appDynamicsJson).To(HaveKeyWithValue("label", "appdynamics"))
-		Expect(appDynamicsJson).To(HaveKeyWithValue("name", "appdynamics"))
+		Expect(appDynamicsJson).To(HaveKeyWithValue("label", serviceOffering))
+		Expect(appDynamicsJson).To(HaveKeyWithValue("name", serviceName))
 
 		By("Checking if the build pack installed and started appdynamics")
 		logs := app.Stdout.String()
