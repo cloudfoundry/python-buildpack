@@ -19,7 +19,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:870b3125e428d27c135631d3e14cff6c6f3fc984d87ddb619a4f808299a62b04"
+  digest = "1:b996000e19c991f95847b73cad5a6d9f8c13eb655a114e83d7a3106da1ac8a40"
   name = "github.com/cloudfoundry/libbuildpack"
   packages = [
     ".",
@@ -30,7 +30,7 @@
     "snapshot",
   ]
   pruneopts = ""
-  revision = "cc90e4eadc963afd67e138acc81fef1ac30c9c05"
+  revision = "c12ae7f40c939f5f54ee01d6f477e183e23c18b7"
 
 [[projects]]
   digest = "1:7ce300e943482aff885b3318c1c6a609827f43e3ba26a073380d5ba6143a0c48"
@@ -91,7 +91,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a2453f1424ddc8c28a93b2bb59f9503f61f4a1a3a4719b007c8d48a2cada631b"
+  digest = "1:63898b364f467713105bd3e7f3c250780aade6fd149550e36cc1473dee0c1006"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -108,7 +108,7 @@
     "types",
   ]
   pruneopts = ""
-  revision = "b6ea1ea48f981d0f615a154a45eabb9dd466556d"
+  revision = "4bbecc8c2307673cacf6e7c9275015b6c87ebe48"
 
 [[projects]]
   digest = "1:3ddca2bd5496c6922a2a9e636530e178a43c2a534ea6634211acdc7d10222794"
@@ -128,14 +128,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2275238ea6cc28f0bb09d622bc88c45bbf25992a15940afee1b7a5dc7661c0ec"
+  digest = "1:53c4b75f22ea7757dea07eae380ea42de547ae6865a5e3b41866754a8a8219c9"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blowfish",
   ]
   pruneopts = ""
-  revision = "80fca2ff14a3fb7db622c9a5462f8ce9ea026cba"
+  revision = "f027049dab0ad238e394a753dba2d14753473a04"
 
 [[projects]]
   branch = "master"
@@ -152,11 +152,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c52d6675dc7645a1f26cae842f243ee479d8b20af9ae671f534a19e3f64afbb5"
+  digest = "1:41e7b97b66e984325fed9d6cd43ca9e2efdd3c711980916ad444667d633f13f1"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = ""
-  revision = "34b17bdb430002e9db9ae7ddc8480b9fa05edc22"
+  revision = "2be389f392cd91df245b41638f818a1c041f0c08"
 
 [[projects]]
   digest = "1:5acd3512b047305d49e8763eef7ba423901e85d5dd2fd1e71778a0ea8de10bd4"
