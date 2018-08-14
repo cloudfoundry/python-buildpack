@@ -360,7 +360,7 @@ func (s *Supplier) InstallPipEnv() error {
 			out := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}
 			if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "pip", "install", dep, "-v", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
-				return err
+				return fmt.Errorf("Failed to install %s: %v.\nStdout: %v\nStderr: %v", dep, err, out, stderr)
 			}
 		}
 		s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
@@ -529,7 +529,7 @@ func (s *Supplier) RunPip() error {
 		return fmt.Errorf("Couldn't check vendor existence: %v", err)
 	}
 
-	installArgs := []string{"install", "-r", requirementsPath, "-v", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
+	installArgs := []string{"install", "-r", requirementsPath, "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
 	var originalReqs []byte
 	if vendorExists {
 		installArgs = append(installArgs, "--no-index", "--find-links=file://"+filepath.Join(s.Stager.BuildDir(), "vendor"))
