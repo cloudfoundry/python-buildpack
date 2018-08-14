@@ -15,6 +15,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"strings"
 	"testing"
 )
 
@@ -157,10 +158,10 @@ func AssertNoInternetTraffic(fixtureName string) {
 			bpDir,
 			filepath.Join("fixtures", fixtureName),
 			bpFile,
-			[]string{},
+			[]string{"LC_ALL C.UTF-8", "LANG C.UTF-8"},
 		)
 		Expect(err).To(BeNil())
-		// Expect(built).To(BeTrue())
+		Expect(built).To(BeTrue())
 		Expect(traffic).To(BeEmpty())
 	})
 }

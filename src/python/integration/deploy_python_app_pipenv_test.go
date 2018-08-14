@@ -38,19 +38,54 @@ var _ = Describe("deploying a flask web app", func() {
 	})
 
 	Context("buildpack is cached", func() {
-		BeforeEach(func() {
-			if !cutlass.Cached {
-				Skip("Running cached tests")
-			}
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv_vendored"))
-		})
+		Context("python 3", func() {
+			Context("app is completely vendored", func() {
+				BeforeEach(func() {
+					if !cutlass.Cached {
+						Skip("Running cached tests")
+					}
+					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv_vendored"))
+					app.SetEnv("BP_DEBUG", "1")
+				})
 
-		It("should work", func() {
-			PushAppAndConfirm(app)
-			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
-		})
+				It("should work", func() {
+					PushAppAndConfirm(app)
+					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
+				})
 
-		//AssertNoInternetTraffic("flask_python_3_pipenv_vendored")
+				AssertNoInternetTraffic("flask_python_3_pipenv_vendored")
+			})
+			Context("app is missing a dependency", func() {
+				BeforeEach(func() {
+					if !cutlass.Cached {
+						Skip("Running cached tests")
+					}
+					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv_vendored_incomplete"))
+					app.SetEnv("BP_DEBUG", "1")
+				})
+
+				It("should work by downloading the missing dependency", func() {
+					PushAppAndConfirm(app)
+					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
+				})
+			})
+		})
+		Context("python 2", func() {
+			BeforeEach(func() {
+				if !cutlass.Cached {
+					Skip("Running cached tests")
+				}
+				app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_2_pipenv_vendored"))
+				app.SetEnv("BP_DEBUG", "1")
+			})
+
+			It("should work", func() {
+				PushAppAndConfirm(app)
+				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
+			})
+
+			AssertNoInternetTraffic("flask_python_2_pipenv_vendored")
+		})
 	})
 
 	Context("no Pipfile", func() {
