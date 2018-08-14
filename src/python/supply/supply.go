@@ -107,13 +107,13 @@ func RunPython(s *Supplier) error {
 		return err
 	}
 
-	if err := s.HandlePylibmc(); err != nil {
-		s.Log.Error("Error checking Pylibmc: %v", err)
+	if err := s.HandleRequirementstxt(); err != nil {
+		s.Log.Error("Error checking requirements.txt: %v", err)
 		return err
 	}
 
-	if err := s.HandleRequirementstxt(); err != nil {
-		s.Log.Error("Error checking requirements.txt: %v", err)
+	if err := s.HandlePylibmc(); err != nil {
+		s.Log.Error("Error checking Pylibmc: %v", err)
 		return err
 	}
 
