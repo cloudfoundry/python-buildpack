@@ -43,6 +43,7 @@ type Installer interface {
 type Command interface {
 	Execute(string, io.Writer, io.Writer, string, ...string) error
 	Output(dir string, program string, args ...string) (string, error)
+	RunWithOutput(*exec.Cmd) ([]byte, error)
 }
 
 type Supplier struct {
@@ -359,7 +360,7 @@ func (s *Supplier) InstallPipEnv() error {
 			s.Log.Info("Installing %s", dep)
 			out := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}
-			if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "pip", "install", dep, "-v", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+			if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
 				return fmt.Errorf("Failed to install %s: %v.\nStdout: %v\nStderr: %v", dep, err, out, stderr)
 			}
 		}
@@ -369,8 +370,7 @@ func (s *Supplier) InstallPipEnv() error {
 		cmd := exec.Command("pipenv", "lock", "--requirements")
 		cmd.Dir = s.Stager.BuildDir()
 		cmd.Env = append(os.Environ(), "VIRTUALENV_NEVER_DOWNLOAD=true")
-
-		output, err := cmd.Output()
+		output, err := s.Command.RunWithOutput(cmd)
 		outputString := string(output)
 
 		if err != nil {
@@ -529,7 +529,7 @@ func (s *Supplier) RunPip() error {
 		return fmt.Errorf("Couldn't check vendor existence: %v", err)
 	}
 
-	installArgs := []string{"install", "-r", requirementsPath, "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
+	installArgs := []string{"install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
 	var originalReqs []byte
 	if vendorExists {
 		installArgs = append(installArgs, "--no-index", "--find-links=file://"+filepath.Join(s.Stager.BuildDir(), "vendor"))

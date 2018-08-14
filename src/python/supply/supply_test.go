@@ -188,7 +188,10 @@ var _ = Describe("Supply", func() {
 		ffiDir := expectInstallFfi()
 		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "setuptools_scm", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
 		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pytest-runner", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "parver", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "invoke", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
 		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "wheel", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
 
 		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
 		return ffiDir
@@ -216,7 +219,7 @@ var _ = Describe("Supply", func() {
 
 			It("installs pipenv and generates requirements.txt", func() {
 				expectInstallPipEnv()
-				mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("test", nil)
+				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("test"), nil)
 				Expect(supplier.InstallPipEnv()).To(Succeed())
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
@@ -225,7 +228,7 @@ var _ = Describe("Supply", func() {
 
 			It("removes extraneous pipenv lock output", func() {
 				expectInstallPipEnv()
-				mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("Using /tmp/deps/0/bin/python3.6m to create virtualenv…\nline 1\nline 2\n", nil)
+				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("Using /tmp/deps/0/bin/python3.6m to create virtualenv…\nline 1\nline 2\n"), nil)
 				Expect(supplier.InstallPipEnv()).To(Succeed())
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
@@ -358,7 +361,7 @@ var _ = Describe("Supply", func() {
 					Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 					Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("This is pipfile"), 0644)).To(Succeed())
 					ffiDir = expectInstallPipEnv()
-					mockCommand.EXPECT().Output(buildDir, "pipenv", "lock", "--requirements").Return("test", nil)
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("test"), nil)
 
 					// install pipenv
 					Expect(supplier.InstallPipEnv()).To(Succeed())
@@ -526,7 +529,7 @@ cffi==0.9.2
 			BeforeEach(func() {
 				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
 			})
-			const proTip = "You have a vendor directory, it must contain all of your dependencies."
+			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
 			Context("vendor does not exist", func() {
 				BeforeEach(func() {
 					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
@@ -539,7 +542,7 @@ cffi==0.9.2
 			Context("vendor exists", func() {
 				BeforeEach(func() {
 					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28"))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28")).Times(2)
 				})
 				It("alerts the user", func() {
 					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("Couldn't run pip: exit 28")))

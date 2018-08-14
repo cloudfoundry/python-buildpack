@@ -8,6 +8,7 @@ import (
 	libbuildpack "github.com/cloudfoundry/libbuildpack"
 	gomock "github.com/golang/mock/gomock"
 	io "io"
+	exec "os/exec"
 	reflect "reflect"
 )
 
@@ -281,4 +282,17 @@ func (m *MockCommand) Output(dir, program string, args ...string) (string, error
 func (mr *MockCommandMockRecorder) Output(dir, program interface{}, args ...interface{}) *gomock.Call {
 	varargs := append([]interface{}{dir, program}, args...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Output", reflect.TypeOf((*MockCommand)(nil).Output), varargs...)
+}
+
+// RunWithOutput mocks base method
+func (m *MockCommand) RunWithOutput(arg0 *exec.Cmd) ([]byte, error) {
+	ret := m.ctrl.Call(m, "RunWithOutput", arg0)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RunWithOutput indicates an expected call of RunWithOutput
+func (mr *MockCommandMockRecorder) RunWithOutput(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunWithOutput", reflect.TypeOf((*MockCommand)(nil).RunWithOutput), arg0)
 }
