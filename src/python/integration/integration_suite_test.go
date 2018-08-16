@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
@@ -163,8 +164,8 @@ func AssertNoInternetTraffic(fixtureName string) {
 		)
 		fmt.Println("### Checking internet traffic results")
 		Expect(err).To(BeNil())
-		Expect(built).To(BeTrue(), logs)
-		Expect(traffic).To(BeEmpty(), logs)
+		Expect(built).To(BeTrue(), strings.Join(logs, "\n"))
+		Expect(traffic).To(BeEmpty(), strings.Join(logs, "\n"))
 	})
 }
 
