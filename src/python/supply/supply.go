@@ -456,11 +456,6 @@ func (s *Supplier) HandleFfi() error {
 }
 
 func (s *Supplier) InstallPip() error {
-	// Starting in Python 3.7, libffi must be installed before setuptools.
-	if strings.HasPrefix(s.PythonVersion, "3.7") {
-		s.HandleFfi()
-	}
-
 	for _, name := range []string{"setuptools", "pip"} {
 		if err := s.Installer.InstallOnlyVersion(name, filepath.Join("/tmp", name)); err != nil {
 			return err
