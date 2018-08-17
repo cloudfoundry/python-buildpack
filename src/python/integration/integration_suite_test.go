@@ -148,21 +148,18 @@ func AssertNoInternetTraffic(fixtureName string) {
 			Skip("Running uncached tests")
 		}
 
-		fmt.Println("### Copying bp file")
 		bpFile := filepath.Join(bpDir, buildpackVersion+"tmp")
 		cmd := exec.Command("cp", packagedBuildpack.File, bpFile)
 		err := cmd.Run()
 		Expect(err).To(BeNil())
 		defer os.Remove(bpFile)
 
-		fmt.Println("### Running internet traffic test")
 		traffic, built, logs, err := cutlass.InternetTraffic(
 			bpDir,
 			filepath.Join("fixtures", fixtureName),
 			bpFile,
 			[]string{"LC_ALL C.UTF-8", "LANG C.UTF-8"},
 		)
-		fmt.Println("### Checking internet traffic results")
 		Expect(err).To(BeNil())
 		Expect(built).To(BeTrue(), strings.Join(logs, "\n"))
 		Expect(traffic).To(BeEmpty(), strings.Join(logs, "\n"))
