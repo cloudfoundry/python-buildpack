@@ -172,9 +172,9 @@ dependencies:
   cf_stacks:
   - cflinuxfs3
 - name: setuptools
-  version: 40.0.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-40.0.0-012adb8e.zip
-  sha256: 012adb8e25fbfd64c652e99e7bab58799a3aaf05d39ab38561f69190a909015f
+  version: 40.1.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-40.1.0-66450026.zip
+  sha256: 664500268e4d649ce5b9f9dc0af0edc2b144666b1544d64af0453da94aa72b70
   cf_stacks:
   - cflinuxfs2
   - cflinuxfs3
