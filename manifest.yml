@@ -34,7 +34,7 @@ dependencies:
   - cflinuxfs2
   - cflinuxfs3
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64-6d33aa02.tgz
-  sha256: '009a3476197030e30d0ce924cc044ee4851ef27324e132b29fd12d8cde071915'
+  sha256: 009a3476197030e30d0ce924cc044ee4851ef27324e132b29fd12d8cde071915
 - name: miniconda2
   version: 4.5.4
   uri: https://repo.continuum.io/miniconda/Miniconda2-4.5.4-Linux-x86_64.sh
@@ -167,8 +167,8 @@ dependencies:
   - cflinuxfs3
 - name: python
   version: 3.7.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.0-linux-x64-cflinuxfs3-888f10db.tgz
-  sha256: 888f10dbcf297397bb729b0e5eb89c7a105279f56a7b897b9b837890ad48633c
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.0-linux-x64-cflinuxfs3-9182e0a3.tgz
+  sha256: 9182e0a3c51de83c215a9b6fecbc2454478b0dc086a3947d0e0489e0566bdd58
   cf_stacks:
   - cflinuxfs3
 - name: setuptools
