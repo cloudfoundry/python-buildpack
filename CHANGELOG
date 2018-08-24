@@ -1,3 +1,23 @@
+v1.6.21 Aug 24, 2018
+=====================
+
+* Completely vendored python apps do not access the internet,
+  even if they use pipenv. (bugfix)
+  (https://www.pivotaltracker.com/story/show/158774977)
+
+* Add setuptools 40.2.0, remove setuptools 40.0.0
+  for stacks cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/159925443)
+
+* Add python 3.7.0 for stacks cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/159252658)
+
+* Add python 3.4.9, remove python 3.4.7
+  (https://www.pivotaltracker.com/story/show/159495910)
+
+* Add python 3.5.6, remove python 3.5.4
+  (https://www.pivotaltracker.com/story/show/159495911)
+
 v1.6.20 Jul 27, 2018
 =====================
 
