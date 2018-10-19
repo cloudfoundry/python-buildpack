@@ -67,10 +67,10 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			body, err := app.GetBody("/")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(body).To(ContainSubstring("numpy: 1.10.4"))
-			Expect(body).To(ContainSubstring("scipy: 0.17.0"))
-			Expect(body).To(ContainSubstring("sklearn: 0.17.1"))
-			Expect(body).To(ContainSubstring("pandas: 0.18.0"))
+			Expect(body).To(ContainSubstring("numpy: 1.15.2"))
+			Expect(body).To(ContainSubstring("scipy: 1.1.0"))
+			Expect(body).To(ContainSubstring("sklearn: 0.20.0"))
+			Expect(body).To(ContainSubstring("pandas: 0.23.4"))
 			Expect(body).To(ContainSubstring("python-version3"))
 		})
 
@@ -87,16 +87,16 @@ var _ = Describe("CF Python Buildpack", func() {
 
 		It("it updates dependencies if environment.yml changes", func() {
 			PushAppAndConfirm(app)
-			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.10.4"))
-			Expect(app.GetBody("/")).ToNot(ContainSubstring("numpy: 1.11.0"))
+			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.15.2"))
+			Expect(app.GetBody("/")).ToNot(ContainSubstring("numpy: 1.15.0"))
 
 			input, err := ioutil.ReadFile(filepath.Join(fixtureDir, "environment.yml"))
 			Expect(err).ToNot(HaveOccurred())
-			output := strings.Replace(string(input), "numpy=1.10.4", "numpy=1.11.0", 1)
+			output := strings.Replace(string(input), "numpy=1.15.2", "numpy=1.15.0", 1)
 			Expect(ioutil.WriteFile(filepath.Join(fixtureDir, "environment.yml"), []byte(output), 0644)).To(Succeed())
 
 			PushAppAndConfirm(app)
-			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.11.0"))
+			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.15.0"))
 		})
 
 		AssertUsesProxyDuringStagingIfPresent("miniconda_python_3")
