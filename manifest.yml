@@ -171,6 +171,12 @@ dependencies:
   sha256: 9182e0a3c51de83c215a9b6fecbc2454478b0dc086a3947d0e0489e0566bdd58
   cf_stacks:
   - cflinuxfs3
+- name: python
+  version: 3.7.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.1-linux-x64-cflinuxfs3-fcb3e593.tgz
+  sha256: fcb3e593f09f3c4ea7e08c94803f01d11ce8351528b24755876cad5a15106254
+  cf_stacks:
+  - cflinuxfs3
 - name: setuptools
   version: 40.4.3
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-40.4.3-any-stack-acbc5740.zip
