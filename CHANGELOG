@@ -1,3 +1,35 @@
+v1.6.22 Oct 22, 2018
+=====================
+
+* Add python 3.7.1
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161363050)
+
+* Add python 3.6.7, remove python 3.6.5
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161363051)
+
+* Add pipenv 2018.10.13, remove pipenv 2018.7.1
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161199971)
+  (https://www.pivotaltracker.com/story/show/161078648)
+
+* Add setuptools 40.4.3, remove setuptools 40.2.0
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/160709589)
+  (https://www.pivotaltracker.com/story/show/160693994)
+  (https://www.pivotaltracker.com/story/show/160591668)
+  (https://www.pivotaltracker.com/story/show/160587221)
+  (https://www.pivotaltracker.com/story/show/160538834)
+
+* Add miniconda2 4.5.11, remove miniconda2 4.5.4
+  for stacks cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/160263384)
+
+* Add miniconda3 4.5.11, remove miniconda3 4.5.4
+  for stacks cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/160263390)
+
 v1.6.21 Aug 24, 2018
 =====================
 
