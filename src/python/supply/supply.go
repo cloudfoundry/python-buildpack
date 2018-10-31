@@ -386,7 +386,7 @@ func (s *Supplier) InstallPipEnv() error {
 			}
 		}
 
-		return s.writeTempRequirementsTxt()
+		return s.writeTempRequirementsTxt(outputString)
 	}
 	return nil
 }
@@ -423,7 +423,7 @@ func (s *Supplier) HandleRequirementstxt() error {
 		return nil
 	}
 
-	return s.writeTempRequirementsTxt()
+	return s.writeTempRequirementsTxt("-e .")
 }
 
 func (s *Supplier) installFfi() error {
@@ -664,9 +664,9 @@ func (s *Supplier) formatVersion(version string) string {
 
 }
 
-func (s *Supplier) writeTempRequirementsTxt() error {
+func (s *Supplier) writeTempRequirementsTxt(content string) error {
 	s.removeRequirementsText = true
-	return ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte("-e ."), 0644)
+	return ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(content), 0644)
 }
 
 func indentWriter(writer io.Writer) io.Writer {

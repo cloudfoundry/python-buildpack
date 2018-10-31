@@ -219,8 +219,11 @@ var _ = Describe("Supply", func() {
 
 			It("installs pipenv and generates requirements.txt", func() {
 				expectInstallPipEnv()
+
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("test"), nil)
+
 				Expect(supplier.InstallPipEnv()).To(Succeed())
+
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(requirementsContents).To(ContainSubstring("test"))
@@ -228,8 +231,11 @@ var _ = Describe("Supply", func() {
 
 			It("removes extraneous pipenv lock output", func() {
 				expectInstallPipEnv()
+
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("Using /tmp/deps/0/bin/python3.6m to create virtualenv…\nline 1\nline 2\n"), nil)
+
 				Expect(supplier.InstallPipEnv()).To(Succeed())
+
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(requirementsContents)).To(Equal("line 1\nline 2\n"))
