@@ -1,0 +1,5 @@
+flask==0.10.1
+gunicorn==19.3.0
+itsdangerous==0.24
+jinja2==2.7.2
+-r sub_folder/other_requirement1.txt

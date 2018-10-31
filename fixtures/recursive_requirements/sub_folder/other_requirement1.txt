@@ -1,0 +1,2 @@
+markupsafe==0.21
+-r other_requirements2.txt

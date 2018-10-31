@@ -55,6 +55,7 @@ type Supplier struct {
 	Log           *libbuildpack.Logger
 	Logfile       *os.File
 	HasNltkData   bool
+	removeRequirementsText bool
 }
 
 func Run(s *Supplier) error {
@@ -78,8 +79,8 @@ func RunPython(s *Supplier) error {
 		return err
 	}
 
-	if err := s.CopyRequirementsAndRuntimeTxt(); err != nil {
-		s.Log.Error("Error copying requirements.txt and runtime.txt to deps dir: %v", err)
+	if err := s.CopyRuntimeTxt(); err != nil {
+		s.Log.Error("Error copying runtime.txt to deps dir: %v", err)
 		return err
 	}
 
@@ -157,19 +158,19 @@ func RunPython(s *Supplier) error {
 		s.Log.Debug("Size of pip cache dir: %s", cacheDirSize)
 	}
 
+	if s.removeRequirementsText {
+		if err := os.Remove(filepath.Join(s.Stager.BuildDir(), "requirements.txt")); err != nil {
+			s.Log.Error("Unable to clean up app directory: %s", err.Error())
+			return err
+		}
+	}
+
 	dirSnapshot.Diff()
 
 	return nil
 }
 
-func (s *Supplier) CopyRequirementsAndRuntimeTxt() error {
-	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt")); err != nil {
-		return err
-	} else if exists {
-		if err = libbuildpack.CopyFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
-			return err
-		}
-	}
+func (s *Supplier) CopyRuntimeTxt() error {
 	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "runtime.txt")); err != nil {
 		return err
 	} else if exists {
@@ -181,7 +182,7 @@ func (s *Supplier) CopyRequirementsAndRuntimeTxt() error {
 }
 
 func (s *Supplier) HandleMercurial() error {
-	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "grep", "-Fiq", "hg+", "requirements.txt"); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "grep", "-Fiq", "hg+", "requirements.txt"); err != nil {
 		return nil
 	}
 
@@ -336,7 +337,7 @@ func (s *Supplier) InstallPipPop() error {
 }
 
 func (s *Supplier) InstallPipEnv() error {
-	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt"))
+	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
 	if err != nil {
 		return err
 	}
@@ -385,16 +386,15 @@ func (s *Supplier) InstallPipEnv() error {
 			}
 		}
 
-		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "requirements.txt"), []byte(outputString), 0644); err != nil {
-			return err
-		}
+		return s.writeTempRequirementsTxt()
 	}
 	return nil
 }
 
 func (s *Supplier) HandlePylibmc() error {
 	memcachedDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
-	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
+
+	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
 		s.Log.BeginStep("Noticed pylibmc. Bootstrapping libmemcached.")
 		if err := s.Installer.InstallOnlyVersion("libmemcache", memcachedDir); err != nil {
 			return err
@@ -411,7 +411,7 @@ func (s *Supplier) HandlePylibmc() error {
 }
 
 func (s *Supplier) HandleRequirementstxt() error {
-	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
+	if exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt")); err != nil {
 		return err
 	} else if exists {
 		return nil
@@ -423,7 +423,7 @@ func (s *Supplier) HandleRequirementstxt() error {
 		return nil
 	}
 
-	return ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "requirements.txt"), []byte("-e ."), 0644)
+	return s.writeTempRequirementsTxt()
 }
 
 func (s *Supplier) installFfi() error {
@@ -449,7 +449,7 @@ func (s *Supplier) installFfi() error {
 }
 
 func (s *Supplier) HandleFfi() error {
-	if err := s.Command.Execute(s.Stager.DepDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
 		return s.installFfi()
 	}
 	return nil
@@ -490,7 +490,17 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 		fileContents, _ := ioutil.ReadFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"))
 		s.Log.Info("requirements-declared: %s", string(fileContents))
 
-		staleContents, err := s.Command.Output(s.Stager.BuildDir(), "pip-diff", "--stale", filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"), filepath.Join(s.Stager.DepDir(), "requirements.txt"), "--exclude", "setuptools", "pip", "wheel")
+		staleContents, err := s.Command.Output(
+			s.Stager.BuildDir(),
+			"pip-diff",
+			"--stale",
+			filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"),
+			filepath.Join(s.Stager.BuildDir(), "requirements.txt"),
+			"--exclude",
+			"setuptools",
+			"pip",
+			"wheel",
+		)
 		if err != nil {
 			return err
 		}
@@ -504,7 +514,15 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 		}
 
 		s.Log.BeginStep("Uninstalling stale dependencies")
-		if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "uninstall", "-r", filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt", "-y", "--exists-action=w")); err != nil {
+		if err := s.Command.Execute(
+			s.Stager.BuildDir(),
+			indentWriter(os.Stdout),
+			indentWriter(os.Stderr),
+			"pip",
+			"uninstall",
+			"-r",
+			filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt", "-y", "--exists-action=w"),
+		); err != nil {
 			return err
 		}
 
@@ -516,9 +534,9 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 func (s *Supplier) RunPip() error {
 	s.Log.BeginStep("Running Pip Install")
 
-	requirementsPath := filepath.Join(s.Stager.DepDir(), "requirements.txt")
+	requirementsPath := filepath.Join(s.Stager.BuildDir(), "requirements.txt")
 	if exists, err := libbuildpack.FileExists(requirementsPath); err != nil {
-		return fmt.Errorf("Couldn't determine existence of requirements.txt: %v", err)
+		return fmt.Errorf("could not determine existence of requirements.txt: %v", err)
 	} else if !exists {
 		s.Log.Debug("Skipping 'pip install' since requirements.txt does not exist")
 		return nil
@@ -526,7 +544,7 @@ func (s *Supplier) RunPip() error {
 
 	vendorExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "vendor"))
 	if err != nil {
-		return fmt.Errorf("Couldn't check vendor existence: %v", err)
+		return fmt.Errorf("could not check vendor existence: %v", err)
 	}
 
 	installArgs := []string{"install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
@@ -539,13 +557,13 @@ func (s *Supplier) RunPip() error {
 		// and pipenv generates requirements.txt with -i
 		originalReqs, err = ioutil.ReadFile(requirementsPath)
 		if err != nil {
-			return fmt.Errorf("Could not read requirements.txt: %v", err)
+			return fmt.Errorf("could not read requirements.txt: %v", err)
 		}
 		re := regexp.MustCompile("(?m)^\\W*-i.*$")
 		modifiedReqs := re.ReplaceAll(originalReqs, []byte{})
 		err = ioutil.WriteFile(requirementsPath, modifiedReqs, 0644)
 		if err != nil {
-			return fmt.Errorf("Could not overwrite requirements file: %v", err)
+			return fmt.Errorf("could not overwrite requirements file: %v", err)
 		}
 	}
 
@@ -553,16 +571,16 @@ func (s *Supplier) RunPip() error {
 		if vendorExists {
 			s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
 
-			err = ioutil.WriteFile(requirementsPath, originalReqs, 0644)
-			if err != nil {
-				return fmt.Errorf("Could not overwrite modified requirements file: %v", err)
+			if err := ioutil.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
+				return fmt.Errorf("could not overwrite modified requirements file: %v", err)
 			}
+
 			if err = s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", installArgs...); err != nil {
 				s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
-				return fmt.Errorf("Couldn't run pip: %v", err)
+				return fmt.Errorf("could not run pip: %v", err)
 			}
 		} else {
-			return fmt.Errorf("Couldn't run pip: %v", err)
+			return fmt.Errorf("could not run pip: %v", err)
 		}
 	}
 
@@ -644,6 +662,11 @@ func (s *Supplier) formatVersion(version string) string {
 
 	return fmt.Sprintf("python-%s", version)
 
+}
+
+func (s *Supplier) writeTempRequirementsTxt() error {
+	s.removeRequirementsText = true
+	return ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte("-e ."), 0644)
 }
 
 func indentWriter(writer io.Writer) io.Writer {

@@ -57,6 +57,12 @@ var _ = Describe("CF Python Buildpack", func() {
 		})
 	})
 
+	It("deploy a web app with -r in requirements.txt", func() {
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "recursive_requirements"))
+		PushAppAndConfirm(app)
+		Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+	})
+
 	It("deploy a web app that uses an nltk corpus", func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "nltk_flask"))
 		app.SetEnv("BP_DEBUG", "1")

@@ -204,7 +204,7 @@ var _ = Describe("Supply", func() {
 		Context("when Pipfile.lock and requirements.txt both exist", func() {
 			BeforeEach(func() {
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("This is pipfile"), 0644)).To(Succeed())
-				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
 			})
 
 			It("does not install Pipenv", func() {
@@ -221,7 +221,7 @@ var _ = Describe("Supply", func() {
 				expectInstallPipEnv()
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("test"), nil)
 				Expect(supplier.InstallPipEnv()).To(Succeed())
-				requirementsContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
+				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(requirementsContents).To(ContainSubstring("test"))
 			})
@@ -230,7 +230,7 @@ var _ = Describe("Supply", func() {
 				expectInstallPipEnv()
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("Using /tmp/deps/0/bin/python3.6m to create virtualenv…\nline 1\nline 2\n"), nil)
 				Expect(supplier.InstallPipEnv()).To(Succeed())
-				requirementsContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
+				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(requirementsContents)).To(Equal("line 1\nline 2\n"))
 			})
@@ -244,7 +244,7 @@ var _ = Describe("Supply", func() {
 
 		Context("when the app uses pylibmc", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(depDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pylibmc").Return(nil)
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pylibmc").Return(nil)
 			})
 			It("installs libmemcache", func() {
 				memcachedDir := filepath.Join(depDir, "libmemcache")
@@ -260,7 +260,7 @@ var _ = Describe("Supply", func() {
 		})
 		Context("when the app does not use pylibmc", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(depDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pylibmc").Return(fmt.Errorf("not found"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pylibmc").Return(fmt.Errorf("not found"))
 			})
 
 			It("does not install libmemcache", func() {
@@ -270,27 +270,24 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
-	Describe("CopyRequirementsAndRuntimeTxt", func() {
+	Describe("CopyRuntimeTxt", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 		})
 
 		It("succeeds without requirements.txt and runtime.txt in build dir", func() {
-			Expect(supplier.CopyRequirementsAndRuntimeTxt()).To(Succeed())
+			Expect(supplier.CopyRuntimeTxt()).To(Succeed())
 		})
 
 		Context("requirements.txt and runtime.txt in build dir", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "runtime.txt"), []byte("blah blah"), 0644)).To(Succeed())
 			})
 
 			It("copies requirements.txt and runtime.txt", func() {
-				Expect(supplier.CopyRequirementsAndRuntimeTxt()).To(Succeed())
-				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(fileContents).To(Equal([]byte("blah")))
-				fileContents, err = ioutil.ReadFile(filepath.Join(depDir, "runtime.txt"))
+				Expect(supplier.CopyRuntimeTxt()).To(Succeed())
+
+				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "runtime.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fileContents).To(Equal([]byte("blah blah")))
 			})
@@ -309,9 +306,9 @@ var _ = Describe("Supply", func() {
 				It("create requirements.txt with '-e .'", func() {
 					Expect(supplier.HandleRequirementstxt()).To(Succeed())
 
-					Expect(filepath.Join(depDir, "requirements.txt")).To(BeARegularFile())
+					Expect(filepath.Join(buildDir, "requirements.txt")).To(BeARegularFile())
 
-					fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
+					fileContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(fileContents).To(Equal([]byte("-e .")))
 				})
@@ -319,19 +316,19 @@ var _ = Describe("Supply", func() {
 			Context("when setup.py does not exist", func() {
 				It("does not create requirements.txt file", func() {
 					Expect(supplier.HandleRequirementstxt()).To(Succeed())
-					Expect(filepath.Join(depDir, "requirements.txt")).ToNot(BeARegularFile())
+					Expect(filepath.Join(buildDir, "requirements.txt")).ToNot(BeARegularFile())
 				})
 			})
 		})
 
 		Context("when requirements.txt exists", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
 			})
 
 			It("does nothing", func() {
 				Expect(supplier.HandleRequirementstxt()).To(Succeed())
-				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "requirements.txt"))
+				fileContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fileContents).To(Equal([]byte("blah")))
 			})
@@ -345,7 +342,7 @@ var _ = Describe("Supply", func() {
 
 		Context("when the app uses ffi", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(depDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(nil)
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(nil)
 			})
 
 			It("installs ffi", func() {
@@ -374,7 +371,7 @@ var _ = Describe("Supply", func() {
 		})
 		Context("when the app does not use libffi", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(depDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(fmt.Errorf("not found"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(fmt.Errorf("not found"))
 			})
 
 			It("does not install libffi", func() {
@@ -387,7 +384,7 @@ var _ = Describe("Supply", func() {
 	Describe("HandleMercurial", func() {
 		Context("has mercurial dependencies", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(depDir, gomock.Any(), gomock.Any(), "grep", "-Fiq", "hg+", "requirements.txt")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "grep", "-Fiq", "hg+", "requirements.txt")
 			})
 
 			Context("the buildpack is not cached", func() {
@@ -416,7 +413,7 @@ var _ = Describe("Supply", func() {
 		})
 		Context("does not have mercurial dependencies", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(depDir, gomock.Any(), gomock.Any(), "grep", "-Fiq", "hg+", "requirements.txt").Return(fmt.Errorf("Mercurial not found"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "grep", "-Fiq", "hg+", "requirements.txt").Return(fmt.Errorf("Mercurial not found"))
 			})
 
 			It("succeeds without installing mercurial", func() {
@@ -479,7 +476,7 @@ cffi==0.9.2
 			})
 
 			It("creates requirements-stale.txt and uninstalls unused dependencies", func() {
-				mockCommand.EXPECT().Output(buildDir, "pip-diff", "--stale", filepath.Join(depDir, "python", "requirements-declared.txt"), filepath.Join(depDir, "requirements.txt"), "--exclude", "setuptools", "pip", "wheel").Return(requirementsStale, nil)
+				mockCommand.EXPECT().Output(buildDir, "pip-diff", "--stale", filepath.Join(depDir, "python", "requirements-declared.txt"), filepath.Join(buildDir, "requirements.txt"), "--exclude", "setuptools", "pip", "wheel").Return(requirementsStale, nil)
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "uninstall", "-r", filepath.Join(depDir, "python", "requirements-stale.txt", "-y", "--exists-action=w"))
 				Expect(supplier.UninstallUnusedDependencies()).To(Succeed())
 				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "python", "requirements-stale.txt"))
@@ -505,11 +502,11 @@ cffi==0.9.2
 		Context("requirements.txt exists in dep dir", func() {
 			BeforeEach(func() {
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
-				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
 			})
 			Context("vendor does not exist", func() {
 				It("Runs and outputs pip", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
 					Expect(supplier.RunPip()).To(Succeed())
 				})
 			})
@@ -519,7 +516,7 @@ cffi==0.9.2
 					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
 				})
 				It("installs the vendor directory", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
 					Expect(supplier.RunPip()).To(Succeed())
 				})
 			})
@@ -527,25 +524,25 @@ cffi==0.9.2
 
 		Context("requirements.txt exists in dep dir and pip install fails", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(depDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
 			})
 			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
 			Context("vendor does not exist", func() {
 				BeforeEach(func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
 				})
 				It("does NOT alert the user", func() {
-					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("Couldn't run pip: exit 28")))
+					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
 					Expect(buffer.String()).ToNot(ContainSubstring(proTip))
 				})
 			})
 			Context("vendor exists", func() {
 				BeforeEach(func() {
 					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(depDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28")).Times(2)
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28")).Times(2)
 				})
 				It("alerts the user", func() {
-					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("Couldn't run pip: exit 28")))
+					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
 					Expect(buffer.String()).To(ContainSubstring(proTip))
 				})
 			})
