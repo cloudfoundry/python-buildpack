@@ -57,6 +57,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			app = cutlass.New(fixtureDir)
 			app.Disk = "2G"
 			app.Memory = "1G"
+			app.Buildpacks = []string{"python_buildpack"}
 		})
 		AfterEach(func() { _ = os.RemoveAll(fixtureDir) })
 
