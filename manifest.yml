@@ -64,15 +64,15 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip-pop/pip-pop-0.1.1-d410583a.tar.gz
   sha256: c928ade1cc134d1b67851caf85a856c8fcc8fc960814385eef1fef2482991bc7
 - name: pipenv
-  version: 2018.10.13
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.10.13-cflinuxfs2-79c3ef68.tgz
-  sha256: 79c3ef6847ab870617937e528cd6853e1071c94555a41645c12f4c080890c633
+  version: 2018.11.14
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.14-cflinuxfs2-86f3f815.tgz
+  sha256: 86f3f815863cc26509cd0c2613abb557b264330b64a0de321eef63c7dae12cbc
   cf_stacks:
   - cflinuxfs2
 - name: pipenv
-  version: 2018.10.13
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.10.13-cflinuxfs3-d86605e8.tgz
-  sha256: d86605e8a437e44de5c05ba5fe4aac17e12ddfa676f7ee042932964249ee7e86
+  version: 2018.11.14
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.14-cflinuxfs3-b76a4270.tgz
+  sha256: b76a42704ea709f4acda0c7a80bc9d7f297f3e5da5d5bf91ed7de38cbce1ece7
   cf_stacks:
   - cflinuxfs3
 - name: python
