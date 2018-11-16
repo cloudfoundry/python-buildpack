@@ -16,7 +16,7 @@
     "default": {
         "Flask": {
             "hash": "sha256:4c83829ff83d408b5e1d4995472265411d2c414112298f2eb4b359d9e4563373",
-            "version": "==0.10.1"
+            "version": "==1.0.2"
         },
         "Jinja2": {
             "hash": "sha256:2231bace0dfd8d2bf1e5d7e41239c06c9e0ded46e70cc1094a0aa64b0afeb054",
