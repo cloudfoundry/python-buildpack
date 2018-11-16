@@ -2,7 +2,6 @@ package supply
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -48,14 +47,14 @@ type Command interface {
 }
 
 type Supplier struct {
-	PythonVersion          string
-	Manifest               Manifest
-	Installer              Installer
-	Stager                 Stager
-	Command                Command
-	Log                    *libbuildpack.Logger
-	Logfile                *os.File
-	HasNltkData            bool
+	PythonVersion string
+	Manifest      Manifest
+	Installer     Installer
+	Stager        Stager
+	Command       Command
+	Log           *libbuildpack.Logger
+	Logfile       *os.File
+	HasNltkData   bool
 	removeRequirementsText bool
 }
 
@@ -369,49 +368,27 @@ func (s *Supplier) InstallPipEnv() error {
 		s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
 		s.Log.Info("Generating 'requirements.txt' with pipenv")
 
-		requirementsContents, err := pipfileToRequirements(filepath.Join(s.Stager.BuildDir(), "Pipfile.lock"))
+		cmd := exec.Command("pipenv", "lock", "--requirements")
+		cmd.Dir = s.Stager.BuildDir()
+		cmd.Env = append(os.Environ(), "VIRTUALENV_NEVER_DOWNLOAD=true")
+		output, err := s.Command.RunWithOutput(cmd)
+		outputString := string(output)
+
 		if err != nil {
-			return fmt.Errorf("Failed to write `requirement.txt` from Pipfile.lock: %s", err.Error())
+			return err
 		}
 
-		return s.writeTempRequirementsTxt(requirementsContents)
+		// Remove output due to virtualenv
+		if strings.HasPrefix(outputString, "Using ") {
+			reqs := strings.SplitN(outputString, "\n", 2)
+			if len(reqs) > 0 {
+				outputString = reqs[1]
+			}
+		}
+
+		return s.writeTempRequirementsTxt(outputString)
 	}
 	return nil
-}
-
-func pipfileToRequirements(lockFilePath string) (string, error) {
-	var lockFile struct {
-		Meta struct {
-			Sources []struct {
-				URL string
-			}
-		} `json:"_meta"`
-		Default map[string]struct {
-			Version string
-		}
-	}
-
-	lockContents, err := ioutil.ReadFile(lockFilePath)
-	if err != nil {
-		return "", err
-	}
-
-	err = json.Unmarshal(lockContents, &lockFile)
-	if err != nil {
-		return "", err
-	}
-
-	buf := &bytes.Buffer{}
-
-	for _, source := range lockFile.Meta.Sources {
-		fmt.Fprintf(buf, "-i %s\n", source.URL)
-	}
-
-	for pkg, obj := range lockFile.Default {
-		fmt.Fprintf(buf, "%s%s\n", pkg, obj.Version)
-	}
-
-	return buf.String(), nil
 }
 
 func (s *Supplier) HandlePylibmc() error {
