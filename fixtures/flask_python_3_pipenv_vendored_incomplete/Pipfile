@@ -3,7 +3,7 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [packages]
-Flask = "==0.10.1"
+Flask = "==1.0.2"
 gunicorn = "==19.3.0"
 itsdangerous = "==0.24"
 Jinja2 = "==2.9.6"

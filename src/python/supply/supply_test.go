@@ -12,7 +12,7 @@ import (
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"
-	gomock "github.com/golang/mock/gomock"
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -201,9 +201,10 @@ var _ = Describe("Supply", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 		})
+
 		Context("when Pipfile.lock and requirements.txt both exist", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("This is pipfile"), 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte("This is pipfile"), 0644)).To(Succeed())
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("blah"), 0644)).To(Succeed())
 			})
 
@@ -214,22 +215,27 @@ var _ = Describe("Supply", func() {
 
 		Context("when Pipfile.lock exists but requirements.txt does not exist", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("This is pipfile"), 0644)).To(Succeed())
+				const lockFileContnet string = `{"_meta":{"sources":[{"url":"https://pypi.org/simple"}]},"default":{"test":{"version":"==1.2.3"}}}`
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(lockFileContnet), 0644)).To(Succeed())
 			})
 
-			It("installs pipenv and generates requirements.txt", func() {
-				expectInstallPipEnv()
-
-				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("test"), nil)
-
+			It("manually generates the requirements.txt", func() {
 				Expect(supplier.InstallPipEnv()).To(Succeed())
 
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
-				Expect(requirementsContents).To(ContainSubstring("test"))
+				Expect(requirementsContents).To(ContainSubstring("-i https://pypi.org/simple"))
+				Expect(requirementsContents).To(ContainSubstring("test==1.2.3"))
+			})
+		})
+
+		Context("when Pipfile exists but requirements.txt and Pipfile.lock do not exist", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
 			})
 
-			It("removes extraneous pipenv lock output", func() {
+			It("manually generates the requirements.txt", func() {
 				expectInstallPipEnv()
 
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("Using /tmp/deps/0/bin/python3.6m to create virtualenv…\nline 1\nline 2\n"), nil)
@@ -238,6 +244,8 @@ var _ = Describe("Supply", func() {
 
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
+
+				By("removes extraneous pipenv lock output")
 				Expect(string(requirementsContents)).To(Equal("line 1\nline 2\n"))
 			})
 		})

@@ -8,11 +8,11 @@ import (
 
 	"path/filepath"
 
+	"fmt"
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"fmt"
 )
 
 func createFile(dir, filename, command string, perm os.FileMode) error {

@@ -62,17 +62,17 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 
 		It("pushes successfully both times", func() {
 			app.Buildpacks = []string{
-					"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",
-					"python_buildpack",
-				}
+				"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",
+				"python_buildpack",
+			}
 			PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 
 			app.Buildpacks = []string{
-					"https://github.com/cloudfoundry/binary-buildpack#develop",
-					"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",
-					"python_buildpack",
-				}
+				"https://github.com/cloudfoundry/binary-buildpack#develop",
+				"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",
+				"python_buildpack",
+			}
 			PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 		})

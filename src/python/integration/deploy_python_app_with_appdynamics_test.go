@@ -6,10 +6,10 @@ import (
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 
+	"encoding/json"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"encoding/json"
 )
 
 var _ = Describe("appdynamics", func() {
