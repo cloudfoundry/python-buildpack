@@ -1,3 +1,26 @@
+v1.6.24 Nov 26, 2018
+=====================
+
+* Add pymysql to list of packages that require libffi
+  (https://www.pivotaltracker.com/story/show/161554556)
+
+* Add pipenv 2018.11.26, remove pipenv 2018.10.13
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162191120)
+  (https://www.pivotaltracker.com/story/show/161973946)
+
+* Fix bug in order to make pipenv install deterministic
+  (https://www.pivotaltracker.com/story/show/161267508)
+
+* Add setuptools 40.6.2, remove setuptools 40.5.0
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161916774)
+  (https://www.pivotaltracker.com/story/show/161903843)
+
+* Handle recursive requirements in requirements.txt
+  (https://www.pivotaltracker.com/story/show/158115122)
+
+
 v1.6.23 Oct 29, 2018
 =====================
 
