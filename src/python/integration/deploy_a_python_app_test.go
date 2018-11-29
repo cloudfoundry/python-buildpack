@@ -32,7 +32,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 
 			Eventually(app.Stdout.String()).Should(ContainSubstring("Could not install python: no match found for 99.99.99"))
-			Eventually(app.Stdout.String()).ShouldNot(ContainSubstring("-----> Installing"))
+			Eventually(app.Stdout.String()).ShouldNot(ContainSubstring("-----> Installing python"))
 		})
 	})
 
