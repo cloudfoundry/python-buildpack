@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"python/conda"
-	"python/pipfile"
+	"github.com/cloudfoundry/python-buildpack/src/python/conda"
+	"github.com/cloudfoundry/python-buildpack/src/python/pipfile"
 	"regexp"
 	"strings"
 

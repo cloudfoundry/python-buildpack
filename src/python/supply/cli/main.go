@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	_ "python/hooks"
-	"python/supply"
+	_ "github.com/cloudfoundry/python-buildpack/src/python/hooks"
+	"github.com/cloudfoundry/python-buildpack/src/python/supply"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"

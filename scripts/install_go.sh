@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-GO_VERSION="1.9.1"
+GO_VERSION="1.11.2"
 
 export GoInstallDir="/tmp/go$GO_VERSION"
 mkdir -p $GoInstallDir

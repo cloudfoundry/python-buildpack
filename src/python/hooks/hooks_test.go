@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"python/hooks"
+	"github.com/cloudfoundry/python-buildpack/src/python/hooks"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"

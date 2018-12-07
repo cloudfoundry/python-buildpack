@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"python/finalize"
+	"github.com/cloudfoundry/python-buildpack/src/python/finalize"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"

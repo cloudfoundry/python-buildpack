@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"python/supply"
+	"github.com/cloudfoundry/python-buildpack/src/python/supply"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"

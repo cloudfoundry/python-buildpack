@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
-	"python/hooks"
+	"github.com/cloudfoundry/python-buildpack/src/python/hooks"
 
 	"path/filepath"
 

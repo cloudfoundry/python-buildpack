@@ -4,9 +4,9 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"python/finalize"
-	_ "python/hooks"
-	"python/pyfinder"
+	"github.com/cloudfoundry/python-buildpack/src/python/finalize"
+	_ "github.com/cloudfoundry/python-buildpack/src/python/hooks"
+	"github.com/cloudfoundry/python-buildpack/src/python/pyfinder"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"

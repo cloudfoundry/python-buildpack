@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"python/conda"
+	"github.com/cloudfoundry/python-buildpack/src/python/conda"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"
