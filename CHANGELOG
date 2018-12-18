@@ -1,3 +1,10 @@
+v1.6.25 Dec 18, 2018
+=====================
+
+* Add setuptools 40.6.3, remove setuptools 40.6.2
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162589898)
+
 v1.6.24 Nov 26, 2018
 =====================
 
