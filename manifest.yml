@@ -176,17 +176,18 @@ dependencies:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
 - name: python
-  version: 3.7.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.0-linux-x64-cflinuxfs3-9182e0a3.tgz
-  sha256: 9182e0a3c51de83c215a9b6fecbc2454478b0dc086a3947d0e0489e0566bdd58
-  cf_stacks:
-  - cflinuxfs3
-- name: python
   version: 3.7.1
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.1-linux-x64-cflinuxfs3-fcb3e593.tgz
   sha256: fcb3e593f09f3c4ea7e08c94803f01d11ce8351528b24755876cad5a15106254
   cf_stacks:
   - cflinuxfs3
+- name: python
+  version: 3.7.2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.2-linux-x64-cflinuxfs3-5bac6de6.tgz
+  sha256: 5bac6de6f636004c1663f2a4c94f74a88b15c5aee4f10b995fa3ecf82e9603cb
+  cf_stacks:
+  - cflinuxfs3
+  source: https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
 - name: setuptools
   version: 40.6.3
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-40.6.3-any-stack-3b474dad.zip
