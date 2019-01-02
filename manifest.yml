@@ -44,12 +44,13 @@ dependencies:
   - cflinuxfs3
   source: https://github.com/conda/conda/archive/4.5.12.tar.gz
 - name: miniconda3
-  version: 4.5.11
-  uri: https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh
-  sha256: ea4594241e13a2671c5b158b3b813f0794fe58d514795fbf72a1aad24db918cf
+  version: 4.5.12
+  uri: https://repo.continuum.io/miniconda/Miniconda3-4.5.12-Linux-x86_64.sh
+  sha256: e5e5b4cd2a918e0e96b395534222773f7241dc59d776db1b9f7fedfcb489157a
   cf_stacks:
   - cflinuxfs2
   - cflinuxfs3
+  source: https://github.com/conda/conda/archive/4.5.12.tar.gz
 - name: pip
   version: 9.0.3
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip-9.0.3-7bf48f9a.tar.gz
