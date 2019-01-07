@@ -217,9 +217,13 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 func init() {
 	logger := libbuildpack.NewLogger(os.Stdout)
 	command := &libbuildpack.Command{}
-
-	libbuildpack.AddHook(AppdynamicsHook{
-		Log:     logger,
-		Command: command,
-	})
+	if os.Getenv("APPD_AGENT") == "" {
+		logger.Warning("[DEPRECATION WARNING]: ")
+		logger.Warning("Please use AppDynamics extension buildpack for Python Application instrumentation")
+		logger.Warning("for more details: https://docs.pivotal.io/partners/appdynamics/multibuildpack.html")
+		libbuildpack.AddHook(AppdynamicsHook{
+			Log:     logger,
+			Command: command,
+		})
+	}
 }
