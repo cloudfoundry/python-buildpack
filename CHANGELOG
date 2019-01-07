@@ -1,3 +1,21 @@
+v1.6.26 Jan 07, 2019
+=====================
+
+* Set the PIP_CERT environment variable in the staging container
+  (https://www.pivotaltracker.com/story/show/156283238)
+
+* Add miniconda3 4.5.12, remove miniconda3 4.5.11
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162914580)
+
+* Add python 3.7.2, remove python 3.7.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162832331)
+
+* Add python 3.6.8, remove python 3.6.6
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162832330)
+
 v1.6.25 Dec 18, 2018
 =====================
 
