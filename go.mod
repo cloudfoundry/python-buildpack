@@ -2,7 +2,7 @@ module github.com/cloudfoundry/python-buildpack
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/cloudfoundry/libbuildpack v0.0.0-20190115190946-c10a4cd29881
+	github.com/cloudfoundry/libbuildpack v0.0.0-20190123211659-27fcba64ad86
 	github.com/golang/mock v1.2.0
 	github.com/kr/text v0.1.0
 	github.com/onsi/ginkgo v1.7.0
