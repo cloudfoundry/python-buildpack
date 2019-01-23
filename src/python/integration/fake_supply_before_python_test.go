@@ -27,7 +27,7 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 
 			app = cutlass.New(filepath.Join(bpDir, "fixtures", "fake_supply_python_app"))
 			app.Buildpacks = []string{
-				"https://github.com/cloudfoundry/dotnet-core-buildpack#develop",
+				"https://github.com/cloudfoundry/dotnet-core-buildpack#master",
 				"python_buildpack",
 			}
 			app.Disk = "1G"
@@ -69,7 +69,7 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 
 			app.Buildpacks = []string{
-				"https://github.com/cloudfoundry/binary-buildpack#develop",
+				"https://github.com/cloudfoundry/binary-buildpack#master",
 				"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",
 				"python_buildpack",
 			}
