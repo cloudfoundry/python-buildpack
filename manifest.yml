@@ -185,8 +185,8 @@ dependencies:
   - cflinuxfs3
 - name: python
   version: 3.7.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.2-linux-x64-cflinuxfs3-5bac6de6.tgz
-  sha256: 5bac6de6f636004c1663f2a4c94f74a88b15c5aee4f10b995fa3ecf82e9603cb
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.2-linux-x64-cflinuxfs3-ea81cea2.tgz
+  sha256: ea81cea2e22660db3c7c296b315fc9405bf4da58f5dcc4eae019f48a7c6f7725
   cf_stacks:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
