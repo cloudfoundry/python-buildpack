@@ -96,11 +96,6 @@ func RunPython(s *Supplier) error {
 		return err
 	}
 
-	if err := s.InstallPip(); err != nil {
-		s.Log.Error("Could not install pip: %v", err)
-		return err
-	}
-
 	if err := s.InstallPipPop(); err != nil {
 		s.Log.Error("Could not install pip pop: %v", err)
 		return err
@@ -192,7 +187,7 @@ func (s *Supplier) HandleMercurial() error {
 		s.Log.Warning("Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.")
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", "install", "mercurial"); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", "-m", "pip", "install", "mercurial"); err != nil {
 		return err
 	}
 
@@ -327,7 +322,7 @@ func (s *Supplier) InstallPipPop() error {
 		return err
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip", "install", "pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "python", "-m", "pip", "install", "pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
 		s.Log.Debug("******Path val: %s", os.Getenv("PATH"))
 		return err
 	}
@@ -379,7 +374,7 @@ func (s *Supplier) InstallPipEnv() error {
 		s.Log.Info("Installing %s", dep)
 		out := &bytes.Buffer{}
 		stderr := &bytes.Buffer{}
-		if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+		if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "python", "-m", "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
 			return fmt.Errorf("Failed to install %s: %v.\nStdout: %v\nStderr: %v", dep, err, out, stderr)
 		}
 	}
@@ -505,31 +500,6 @@ func (s *Supplier) HandleFfi() error {
 	return nil
 }
 
-func (s *Supplier) InstallPip() error {
-	for _, name := range []string{"setuptools", "pip"} {
-		if err := s.Installer.InstallOnlyVersion(name, filepath.Join("/tmp", name)); err != nil {
-			return err
-		}
-		versions := s.Manifest.AllDependencyVersions(name)
-		outWriter := new(bytes.Buffer)
-		if err := s.Command.Execute(filepath.Join("/tmp", name, name+"-"+versions[0]), outWriter, outWriter, "python", "setup.py", "install", fmt.Sprintf("--prefix=%s", filepath.Join(s.Stager.DepDir(), "python"))); err != nil {
-			s.Log.Error(outWriter.String())
-			return err
-		}
-	}
-
-	for _, dir := range []string{"bin", "lib", "include"} {
-		if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", dir), dir); err != nil {
-			return err
-		}
-	}
-	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "lib", "pkgconfig"), "pkgconfig"); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (s *Supplier) UninstallUnusedDependencies() error {
 	requirementsDeclaredExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"))
 	if err != nil {
@@ -568,6 +538,8 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 			s.Stager.BuildDir(),
 			indentWriter(os.Stdout),
 			indentWriter(os.Stderr),
+			"python",
+			"-m",
 			"pip",
 			"uninstall",
 			"-r",
@@ -600,7 +572,7 @@ func (s *Supplier) RunPip() error {
 		return fmt.Errorf("could not check vendor existence: %v", err)
 	}
 
-	installArgs := []string{"install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
+	installArgs := []string{"-m", "pip", "install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
 	var originalReqs []byte
 	if vendorExists {
 		installArgs = append(installArgs, "--no-index", "--find-links=file://"+filepath.Join(s.Stager.BuildDir(), "vendor"))
@@ -620,7 +592,7 @@ func (s *Supplier) RunPip() error {
 		}
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", installArgs...); err != nil {
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
 		if vendorExists {
 			s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
 
@@ -628,7 +600,7 @@ func (s *Supplier) RunPip() error {
 				return fmt.Errorf("could not overwrite modified requirements file: %v", err)
 			}
 
-			if err = s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "pip", installArgs...); err != nil {
+			if err = s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
 				s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
 				return fmt.Errorf("could not run pip: %v", err)
 			}

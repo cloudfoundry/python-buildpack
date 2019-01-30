@@ -137,30 +137,10 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
-	Describe("InstallPip", func() {
-		It("Downloads and installs setuptools", func() {
-			mockManifest.EXPECT().AllDependencyVersions("setuptools").Return([]string{"2.4.6"})
-			mockInstaller.EXPECT().InstallOnlyVersion("setuptools", "/tmp/setuptools")
-			mockCommand.EXPECT().Execute("/tmp/setuptools/setuptools-2.4.6", gomock.Any(), gomock.Any(), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return(nil)
-
-			mockManifest.EXPECT().AllDependencyVersions("pip").Return([]string{"1.3.4"})
-			mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/pip")
-			mockCommand.EXPECT().Execute("/tmp/pip/pip-1.3.4", gomock.Any(), gomock.Any(), "python", "setup.py", "install", fmt.Sprintf("--prefix=%s/python", depDir)).Return(nil)
-
-			pythonInstallDir := filepath.Join(depDir, "python")
-			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")
-			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
-			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "include"), "include")
-			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib", "pkgconfig"), "pkgconfig")
-
-			Expect(supplier.InstallPip()).To(Succeed())
-		})
-	})
-
 	Describe("InstallPipPop", func() {
 		It("installs pip-pop", func() {
 			mockInstaller.EXPECT().InstallOnlyVersion("pip-pop", "/tmp/pip-pop")
-			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pip-pop", "--exists-action=w", "--no-index", "--find-links=/tmp/pip-pop")
+			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "pip-pop", "--exists-action=w", "--no-index", "--find-links=/tmp/pip-pop")
 			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
 			Expect(supplier.InstallPipPop()).To(Succeed())
 		})
@@ -186,12 +166,12 @@ var _ = Describe("Supply", func() {
 
 		// install pipenv dependencies
 		ffiDir := expectInstallFfi()
-		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "setuptools_scm", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pytest-runner", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "parver", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "invoke", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
-		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "wheel", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "setuptools_scm", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "pytest-runner", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "parver", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "invoke", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "pipenv", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
+		mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--exists-action=w", "--no-index", "--find-links=/tmp/pipenv")
 
 		mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
 		return ffiDir
@@ -406,7 +386,7 @@ var _ = Describe("Supply", func() {
 					mockManifest.EXPECT().IsCached().Return(false)
 				})
 				It("installs mercurial", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "mercurial")
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "mercurial")
 					mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
 					Expect(supplier.HandleMercurial()).To(Succeed())
 				})
@@ -417,7 +397,7 @@ var _ = Describe("Supply", func() {
 					mockManifest.EXPECT().IsCached().Return(true)
 				})
 				It("installs mercurial and provides a warning", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "mercurial")
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "mercurial")
 					mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
 					Expect(supplier.HandleMercurial()).To(Succeed())
 					Expect(buffer.String()).To(ContainSubstring("Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work."))
@@ -491,7 +471,7 @@ cffi==0.9.2
 
 			It("creates requirements-stale.txt and uninstalls unused dependencies", func() {
 				mockCommand.EXPECT().Output(buildDir, "pip-diff", "--stale", filepath.Join(depDir, "python", "requirements-declared.txt"), filepath.Join(buildDir, "requirements.txt"), "--exclude", "setuptools", "pip", "wheel").Return(requirementsStale, nil)
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "uninstall", "-r", filepath.Join(depDir, "python", "requirements-stale.txt", "-y", "--exists-action=w"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "uninstall", "-r", filepath.Join(depDir, "python", "requirements-stale.txt", "-y", "--exists-action=w"))
 				Expect(supplier.UninstallUnusedDependencies()).To(Succeed())
 				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "python", "requirements-stale.txt"))
 				Expect(err).ToNot(HaveOccurred())
@@ -520,7 +500,7 @@ cffi==0.9.2
 			})
 			Context("vendor does not exist", func() {
 				It("Runs and outputs pip", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
 					Expect(supplier.RunPip()).To(Succeed())
 				})
 			})
@@ -530,7 +510,7 @@ cffi==0.9.2
 					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
 				})
 				It("installs the vendor directory", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
 					Expect(supplier.RunPip()).To(Succeed())
 				})
 			})
@@ -543,7 +523,7 @@ cffi==0.9.2
 			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
 			Context("vendor does not exist", func() {
 				BeforeEach(func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
 				})
 				It("does NOT alert the user", func() {
 					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
@@ -553,7 +533,7 @@ cffi==0.9.2
 			Context("vendor exists", func() {
 				BeforeEach(func() {
 					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28")).Times(2)
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28")).Times(2)
 				})
 				It("alerts the user", func() {
 					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
