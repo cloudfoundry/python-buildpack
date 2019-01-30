@@ -81,16 +81,18 @@ dependencies:
   source: https://files.pythonhosted.org/packages/fd/e9/01822318551caa0d62a181ba3b10f0f3757bb1e270da97165bd52db92776/pipenv-2018.11.26.tar.gz
 - name: python
   version: 2.7.14
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.14-linux-x64-cflinuxfs2-97240242.tgz
-  sha256: 972402429ca6cd32a0728b7856aed86c6690d6233161d68b36e7709bf4927f01
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.14-linux-x64-cflinuxfs2-61573fff.tgz
+  sha256: 61573fffe50ebe535f53ba5c759e00962b42c0894b8ff78453bc1d9a5fc5c46e
   cf_stacks:
   - cflinuxfs2
+  source: https://www.python.org/ftp/python/2.7.14/Python-2.7.14.tgz
 - name: python
   version: 2.7.14
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.14-linux-x64-cflinuxfs3-95f23a26.tgz
-  sha256: 95f23a26eb66cb2a569e404f0c15c6966f613591031eb5e7f988bd6e3f5b6ab4
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.14-linux-x64-cflinuxfs3-bd03ec4b.tgz
+  sha256: bd03ec4ba92fafbc4dcf50bed378c56e93d0d1bcf85a1f070977faf189cdc441
   cf_stacks:
   - cflinuxfs3
+  source: https://www.python.org/ftp/python/2.7.14/Python-2.7.14.tgz
 - name: python
   version: 2.7.15
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.15-linux-x64-cflinuxfs2-e0dd33dd.tgz
