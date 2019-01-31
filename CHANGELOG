@@ -1,3 +1,23 @@
+v1.6.28 Jan 31, 2019
+=====================
+
+* Remove InstallPip and use the pip that is bundled with python
+  (https://www.pivotaltracker.com/story/show/163494890)
+
+* Add setuptools 40.7.1, remove setuptools 40.7.0
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163545642)
+
+* Add setuptools 40.7.0, remove setuptools 40.6.3
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163504243)
+
+* Update pip-pop to support newer versions of pip
+  (https://www.pivotaltracker.com/story/show/163494890)
+
+* Use built version of go 1.11.4 in online unbuilt/URL buildpack
+  (https://www.pivotaltracker.com/story/show/163089977)
+
 v1.6.27 Jan 14, 2019
 =====================
 
