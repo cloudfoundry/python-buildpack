@@ -131,9 +131,21 @@ func RunPython(s *Supplier) error {
 		return err
 	}
 
-	if err := s.RunPip(); err != nil {
-		s.Log.Error("Could not install pip packages: %v", err)
-		return err
+	vendored, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "vendor"))
+	if err != nil {
+		return fmt.Errorf("could not check vendor existence: %v", err)
+	}
+
+	if vendored {
+		if err := s.RunPipVendored(); err != nil {
+			s.Log.Error("Could not install vendored pip packages: %v", err)
+			return err
+		}
+	} else {
+		if err := s.RunPipUnvendored(); err != nil {
+			s.Log.Error("Could not install pip packages: %v", err)
+			return err
+		}
 	}
 
 	if err := s.DownloadNLTKCorpora(); err != nil {
@@ -553,59 +565,103 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 	return nil
 }
 
-func (s *Supplier) RunPip() error {
-	s.Log.BeginStep("Running Pip Install")
-	if os.Getenv("PIP_CERT") == "" {
-		os.Setenv("PIP_CERT", "/etc/ssl/certs/ca-certificates.crt")
-	}
-
-	requirementsPath := filepath.Join(s.Stager.BuildDir(), "requirements.txt")
-	if exists, err := libbuildpack.FileExists(requirementsPath); err != nil {
-		return fmt.Errorf("could not determine existence of requirements.txt: %v", err)
-	} else if !exists {
-		s.Log.Debug("Skipping 'pip install' since requirements.txt does not exist")
+func (s *Supplier) RunPipUnvendored() error {
+	shouldContinue, requirementsPath, err := s.shouldRunPip()
+	if err != nil {
+		return err
+	} else if !shouldContinue {
 		return nil
 	}
 
-	vendorExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "vendor"))
+	// Search lines from requirements.txt that begin with -i, -index-url, or -extra-index-url
+	// and add them to the pydistutils file. We do this so that easy_install will use
+	// the same indexes as pip. This may not actually be necessary because it's possible that
+	// easy_install has been fixed upstream, but it has no ill side-effects.
+	reqs, err := ioutil.ReadFile(requirementsPath)
 	if err != nil {
-		return fmt.Errorf("could not check vendor existence: %v", err)
+		return fmt.Errorf("could not read requirements.txt: %v", err)
+	}
+
+	distUtils := map[string][]string{}
+
+	re := regexp.MustCompile(`(?m)^\s*(-i|-index-url)\s+(.*)$`)
+	match := re.FindStringSubmatch(string(reqs))
+	if len(match) > 0 {
+		distUtils["index_url"] = []string{match[len(match)-1]}
+	}
+
+	re = regexp.MustCompile(`(?m)^\s*-extra-index-url\s+(.*)$`)
+	matches := re.FindAllStringSubmatch(string(reqs), -1)
+	for _, m := range matches {
+		distUtils["find_links"] = append(distUtils["find_links"], m[len(m)-1])
+	}
+
+	if err := writePyDistUtils(distUtils); err != nil {
+		return err
 	}
 
 	installArgs := []string{"-m", "pip", "install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
-	var originalReqs []byte
-	if vendorExists {
-		installArgs = append(installArgs, "--no-index", "--find-links=file://"+filepath.Join(s.Stager.BuildDir(), "vendor"))
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
+		return fmt.Errorf("could not run pip: %v", err)
+	}
 
-		// Remove lines from requirements.txt that begin with -i
-		// because specifying index links here makes pip always want internet
-		// and pipenv generates requirements.txt with -i
-		originalReqs, err = ioutil.ReadFile(requirementsPath)
-		if err != nil {
-			return fmt.Errorf("could not read requirements.txt: %v", err)
-		}
-		re := regexp.MustCompile("(?m)^\\W*-i.*$")
-		modifiedReqs := re.ReplaceAll(originalReqs, []byte{})
-		err = ioutil.WriteFile(requirementsPath, modifiedReqs, 0644)
-		if err != nil {
-			return fmt.Errorf("could not overwrite requirements file: %v", err)
-		}
+	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
+}
+
+func (s *Supplier) RunPipVendored() error {
+	shouldContinue, requirementsPath, err := s.shouldRunPip()
+	if err != nil {
+		return err
+	} else if !shouldContinue {
+		return nil
+	}
+
+	distUtils := map[string][]string{
+		"allows_hosts": {""},
+		"find_links":   {filepath.Join(s.Stager.BuildDir(), "vendor")},
+	}
+	if err := writePyDistUtils(distUtils); err != nil {
+		return err
+	}
+
+	installArgs := []string{
+		"-m",
+		"pip",
+		"install",
+		"-r",
+		requirementsPath,
+		"--ignore-installed",
+		"--exists-action=w",
+		"--src=" + filepath.Join(s.Stager.DepDir(), "src"),
+		"--no-index",
+		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"),
+	}
+
+	// Remove lines from requirements.txt that begin with -i
+	// because specifying index links here makes pip always want internet access,
+	// and pipenv generates requirements.txt with -i.
+	originalReqs, err := ioutil.ReadFile(requirementsPath)
+	if err != nil {
+		return fmt.Errorf("could not read requirements.txt: %v", err)
+	}
+
+	re := regexp.MustCompile(`(?m)^\s*-i.*$`)
+	modifiedReqs := re.ReplaceAll(originalReqs, []byte{})
+	err = ioutil.WriteFile(requirementsPath, modifiedReqs, 0644)
+	if err != nil {
+		return fmt.Errorf("could not overwrite requirements file: %v", err)
 	}
 
 	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
-		if vendorExists {
-			s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
+		s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
 
-			if err := ioutil.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
-				return fmt.Errorf("could not overwrite modified requirements file: %v", err)
-			}
+		if err := ioutil.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
+			return fmt.Errorf("could not overwrite modified requirements file: %v", err)
+		}
 
-			if err = s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
-				s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
-				return fmt.Errorf("could not run pip: %v", err)
-			}
-		} else {
-			return fmt.Errorf("could not run pip: %v", err)
+		if err := s.RunPipUnvendored(); err != nil {
+			s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
+			return err
 		}
 	}
 
@@ -678,6 +734,49 @@ func (s *Supplier) DownloadNLTKCorpora() error {
 	return nil
 }
 
+func (s *Supplier) SetupCacheDir() error {
+	if err := os.Setenv("XDG_CACHE_HOME", filepath.Join(s.Stager.CacheDir(), "pip_cache")); err != nil {
+		return err
+	}
+	if err := s.Stager.WriteEnvFile("XDG_CACHE_HOME", filepath.Join(s.Stager.CacheDir(), "pip_cache")); err != nil {
+		return err
+	}
+	return nil
+}
+
+func writePyDistUtils(distUtils map[string][]string) error {
+	pyDistUtilsPath := filepath.Join(os.Getenv("HOME"), ".pydistutils.cfg")
+
+	b := strings.Builder{}
+	b.WriteString("[easy_install]\n")
+	for k, v := range distUtils {
+		b.WriteString(fmt.Sprintf("%s = %s\n", k, strings.Join(v, "\n\t")))
+	}
+
+	if err := ioutil.WriteFile(pyDistUtilsPath, []byte(b.String()), os.ModePerm); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Supplier) shouldRunPip() (bool, string, error) {
+	s.Log.BeginStep("Running Pip Install")
+	if os.Getenv("PIP_CERT") == "" {
+		os.Setenv("PIP_CERT", "/etc/ssl/certs/ca-certificates.crt")
+	}
+
+	requirementsPath := filepath.Join(s.Stager.BuildDir(), "requirements.txt")
+	if exists, err := libbuildpack.FileExists(requirementsPath); err != nil {
+		return false, "", fmt.Errorf("could not determine existence of requirements.txt: %v", err)
+	} else if !exists {
+		s.Log.Debug("Skipping 'pip install' since requirements.txt does not exist")
+		return false, "", nil
+	}
+
+	return true, requirementsPath, nil
+}
+
 func (s *Supplier) formatVersion(version string) string {
 	verSlice := strings.Split(version, ".")
 
@@ -696,14 +795,4 @@ func (s *Supplier) writeTempRequirementsTxt(content string) error {
 
 func indentWriter(writer io.Writer) io.Writer {
 	return text.NewIndentWriter(writer, []byte("       "))
-}
-
-func (s *Supplier) SetupCacheDir() error {
-	if err := os.Setenv("XDG_CACHE_HOME", filepath.Join(s.Stager.CacheDir(), "pip_cache")); err != nil {
-		return err
-	}
-	if err := s.Stager.WriteEnvFile("XDG_CACHE_HOME", filepath.Join(s.Stager.CacheDir(), "pip_cache")); err != nil {
-		return err
-	}
-	return nil
 }

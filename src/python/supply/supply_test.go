@@ -489,62 +489,81 @@ cffi==0.9.2
 		})
 	})
 
-	Describe("RunPip", func() {
+	Describe("RunPipUnvendored", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 		})
+
 		Context("requirements.txt exists in dep dir", func() {
 			BeforeEach(func() {
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
 			})
-			Context("vendor does not exist", func() {
-				It("Runs and outputs pip", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
-					Expect(supplier.RunPip()).To(Succeed())
-				})
-			})
 
-			Context("vendor exists", func() {
-				BeforeEach(func() {
-					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
-				})
-				It("installs the vendor directory", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
-					Expect(supplier.RunPip()).To(Succeed())
-				})
+			It("Runs and outputs pip", func() {
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+				Expect(supplier.RunPipUnvendored()).To(Succeed())
 			})
 		})
 
 		Context("requirements.txt exists in dep dir and pip install fails", func() {
 			BeforeEach(func() {
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
 			})
+
 			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
-			Context("vendor does not exist", func() {
-				BeforeEach(func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
-				})
-				It("does NOT alert the user", func() {
-					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
-					Expect(buffer.String()).ToNot(ContainSubstring(proTip))
-				})
-			})
-			Context("vendor exists", func() {
-				BeforeEach(func() {
-					Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28")).Times(2)
-				})
-				It("alerts the user", func() {
-					Expect(supplier.RunPip()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
-					Expect(buffer.String()).To(ContainSubstring(proTip))
-				})
+
+			It("does NOT alert the user", func() {
+				Expect(supplier.RunPipUnvendored()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
+				Expect(buffer.String()).ToNot(ContainSubstring(proTip))
 			})
 		})
 
 		Context("requirements.txt is NOT in dep dir", func() {
 			It("exits early", func() {
-				Expect(supplier.RunPip()).To(Succeed())
+				Expect(supplier.RunPipUnvendored()).To(Succeed())
+			})
+		})
+	})
+
+	Describe("RunPipVendored", func() {
+		BeforeEach(func() {
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+		})
+
+		Context("requirements.txt exists in dep dir", func() {
+			BeforeEach(func() {
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+				Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
+			})
+
+			It("installs the vendor directory", func() {
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir))
+				Expect(supplier.RunPipVendored()).To(Succeed())
+			})
+		})
+
+		Context("requirements.txt exists in dep dir and pip install fails", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+				Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir)).Return(fmt.Errorf("exit 28"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
+			})
+
+			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
+
+			It("alerts the user", func() {
+				Expect(supplier.RunPipVendored()).To(MatchError(fmt.Errorf("could not run pip: exit 28")))
+				Expect(buffer.String()).To(ContainSubstring(proTip))
+			})
+		})
+
+		Context("requirements.txt is NOT in dep dir", func() {
+			It("exits early", func() {
+				Expect(supplier.RunPipVendored()).To(Succeed())
 			})
 		})
 	})
