@@ -144,6 +144,15 @@ func (h AppdynamicsHook) CreateAppDynamicsEnv(stager *libbuildpack.Stager, envir
 }
 
 func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
+	if os.Getenv("APPD_AGENT") != "" {
+		// APPD_AGENT is set => multibuildpack is used to configure appdynamics agent. Do nothing.
+		return nil
+	}
+
+	h.Log.Warning("[DEPRECATION WARNING]:")
+	h.Log.Warning("Please use AppDynamics extension buildpack for Python Application instrumentation")
+	h.Log.Warning("for more details: https://docs.pivotal.io/partners/appdynamics/multibuildpack.html")
+
 	vcapServices := os.Getenv("VCAP_SERVICES")
 	services := make(map[string][]Plan)
 
@@ -217,7 +226,6 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 func init() {
 	logger := libbuildpack.NewLogger(os.Stdout)
 	command := &libbuildpack.Command{}
-
 	libbuildpack.AddHook(AppdynamicsHook{
 		Log:     logger,
 		Command: command,
