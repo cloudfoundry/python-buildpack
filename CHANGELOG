@@ -1,3 +1,24 @@
+v1.6.29 Mar 04, 2019
+=====================
+
+* Add python 2.7.16, remove python 2.7.14
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164359785)
+
+* Merge pull request #127 from pavankrish123/master
+  - Warn users to begin using AppDynamics via extension buildpack
+  - See: https://docs.pivotal.io/partners/appdynamics/multibuildpack.html
+
+* Write pydistutil.cfg with index-url, extra-index-url, and find_links
+  - This allows easy_install to respect arguments from requirements.txt
+  (https://www.pivotaltracker.com/story/show/151742300)
+
+* Add setuptools 40.8.0, remove setuptools 40.7.1
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163738585)
+  (https://www.pivotaltracker.com/story/show/163682820)
+  (https://www.pivotaltracker.com/story/show/163642810)
+
 v1.6.28 Jan 31, 2019
 =====================
 
