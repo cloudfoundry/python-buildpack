@@ -21,11 +21,7 @@ To build this buildpack, run the following commands from the buildpack's directo
    ```
    To simplify the process in the future, install [direnv](https://direnv.net/) which will automatically source .envrc when you change directories.
 
-1. Install buildpack-packager
-
-    ```bash
-    (cd vendor/github.com/cloudfoundry/libbuildpack/packager && go install)
-    ```
+1. [Install buildpack-packager](https://github.com/cloudfoundry/libbuildpack/tree/master/packager)
 
 1. Build the buildpack
 
