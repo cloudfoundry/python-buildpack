@@ -47,7 +47,7 @@ To build this buildpack, run the following commands from the buildpack's directo
 Buildpacks use the [Cutlass](https://github.com/cloudfoundry/libbuildpack/tree/master/cutlass) framework for running integration tests.
 
 To test this buildpack, run the following commands from the buildpack's directory:
-
+ 
 1. Source the .envrc file in the buildpack directory.
 
    ```bash
