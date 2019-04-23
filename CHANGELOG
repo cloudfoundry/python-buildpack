@@ -1,3 +1,20 @@
+v1.6.32 Apr 23, 2019
+=====================
+
+* Remove warning logs causing bosh cli error
+
+* Add setuptools 41.0.1, remove setuptools 41.0.0
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165517042)
+
+* Add miniconda2 4.6.14, remove miniconda2 4.5.12
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165472046)
+
+* Add miniconda3 4.6.14, remove miniconda3 4.5.12
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165472037)
+
 v1.6.31 Apr 15, 2019
 =====================
 
