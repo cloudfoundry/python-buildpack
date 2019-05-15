@@ -149,9 +149,7 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		return nil
 	}
 
-	h.Log.Warning("[DEPRECATION WARNING]:")
-	h.Log.Warning("Please use AppDynamics extension buildpack for Python Application instrumentation")
-	h.Log.Warning("for more details: https://docs.pivotal.io/partners/appdynamics/multibuildpack.html")
+	// Some env var or something that lets us know that we are using app dynamics?
 
 	vcapServices := os.Getenv("VCAP_SERVICES")
 	services := make(map[string][]Plan)
@@ -168,6 +166,9 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 			return nil
 		} else if match {
 			appdServiceName = serviceName
+			h.Log.Warning("[DEPRECATION WARNING]:")
+			h.Log.Warning("Please use AppDynamics extension buildpack for Python Application instrumentation")
+			h.Log.Warning("for more details: https://docs.pivotal.io/partners/appdynamics/multibuildpack.html")
 			break
 		}
 	}
