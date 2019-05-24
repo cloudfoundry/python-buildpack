@@ -1,3 +1,13 @@
+v1.6.34 May 24, 2019
+=====================
+
+* only print deprecated appdynamics warnings when appdynamics is used
+  (https://www.pivotaltracker.com/story/show/164703749)
+
+* remove pip 9 binary from manifest.yml
+   - we currently just use the version of pip that comes bundled with python.
+  (https://www.pivotaltracker.com/story/show/165972067)
+
 v1.6.33 May 06, 2019
 =====================
 
