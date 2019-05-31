@@ -68,20 +68,20 @@ dependencies:
   source_sha256: b916caf6b9d9ea7bc1f53591b016a9e9e74f74b72925eb48600b90810ae0a285
 - name: pipenv
   version: 2018.11.26
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs2-eeaa1c70.tgz
-  sha256: eeaa1c70e6fc736a2d2df5b385158d40c34d3f3197061ae40c412ac3fef435a4
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs2-c6e0eb81.tgz
+  sha256: c6e0eb81545a5e3599cd767312b2a20d3d441e672fa52b5db7b66565340ec81c
   cf_stacks:
   - cflinuxfs2
   source: https://files.pythonhosted.org/packages/fd/e9/01822318551caa0d62a181ba3b10f0f3757bb1e270da97165bd52db92776/pipenv-2018.11.26.tar.gz
-  source_sha256: 
+  source_sha256: a673e606e8452185e9817a987572b55360f4d28b50831ef3b42ac3cab3fee846
 - name: pipenv
   version: 2018.11.26
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs3-9e84619a.tgz
-  sha256: 9e84619a4d471ad8d67ff87431c22bce33175ef070742a34727bd7a48c0d051d
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs3-df1da6e6.tgz
+  sha256: df1da6e65a2db0f6f6ab5637027d9805c69e7f641265ece4fad0950f8cdcc83c
   cf_stacks:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/fd/e9/01822318551caa0d62a181ba3b10f0f3757bb1e270da97165bd52db92776/pipenv-2018.11.26.tar.gz
-  source_sha256: 
+  source_sha256: a673e606e8452185e9817a987572b55360f4d28b50831ef3b42ac3cab3fee846
 - name: python
   version: 2.7.15
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.15-linux-x64-cflinuxfs2-a051d3cb.tgz
