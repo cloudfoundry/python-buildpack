@@ -74,6 +74,8 @@ To test this buildpack, run the following commands from the buildpack's director
     ```bash
     ./scripts/integration.sh
     ```
+    
+1. Note: To run the network tests, you must have Docker installed.   
 
 ### Contributing
 
