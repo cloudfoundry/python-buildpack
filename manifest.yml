@@ -20,6 +20,10 @@ dependency_deprecation_dates:
   name: python
   date: 2021-12-23
   link: https://docs.python.org/devguide/index.html#branchstatus
+- version_line: 3.7.X
+  name: python
+  deprecation_date: '2023-06-27'
+  deprecation_link: https://www.python.org/dev/peps/pep-0537/
 dependencies:
 - name: libffi
   version: 3.2.1
@@ -218,8 +222,8 @@ dependencies:
   source_sha256: f09d83c773b9cc72421abba2c317e4e6e05d919f9bcf34468e192b6a6c8e328d
 - name: python
   version: 3.7.3
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.3-linux-x64-cflinuxfs3-827f07e1.tgz
-  sha256: 827f07e197aead8bd7f2a6387db97b956dd258262108a2ef893a16669682858c
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.3-linux-x64-cflinuxfs3-8fad39c2.tgz
+  sha256: 8fad39c254588162e9c46af501da94fa268c34ac89fe31e08fa50c863f28b02e
   cf_stacks:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz
