@@ -19,7 +19,7 @@ dependency_deprecation_dates:
 - version_line: 3.6.x
   name: python
   date: 2021-12-23
-  link: https://docs.python.org/devguide/index.html#branchstatus
+  link: https://www.python.org/dev/peps/pep-0494/
 - version_line: 3.7.x
   name: python
   deprecation_date: 2023-06-27
@@ -198,16 +198,16 @@ dependencies:
   source_sha256: b7c36f7ed8f7143b2c46153b7332db2227669f583ea0cce753facf549d1a4239
 - name: python
   version: 3.6.8
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.8-linux-x64-cflinuxfs2-c8a7acb5.tgz
-  sha256: c8a7acb56fd84ad77ab273e0f68af741eae772678878aa09fbfb5af62f4d40dd
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.8-linux-x64-cflinuxfs2-a1aa37d8.tgz
+  sha256: a1aa37d8f08e9de78be4d9bd0efd09837c5ee37d6cef0689787ee4110453f6c6
   cf_stacks:
   - cflinuxfs2
   source: https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
   source_sha256: 7f5b1f08b3b0a595387ef6c64c85b1b13b38abef0dd871835ee923262e4f32f0
 - name: python
   version: 3.6.8
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.8-linux-x64-cflinuxfs3-0e8b91a8.tgz
-  sha256: 0e8b91a865827da8da86feefc0c43ecdefe6bb0d3456acf6ef61958552540b67
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.8-linux-x64-cflinuxfs3-83d51734.tgz
+  sha256: 83d51734622b46e6c7c5a92e3f757f09451a4959fa295ffeb6e4b1a300011676
   cf_stacks:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
