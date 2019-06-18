@@ -4,6 +4,10 @@ default_versions:
 - name: python
   version: 2.7.x
 dependency_deprecation_dates:
+- version_line: 2.7.X
+  name: python
+  date: '2020-01-01'
+  link: https://www.python.org/dev/peps/pep-0373/
 - version_line: 2.7.x
   name: python
   date: 2020-01-01
@@ -102,16 +106,16 @@ dependencies:
   source: https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tgz
 - name: python
   version: 2.7.16
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.16-linux-x64-cflinuxfs2-978c1153.tgz
-  sha256: 978c1153db5f6d4c351463fdb4db6ed7be7dc3f3aca13551f2daa7c65414b26e
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.16-linux-x64-cflinuxfs2-57e69407.tgz
+  sha256: 57e6940767c4c2b4c6433e382c166c4947c1f1e259c5b9e93bf196316a4e4e2f
   cf_stacks:
   - cflinuxfs2
   source: https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz
   source_sha256: 01da813a3600876f03f46db11cc5c408175e99f03af2ba942ef324389a83bad5
 - name: python
   version: 2.7.16
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.16-linux-x64-cflinuxfs3-dd783b09.tgz
-  sha256: dd783b09c20bc56436dea9ae59dce7d5835ae753aa28a89d450522f5156c1ca8
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-2.7.16-linux-x64-cflinuxfs3-cb0dd1e4.tgz
+  sha256: cb0dd1e4e4c7a37fb7397774edb75b67ea9532e0b93b31f0b10bf11f666081b6
   cf_stacks:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz
