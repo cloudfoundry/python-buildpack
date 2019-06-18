@@ -4,10 +4,6 @@ default_versions:
 - name: python
   version: 2.7.x
 dependency_deprecation_dates:
-- version_line: 2.7.X
-  name: python
-  date: '2020-01-01'
-  link: https://www.python.org/dev/peps/pep-0373/
 - version_line: 2.7.x
   name: python
   date: 2020-01-01
@@ -24,9 +20,9 @@ dependency_deprecation_dates:
   name: python
   date: 2021-12-23
   link: https://docs.python.org/devguide/index.html#branchstatus
-- version_line: 3.7.X
+- version_line: 3.7.x
   name: python
-  deprecation_date: '2023-06-27'
+  deprecation_date: 2023-06-27
   deprecation_link: https://www.python.org/dev/peps/pep-0537/
 dependencies:
 - name: libffi
