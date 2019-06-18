@@ -6,7 +6,7 @@ default_versions:
 dependency_deprecation_dates:
 - version_line: 2.7.x
   name: python
-  date: '2020-01-01'
+  date: 2020-01-01
   link: https://www.python.org/dev/peps/pep-0373/
 - version_line: 3.4.x
   name: python
