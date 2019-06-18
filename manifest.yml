@@ -22,8 +22,8 @@ dependency_deprecation_dates:
   link: https://www.python.org/dev/peps/pep-0494/
 - version_line: 3.7.x
   name: python
-  deprecation_date: 2023-06-27
-  deprecation_link: https://www.python.org/dev/peps/pep-0537/
+  date: 2023-06-27
+  link: https://www.python.org/dev/peps/pep-0537/
 dependencies:
 - name: libffi
   version: 3.2.1
