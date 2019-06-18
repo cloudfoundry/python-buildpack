@@ -11,7 +11,7 @@ dependency_deprecation_dates:
 - version_line: 3.4.x
   name: python
   date: 2019-03-16
-  link: https://docs.python.org/devguide/index.html#branchstatus
+  link: https://www.python.org/dev/peps/pep-0429/
 - version_line: 3.5.x
   name: python
   date: 2020-09-13
@@ -134,16 +134,16 @@ dependencies:
   source_sha256: e02e565372750a6678efe35ddecbe5ccd5330a8a2e8bbe38d3060713492e3dab
 - name: python
   version: 3.4.10
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.10-linux-x64-cflinuxfs2-14ccdc19.tgz
-  sha256: 14ccdc196c4bd99f781d942be814122592c7ed81909c4015381c758d0399d716
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.10-linux-x64-cflinuxfs2-c205db1f.tgz
+  sha256: c205db1fd96fd9fb951d449fc4f7a9db6a94c5bfa6d3324c512f50fb7e3dd06e
   cf_stacks:
   - cflinuxfs2
   source: https://www.python.org/ftp/python/3.4.10/Python-3.4.10.tgz
   source_sha256: 217757699249ab432571b381386d441e12b433100ab5f908051fcb7cced2539d
 - name: python
   version: 3.4.10
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.10-linux-x64-cflinuxfs3-468be963.tgz
-  sha256: 468be96327b737609053cc242a386f88ba94b689d52eaca59d3658926afdbe27
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.4.10-linux-x64-cflinuxfs3-987b05af.tgz
+  sha256: 987b05af82915e0de48498b10295d740aa3f4eec5d01d3457ac1cc357f06b31c
   cf_stacks:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.4.10/Python-3.4.10.tgz
