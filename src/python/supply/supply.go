@@ -634,6 +634,7 @@ func (s *Supplier) RunPipVendored() error {
 		"--exists-action=w",
 		"--src=" + filepath.Join(s.Stager.DepDir(), "src"),
 		"--no-index",
+		"--no-build-isolation",
 		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"),
 	}
 

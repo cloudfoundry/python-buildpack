@@ -116,6 +116,19 @@ var _ = Describe("CF Python Buildpack", func() {
 				})
 			})
 
+			Context("including flask and no build isolation", func() {
+				BeforeEach(func() {
+					app = cutlass.New(filepath.Join(bpDir, "fixtures", "no_build_isolation"))
+					app.SetEnv("BP_DEBUG", "1")
+				})
+
+				It("deploys", func() {
+					PushAppAndConfirm(app)
+					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
+				})
+			})
+
 			Context("including django with specified python version", func() {
 				BeforeEach(func() {
 					app = cutlass.New(filepath.Join(bpDir, "fixtures", "django_python_3"))

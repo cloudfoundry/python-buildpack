@@ -77,11 +77,6 @@ func main() {
 		Installer: installer,
 		Log:       logger,
 		Command:   &libbuildpack.Command{},
-		// 	Cache: &cache.Cache{
-		// 		Stager:  stager,
-		// 		Command: &libbuildpack.Command{},
-		// 		Log:     logger,
-		// 	},
 	}
 
 	err = supply.Run(&s)
