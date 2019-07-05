@@ -139,10 +139,10 @@ var _ = Describe("Finalize", func() {
 			BeforeEach(func() {
 				file = filepath.Join(depsDir, depsIdx, "python", "lib", "python2.7", "site-packages", "easy-install.pth")
 				Expect(os.MkdirAll(path.Dir(file), 0755)).To(Succeed())
-				Expect(ioutil.WriteFile(file, []byte("./setuptools-32.1.0-py2.7.egg\n./pip-9.0.1-py2.7.egg\n"+depsDir+"/9/src/regcore\n"), 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(file, []byte("./pip-9.0.1-py2.7.egg\n"+depsDir+"/9/src/regcore\n"), 0644)).To(Succeed())
 			})
 			It("Converts DepsDir value to '$DEPS_DIR' string", func() {
-				Expect(runSubjectAndReadContents()).To(Equal("./setuptools-32.1.0-py2.7.egg\n./pip-9.0.1-py2.7.egg\nDOLLAR_DEPS_DIR/9/src/regcore\n"))
+				Expect(runSubjectAndReadContents()).To(Equal("./pip-9.0.1-py2.7.egg\nDOLLAR_DEPS_DIR/9/src/regcore\n"))
 			})
 		})
 		Context("file deeply nested under site-packages root", func() {
@@ -163,7 +163,7 @@ var _ = Describe("Finalize", func() {
 			BeforeEach(func() {
 				file = filepath.Join(depsDir, depsIdx, "python", "lib", "python2.7", "site-packages", "easy-install.pth")
 				Expect(os.MkdirAll(path.Dir(file), 0755)).To(Succeed())
-				Expect(ioutil.WriteFile(file, []byte("./setuptools-32.1.0-py2.7.egg\n./pip-9.0.1-py2.7.egg\nDOLLAR_DEPS_DIR/9/src/regcore\n"), 0644)).To(Succeed())
+				Expect(ioutil.WriteFile(file, []byte("./pip-9.0.1-py2.7.egg\nDOLLAR_DEPS_DIR/9/src/regcore\n"), 0644)).To(Succeed())
 			})
 			It("At runtime, converts the contents to the runtime depsDir", func() {
 				Expect(finalizer.ReplaceLiteralWithDepsDirAtRuntime()).To(Succeed())
@@ -174,7 +174,7 @@ var _ = Describe("Finalize", func() {
 
 				contents, err := ioutil.ReadFile(file)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal("./setuptools-32.1.0-py2.7.egg\n./pip-9.0.1-py2.7.egg\n" + depsDir + "/9/src/regcore\n"))
+				Expect(string(contents)).To(Equal("./pip-9.0.1-py2.7.egg\n" + depsDir + "/9/src/regcore\n"))
 			})
 		})
 	})
