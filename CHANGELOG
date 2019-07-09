@@ -1,3 +1,20 @@
+v1.6.35 Jul 09, 2019
+=====================
+
+* Add python 3.7.4, remove python 3.7.2
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/167157008)
+
+* Add python 3.6.9, remove python 3.6.7
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/167057276)
+
+* Add the build --no-build-isolation for vendored apps
+  (https://www.pivotaltracker.com/story/show/166454008)
+
+* Remove setuptools dependency from manifest
+  (https://www.pivotaltracker.com/story/show/166736482)
+
 v1.6.34 May 24, 2019
 =====================
 
