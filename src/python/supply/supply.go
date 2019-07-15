@@ -634,8 +634,14 @@ func (s *Supplier) RunPipVendored() error {
 		"--exists-action=w",
 		"--src=" + filepath.Join(s.Stager.DepDir(), "src"),
 		"--no-index",
-		"--no-build-isolation",
 		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"),
+	}
+
+	if hasBuildOptions() {
+		s.Log.Info("Using the pip no build isolation flag")
+		installArgs = append(installArgs, "--no-build-isolation")
+	} else {
+		s.Log.Info("Using the build isolation flag")
 	}
 
 	// Remove lines from requirements.txt that begin with -i
@@ -796,4 +802,9 @@ func (s *Supplier) writeTempRequirementsTxt(content string) error {
 
 func indentWriter(writer io.Writer) io.Writer {
 	return text.NewIndentWriter(writer, []byte("       "))
+}
+
+func hasBuildOptions() bool {
+	cmd := exec.Command("python", "-m", "pip", "install", "--no-build-isolation", "-h")
+	return nil == cmd.Run()
 }
