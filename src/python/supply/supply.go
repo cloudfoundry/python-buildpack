@@ -637,7 +637,7 @@ func (s *Supplier) RunPipVendored() error {
 		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"),
 	}
 
-	if hasBuildOptions() {
+	if s.hasBuildOptions() {
 		s.Log.Info("Using the pip --no-build-isolation flag since it is available")
 		installArgs = append(installArgs, "--no-build-isolation")
 	}
@@ -798,11 +798,11 @@ func (s *Supplier) writeTempRequirementsTxt(content string) error {
 	return ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(content), 0644)
 }
 
-func indentWriter(writer io.Writer) io.Writer {
-	return text.NewIndentWriter(writer, []byte("       "))
+func (s *Supplier) hasBuildOptions() bool {
+	err := s.Command.Execute(s.Stager.BuildDir(), nil, nil, "python", "-m", "pip", "install", "--no-build-isolation", "-h")
+	return nil == err
 }
 
-func hasBuildOptions() bool {
-	cmd := exec.Command("python", "-m", "pip", "install", "--no-build-isolation", "-h")
-	return nil == cmd.Run()
+func indentWriter(writer io.Writer) io.Writer {
+	return text.NewIndentWriter(writer, []byte("       "))
 }
