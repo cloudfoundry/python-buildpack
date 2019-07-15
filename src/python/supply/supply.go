@@ -638,10 +638,8 @@ func (s *Supplier) RunPipVendored() error {
 	}
 
 	if hasBuildOptions() {
-		s.Log.Info("Using the pip no build isolation flag")
+		s.Log.Info("Using the pip --no-build-isolation flag since it is available")
 		installArgs = append(installArgs, "--no-build-isolation")
-	} else {
-		s.Log.Info("Using the build isolation flag")
 	}
 
 	// Remove lines from requirements.txt that begin with -i
