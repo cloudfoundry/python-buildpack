@@ -1,3 +1,11 @@
+v1.6.36 Jul 16, 2019
+=====================
+
+* Add no-build-isolation flag only when the pip version supports it
+  - Add wheel as dependency for build-isolation test fixture
+  (https://www.pivotaltracker.com/story/show/167219238)
+
+
 v1.6.35 Jul 09, 2019
 =====================
 
