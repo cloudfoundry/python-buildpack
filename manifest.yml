@@ -44,14 +44,14 @@ dependencies:
   source: https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
   source_sha256: e22c0bb032fde08f53de9ffbc5a128233041d9f33b5de022c0978a2149885f82
 - name: miniconda2
-  version: 4.6.14
-  uri: https://repo.continuum.io/miniconda/Miniconda2-4.6.14-Linux-x86_64.sh
-  sha256: 3e20425afa1a2a4c45ee30bd168b90ca30a3fdf8598b61cb68432886aadc6f4d
+  version: 4.7.10
+  uri: https://repo.continuum.io/miniconda/Miniconda2-4.7.10-Linux-x86_64.sh
+  sha256: 9b1c7899f3bfcd520203eb7d51bfe456e25e5700dfa877c09bd2dbb028c305d8
   cf_stacks:
   - cflinuxfs2
   - cflinuxfs3
-  source: https://github.com/conda/conda/archive/4.6.14.tar.gz
-  source_sha256: 3e20425afa1a2a4c45ee30bd168b90ca30a3fdf8598b61cb68432886aadc6f4d
+  source: https://github.com/conda/conda/archive/4.7.10.tar.gz
+  source_sha256: 9b1c7899f3bfcd520203eb7d51bfe456e25e5700dfa877c09bd2dbb028c305d8
 - name: miniconda3
   version: 4.6.14
   uri: https://repo.continuum.io/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh
