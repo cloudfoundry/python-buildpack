@@ -228,6 +228,15 @@ dependencies:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
   source_sha256: d63e63e14e6d29e17490abbe6f7d17afb3db182dbd801229f14e55f4157c4ba3
+- name: setuptools
+  version: 41.1.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-41.1.0-any-stack-c519b84c.zip
+  sha256: c519b84c299911fd94ef47e3de4fe678c254aefc5cdf8a9b12e4cdc8cc3744a8
+  cf_stacks:
+  - cflinuxfs2
+  - cflinuxfs3
+  source: https://files.pythonhosted.org/packages/68/0c/e470db6866aedbff3c4c88faf7f81b90343d8ff32cd68b62db1b65037fb4/setuptools-41.1.0.zip
+  source_sha256: c519b84c299911fd94ef47e3de4fe678c254aefc5cdf8a9b12e4cdc8cc3744a8
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
