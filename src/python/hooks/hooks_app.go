@@ -52,7 +52,7 @@ func runHook(scriptName string, compiler *libbuildpack.Stager) error {
 		}
 
 		cmd.Dir = compiler.BuildDir()
-		output, err := cmd.Output()
+		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return err
 		}
