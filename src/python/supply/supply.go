@@ -573,7 +573,7 @@ func (s *Supplier) RunPipUnvendored() error {
 		return nil
 	}
 
-	// Search lines from requirements.txt that begin with -i, -index-url, or -extra-index-url
+	// Search lines from requirements.txt that begin with -i, --index-url, --extra-index-url or --trusted-host
 	// and add them to the pydistutils file. We do this so that easy_install will use
 	// the same indexes as pip. This may not actually be necessary because it's possible that
 	// easy_install has been fixed upstream, but it has no ill side-effects.
@@ -584,16 +584,26 @@ func (s *Supplier) RunPipUnvendored() error {
 
 	distUtils := map[string][]string{}
 
-	re := regexp.MustCompile(`(?m)^\s*(-i|-index-url)\s+(.*)$`)
+	re := regexp.MustCompile(`(?m)^\s*(-i|--index-url)\s+(.*)$`)
 	match := re.FindStringSubmatch(string(reqs))
 	if len(match) > 0 {
 		distUtils["index_url"] = []string{match[len(match)-1]}
 	}
 
-	re = regexp.MustCompile(`(?m)^\s*-extra-index-url\s+(.*)$`)
+	re = regexp.MustCompile(`(?m)^\s*--extra-index-url\s+(.*)$`)
 	matches := re.FindAllStringSubmatch(string(reqs), -1)
 	for _, m := range matches {
 		distUtils["find_links"] = append(distUtils["find_links"], m[len(m)-1])
+	}
+
+	re = regexp.MustCompile(`(?m)^\s*--trusted-host\s+(.*)$`)
+	matches = re.FindAllStringSubmatch(string(reqs), -1)
+	if len(matches) > 0 {
+		var allowHosts []string
+		for _, m := range matches {
+			allowHosts = append(allowHosts, m[len(m)-1])
+		}
+		distUtils["allow_hosts"] = []string{strings.Join(allowHosts, ",")}
 	}
 
 	if err := writePyDistUtils(distUtils); err != nil {
