@@ -157,19 +157,6 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-41.4.0-any-stack-7eae782c.zip
   sha256: 7eae782ccf36b790c21bde7d86a4f303a441cd77036b25c559a602cf5186ce4d
   cf_stacks:
-  - bionic
-  - cflinuxfs3
-  - windows2012R2
-  - windows2016
-  - windows
-  - any-stack
-  source: https://files.pythonhosted.org/packages/f4/d5/a6c19dcbcbc267aca376558797f036d9bcdff344c9f785fe7d0fe9a5f2a7/setuptools-41.4.0.zip
-  source_sha256: 7eae782ccf36b790c21bde7d86a4f303a441cd77036b25c559a602cf5186ce4d
-- name: setuptools
-  version: 41.4.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-41.4.0-any-stack-7eae782c.zip
-  sha256: 7eae782ccf36b790c21bde7d86a4f303a441cd77036b25c559a602cf5186ce4d
-  cf_stacks:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/f4/d5/a6c19dcbcbc267aca376558797f036d9bcdff344c9f785fe7d0fe9a5f2a7/setuptools-41.4.0.zip
   source_sha256: 7eae782ccf36b790c21bde7d86a4f303a441cd77036b25c559a602cf5186ce4d
