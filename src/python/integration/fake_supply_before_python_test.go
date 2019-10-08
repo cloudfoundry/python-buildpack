@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 
@@ -25,7 +24,7 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 				Skip("API version does not have multi-buildpack support")
 			}
 
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "fake_supply_python_app"))
+			app = cutlass.New(Fixtures("fake_supply_python_app"))
 			app.Buildpacks = []string{
 				"https://github.com/cloudfoundry/dotnet-core-buildpack#master",
 				"python_buildpack",
@@ -51,7 +50,7 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 			}
 
 			var err error
-			tmpDir, err = cutlass.CopyFixture(filepath.Join(bpDir, "fixtures", "flask_git_req"))
+			tmpDir, err = cutlass.CopyFixture(Fixtures("flask_git_req"))
 			Expect(err).To(BeNil())
 			app = cutlass.New(tmpDir)
 		})
@@ -84,7 +83,7 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 				Skip("API version does not have multi-buildpack support")
 			}
 
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "miniconda_python_3"))
+			app = cutlass.New(Fixtures("miniconda_python_3"))
 			app.Buildpacks = []string{
 				"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",
 				"python_buildpack",

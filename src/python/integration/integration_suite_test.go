@@ -104,6 +104,14 @@ func ApiHasStackAssociation() bool {
 	return supported
 }
 
+func Fixtures(names ...string) string {
+	root, err := cutlass.FindRoot()
+	Expect(err).NotTo(HaveOccurred())
+
+	names = append([]string{root, "fixtures"}, names...)
+	return filepath.Join(names...)
+}
+
 func AssertUsesProxyDuringStagingIfPresent(fixtureName string) {
 	Context("with an uncached buildpack", func() {
 		BeforeEach(func() {
@@ -125,7 +133,7 @@ func AssertUsesProxyDuringStagingIfPresent(fixtureName string) {
 
 			traffic, _, _, err := cutlass.InternetTraffic(
 				bpDir,
-				filepath.Join("fixtures", fixtureName),
+				Fixtures(fixtureName),
 				bpFile,
 				[]string{"HTTP_PROXY=" + proxy.URL, "HTTPS_PROXY=" + proxy.URL},
 			)
@@ -156,7 +164,7 @@ func AssertNoInternetTraffic(fixtureName string) {
 
 		traffic, built, logs, err := cutlass.InternetTraffic(
 			bpDir,
-			filepath.Join("fixtures", fixtureName),
+			Fixtures(fixtureName),
 			bpFile,
 			[]string{"LC_ALL C.UTF-8", "LANG C.UTF-8"},
 		)

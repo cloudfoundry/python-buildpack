@@ -24,7 +24,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 	Context("with an unsupported dependency", func() {
 		BeforeEach(func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "unsupported_version"))
+			app = cutlass.New(Fixtures("unsupported_version"))
 		})
 
 		It("displays a nice error messages and gracefully fails", func() {
@@ -37,7 +37,7 @@ var _ = Describe("CF Python Buildpack", func() {
 	})
 
 	It("deploy a web app with -e in requirements.txt", func() {
-		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_git_req"))
+		app = cutlass.New(Fixtures("flask_git_req"))
 		app.SetEnv("BP_DEBUG", "1")
 		PushAppAndConfirm(app)
 
@@ -58,13 +58,13 @@ var _ = Describe("CF Python Buildpack", func() {
 	})
 
 	It("deploy a web app with -r in requirements.txt", func() {
-		app = cutlass.New(filepath.Join(bpDir, "fixtures", "recursive_requirements"))
+		app = cutlass.New(Fixtures("recursive_requirements"))
 		PushAppAndConfirm(app)
 		Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 	})
 
 	It("deploy a web app that uses an nltk corpus", func() {
-		app = cutlass.New(filepath.Join(bpDir, "fixtures", "nltk_flask"))
+		app = cutlass.New(Fixtures("nltk_flask"))
 		app.SetEnv("BP_DEBUG", "1")
 		app.Memory = "256M"
 		PushAppAndConfirm(app)
@@ -75,7 +75,7 @@ var _ = Describe("CF Python Buildpack", func() {
 	})
 
 	It("deploy a web app that uses an tkinter", func() {
-		app = cutlass.New(filepath.Join(bpDir, "fixtures", "tkinter"))
+		app = cutlass.New(Fixtures("tkinter"))
 		app.Buildpacks = []string{"python_buildpack"}
 		PushAppAndConfirm(app)
 
@@ -83,13 +83,13 @@ var _ = Describe("CF Python Buildpack", func() {
 	})
 
 	It("should not display the allow-all-external deprecation message", func() {
-		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
+		app = cutlass.New(Fixtures("flask"))
 		PushAppAndConfirm(app)
 		Expect(app.Stdout.String()).ToNot(ContainSubstring("DEPRECATION: --allow-all-external has been deprecated and will be removed in the future"))
 	})
 
 	It("app has pre and post scripts", func() {
-		app = cutlass.New(filepath.Join(bpDir, "fixtures", "with_hooks"))
+		app = cutlass.New(Fixtures("with_hooks"))
 		PushAppAndConfirm(app)
 		Expect(app.Stdout.String()).To(ContainSubstring("Echo from app pre compile"))
 		Expect(app.Stdout.String()).To(ContainSubstring("Echo from app post compile"))
@@ -105,7 +105,7 @@ var _ = Describe("CF Python Buildpack", func() {
 		Context("pushing a Python 3 app with a runtime.txt", func() {
 			Context("including flask", func() {
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3"))
+					app = cutlass.New(Fixtures("flask_python_3"))
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
@@ -118,7 +118,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			Context("including flask and no build isolation", func() {
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "no_build_isolation"))
+					app = cutlass.New(Fixtures("no_build_isolation"))
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
@@ -131,7 +131,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			Context("including django with specified python version", func() {
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "django_python_3"))
+					app = cutlass.New(Fixtures("django_python_3"))
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
@@ -159,7 +159,7 @@ var _ = Describe("CF Python Buildpack", func() {
 				}
 
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
+					app = cutlass.New(Fixtures("flask"))
 					mc := manifestContent{}
 					err := libbuildpack.NewYAML().Load(filepath.Join(bpDir, "manifest.yml"), &mc)
 					Expect(err).To(BeNil())
@@ -187,7 +187,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			Context("including django but not specified Python version", func() {
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "django_web_app"))
+					app = cutlass.New(Fixtures("django_web_app"))
 				})
 
 				It("deploys", func() {
@@ -200,7 +200,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			Context("including flask without a vendor directory", func() {
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_not_vendored"))
+					app = cutlass.New(Fixtures("flask_not_vendored"))
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
@@ -216,7 +216,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 		Context("with mercurial dependencies", func() {
 			BeforeEach(func() {
-				app = cutlass.New(filepath.Join(bpDir, "fixtures", "mercurial"))
+				app = cutlass.New(Fixtures("mercurial"))
 				app.SetEnv("BP_DEBUG", "1")
 			})
 
@@ -239,7 +239,7 @@ var _ = Describe("CF Python Buildpack", func() {
 		Context("when using flask", func() {
 			Context("with Python 2", func() {
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
+					app = cutlass.New(Fixtures("flask"))
 				})
 
 				It("deploys", func() {
@@ -252,7 +252,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			Context("with Python 3", func() {
 				BeforeEach(func() {
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3"))
+					app = cutlass.New(Fixtures("flask_python_3"))
 				})
 
 				It("deploys", func() {
@@ -266,7 +266,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 		Context("with mercurial dependencies", func() {
 			BeforeEach(func() {
-				app = cutlass.New(filepath.Join(bpDir, "fixtures", "mercurial"))
+				app = cutlass.New(Fixtures("mercurial"))
 			})
 
 			It("deploys", func() {
@@ -278,7 +278,7 @@ var _ = Describe("CF Python Buildpack", func() {
 	})
 
 	It("sets gunicorn to send access logs to stdout by defualt", func() {
-		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_latest_gunicorn"))
+		app = cutlass.New(Fixtures("flask_latest_gunicorn"))
 		PushAppAndConfirm(app)
 
 		Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))

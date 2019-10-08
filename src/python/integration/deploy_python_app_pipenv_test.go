@@ -1,8 +1,6 @@
 package integration_test
 
 import (
-	"path/filepath"
-
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +18,7 @@ var _ = Describe("deploying a flask web app", func() {
 
 	Context("app has Pipfile.lock and no requirements.txt or runtime.txt", func() {
 		BeforeEach(func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv"))
+			app = cutlass.New(Fixtures("flask_python_3_pipenv"))
 			app.SetEnv("BP_DEBUG", "1")
 			PushAppAndConfirm(app)
 		})
@@ -44,7 +42,7 @@ var _ = Describe("deploying a flask web app", func() {
 					if !cutlass.Cached {
 						Skip("Running cached tests")
 					}
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv_vendored"))
+					app = cutlass.New(Fixtures("flask_python_3_pipenv_vendored"))
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
@@ -60,7 +58,7 @@ var _ = Describe("deploying a flask web app", func() {
 					if !cutlass.Cached {
 						Skip("Running cached tests")
 					}
-					app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_3_pipenv_vendored_incomplete"))
+					app = cutlass.New(Fixtures("flask_python_3_pipenv_vendored_incomplete"))
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
@@ -75,7 +73,7 @@ var _ = Describe("deploying a flask web app", func() {
 				if !cutlass.Cached {
 					Skip("Running cached tests")
 				}
-				app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask_python_2_pipenv_vendored"))
+				app = cutlass.New(Fixtures("flask_python_2_pipenv_vendored"))
 				app.SetEnv("BP_DEBUG", "1")
 			})
 
@@ -90,7 +88,7 @@ var _ = Describe("deploying a flask web app", func() {
 
 	Context("no Pipfile", func() {
 		BeforeEach(func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "no_deps"))
+			app = cutlass.New(Fixtures("no_deps"))
 			app.Buildpacks = []string{"python_buildpack"}
 			app.SetEnv("BP_DEBUG", "1")
 		})
@@ -104,7 +102,7 @@ var _ = Describe("deploying a flask web app", func() {
 
 	Context("When there is a requirements.txt and a Pipfile", func() {
 		BeforeEach(func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "pipfile_and_requirements"))
+			app = cutlass.New(Fixtures("pipfile_and_requirements"))
 			app.Buildpacks = []string{"python_buildpack"}
 			app.SetEnv("BP_DEBUG", "1")
 		})
