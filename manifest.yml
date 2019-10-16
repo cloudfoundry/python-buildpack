@@ -50,13 +50,13 @@ dependencies:
   source: https://github.com/conda/conda/archive/4.7.12.tar.gz
   source_sha256: 2248d5f2eeeff69b142a6ccf3148357b8e42f9c4141ab97a17c9e27f6149c417
 - name: miniconda3
-  version: 4.6.14
-  uri: https://repo.continuum.io/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh
-  sha256: 0d6b23895a91294a4924bd685a3a1f48e35a17970a073cd2f684ffe2c31fc4be
+  version: 4.7.12
+  uri: https://repo.continuum.io/miniconda/Miniconda3-4.7.12-Linux-x86_64.sh
+  sha256: a23fcffe97690d3bbcd34cda798c3a3318e0f35d863c5d4aca3fc983fe8450b7
   cf_stacks:
   - cflinuxfs3
-  source: https://github.com/conda/conda/archive/4.6.14.tar.gz
-  source_sha256: 0d6b23895a91294a4924bd685a3a1f48e35a17970a073cd2f684ffe2c31fc4be
+  source: https://github.com/conda/conda/archive/4.7.12.tar.gz
+  source_sha256: a23fcffe97690d3bbcd34cda798c3a3318e0f35d863c5d4aca3fc983fe8450b7
 - name: pip-pop
   version: 0.1.3
   cf_stacks:
