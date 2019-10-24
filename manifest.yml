@@ -4,6 +4,10 @@ default_versions:
 - name: python
   version: 2.7.x
 dependency_deprecation_dates:
+- version_line: 4.7.x
+  name: miniconda2
+  date: 2020-01-01
+  link: https://www.python.org/dev/peps/pep-0373/ # same as python 2.7
 - version_line: 2.7.x
   name: python
   date: 2020-01-01
