@@ -166,13 +166,13 @@ dependencies:
   source: https://www.python.org/ftp/python/3.8.0/Python-3.8.0.tgz
   source_sha256: f1069ad3cae8e7ec467aa98a6565a62a48ef196cb8f1455a245a08db5e1792df
 - name: setuptools
-  version: 41.5.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-41.5.0-any-stack-3025741f.zip
-  sha256: 3025741f235bee01847ec315b31b34fa6673d5076d666a92594e3999b20a9ee1
+  version: 41.5.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-41.5.1-any-stack-998a90a4.zip
+  sha256: 998a90a43ad3c696e1ffad1b23783e1bd2e6a92e6066959de7c6f0669c154458
   cf_stacks:
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/cb/83/055c30a0d60b12aec280e41fa3b0b316ae9d655b11ff8decfe74c4395908/setuptools-41.5.0.zip
-  source_sha256: 3025741f235bee01847ec315b31b34fa6673d5076d666a92594e3999b20a9ee1
+  source: https://files.pythonhosted.org/packages/e7/93/ee0ad1215dc5abe6cf43c988e270504670e41e90ae6625703699d8ffe10e/setuptools-41.5.1.zip
+  source_sha256: 998a90a43ad3c696e1ffad1b23783e1bd2e6a92e6066959de7c6f0669c154458
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
