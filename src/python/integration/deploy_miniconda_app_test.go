@@ -38,10 +38,10 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			body, err := app.GetBody("/")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(body).To(ContainSubstring("numpy: 1.10.4"))
-			Expect(body).To(ContainSubstring("scipy: 0.17.0"))
-			Expect(body).To(ContainSubstring("sklearn: 0.17.1"))
-			Expect(body).To(ContainSubstring("pandas: 0.18.0"))
+			Expect(body).To(ContainSubstring("numpy: 1.16.5"))
+			Expect(body).To(ContainSubstring("scipy: 1.2.1"))
+			Expect(body).To(ContainSubstring("sklearn: 0.20.3"))
+			Expect(body).To(ContainSubstring("pandas: 0.24.2"))
 			Expect(body).To(ContainSubstring("python-version2"))
 		})
 

@@ -1,11 +1,11 @@
 name: pydata_test
 dependencies:
-- python=2.7.13
+- python=2.7.17
 - pip
 - pytest
 - flask
 - nose
-- numpy=1.10.4
-- scipy=0.17.0
-- scikit-learn=0.17.1
-- pandas=0.18.0
+- numpy=1.16.5
+- scipy=1.2.1
+- scikit-learn=0.20.3
+- pandas=0.24.2
