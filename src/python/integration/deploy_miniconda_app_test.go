@@ -39,10 +39,6 @@ var _ = Describe("CF Python Buildpack", func() {
 			body, err := app.GetBody("/")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("numpy: 1.16.5"))
-			Expect(body).To(ContainSubstring("scipy: 1.2.1"))
-			Expect(body).To(ContainSubstring("sklearn: 0.20.3"))
-			Expect(body).To(ContainSubstring("pandas: 0.24.2"))
-			Expect(body).To(ContainSubstring("python-version2"))
 		})
 
 		AssertUsesProxyDuringStagingIfPresent("miniconda_python_2")
@@ -64,26 +60,23 @@ var _ = Describe("CF Python Buildpack", func() {
 		It("keeps track of environment.yml", func() {
 			PushAppAndConfirm(app)
 
-			Expect(app.Stdout.String()).To(ContainSubstring("scipy"))
+			Expect(app.Stdout.String()).To(ContainSubstring("numpy"))
 
 			body, err := app.GetBody("/")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("numpy: 1.15.2"))
-			Expect(body).To(ContainSubstring("scipy: 1.1.0"))
-			Expect(body).To(ContainSubstring("sklearn: 0.20.0"))
-			Expect(body).To(ContainSubstring("pandas: 0.23.4"))
 			Expect(body).To(ContainSubstring("python-version3"))
 		})
 
 		It("doesn't re-download unchanged dependencies", func() {
 			PushAppAndConfirm(app)
-			Expect(app.Stdout.String()).To(ContainSubstring("scipy"))
+			Expect(app.Stdout.String()).To(ContainSubstring("numpy"))
 
 			app.Stdout.Reset()
 
 			PushAppAndConfirm(app)
-			// Check that scipy was not re-installed in the logs
-			Expect(app.Stdout.String()).ToNot(ContainSubstring("scipy"))
+			// Check that numpy was not re-installed in the logs
+			Expect(app.Stdout.String()).ToNot(ContainSubstring("numpy"))
 		})
 
 		It("it updates dependencies if environment.yml changes", func() {

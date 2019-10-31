@@ -4,7 +4,7 @@ import os
 import importlib
 import sys
 
-MODULE_NAMES = ['numpy', 'scipy', 'sklearn', 'pandas']
+MODULE_NAMES = ['numpy']
 modules = {}
 
 for m in MODULE_NAMES:
@@ -21,14 +21,9 @@ def in_module_tests(module_name):
     if module_name not in modules:
         return "This module is not listed"
     try:
-        module = modules[module_name]
-        if module_name == 'sklearn':
-            result = pytest.main('--pyargs sklearn.tests')
-            result_string = "sklearn: passed" if result == 0 else "sklearn: failed"
-        else:
-            result = module.test()
-            num_failures = result.failures
-            result_string = "{}: number of failures={}".format(module_name, len(num_failures))
+        result = modules[module_name].test()
+        num_failures = result.failures
+        result_string = "{}: number of failures={}".format(module_name, len(num_failures))
     except (NameError, ImportError, AttributeError):
         result_string = "{}: Error running test!".format(module_name)
     return result_string
@@ -56,7 +51,7 @@ def root():
     r = """<br><br>
     Imports Successful!<br>
 
-    To test each module go to /numpy, /scipy, /sklearn and /pandas
+    To test each module go to /numpy
     or test all at /all.<br>
     Test suites can take up to 10 minutes to run, main output is in app logs."""
     return python_version + versions + r

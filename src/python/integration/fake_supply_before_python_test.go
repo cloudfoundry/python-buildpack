@@ -94,15 +94,12 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 
 		It("uses miniconda", func() {
 			PushAppAndConfirm(app)
-			Expect(app.Stdout.String()).To(ContainSubstring("scipy"))
+			Expect(app.Stdout.String()).To(ContainSubstring("numpy"))
 
 			body, err := app.GetBody("/")
 			Expect(err).To(BeNil())
 
 			Expect(body).To(MatchRegexp(`numpy: \d+\.\d+\.\d+`))
-			Expect(body).To(MatchRegexp(`scipy: \d+\.\d+\.\d+`))
-			Expect(body).To(MatchRegexp(`sklearn: \d+\.\d+\.\d+`))
-			Expect(body).To(MatchRegexp(`pandas: \d+\.\d+\.\d+`))
 			Expect(body).To(ContainSubstring("python-version3"))
 		})
 	})
