@@ -1,3 +1,71 @@
+v1.7.0 Oct 31, 2019
+=====================
+
+* Bump pip-pop to version that works with latest pip
+  * Update versions in integration tests to work with new python/pip versions
+  (https://www.pivotaltracker.com/story/show/169340183)
+
+* Add setuptools 41.6.0, remove setuptools 41.5.1
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169424428)
+
+* Add setuptools 41.5.1, remove setuptools 41.5.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169407258)
+
+* Add setuptools 41.5.0, remove setuptools 41.4.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169386424)
+
+* Add miniconda2 4.7.12.1, remove miniconda2 4.7.12
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169374747)
+
+* Add miniconda3 4.7.12.1, remove miniconda3 4.7.12
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169374746)
+
+* Add deprecation info for miniconda2
+  (https://www.pivotaltracker.com/story/show/169340305)
+
+* Add python 2.7.17, remove python 2.7.15
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169246561)
+
+* Add miniconda3 4.7.12, remove miniconda3 4.6.14
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169191663)
+
+* Add miniconda2 4.7.12, remove miniconda2 4.6.14
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169191659)
+
+* Add python 3.7.5, remove python 3.7.3
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169184075)
+
+* Add python 3.8.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/169163682)
+
+* Remove duplicate setuptools from manifest
+  (https://www.pivotaltracker.com/story/show/168990295)
+
+* Rebuild setuptools 41.4.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/168990295)
+
+* Add setuptools 41.4.0, remove setuptools 41.2.0
+  for stack(s) bionic, cflinuxfs3, windows2012R2, windows2016, windows, any-stack
+  (https://www.pivotaltracker.com/story/show/168990295)
+
+* Remove cflinuxfs2 support Fixes: #138
+  (https://www.pivotaltracker.com/story/show/166710433)
+
+* Fixes #129
+  (https://www.pivotaltracker.com/story/show/163705746)
+
+
 v1.6.37 Aug 27, 2019
 =====================
 
