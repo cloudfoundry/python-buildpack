@@ -525,6 +525,37 @@ cffi==0.9.2
 				Expect(supplier.RunPipUnvendored()).To(Succeed())
 			})
 		})
+
+		Context("have index_url, find_links, allow_hosts exists in pydistutils.cfg file", func() {
+			requirements :=
+				`--index-url https://index-url
+--extra-index-url https://extra-index-url1
+--extra-index-url https://extra-index-url2
+--trusted-host extra-index-url1
+--trusted-host extra-index-url2
+Flask==0.10.1
+Jinja2==2.7.2
+MarkupSafe==0.21
+`
+			BeforeEach(func() {
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte(requirements), 0644)).To(Succeed())
+			})
+
+			It("check index_url, find_links, allow_hosts values", func() {
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+				Expect(supplier.RunPipUnvendored()).To(Succeed())
+				filePath := filepath.Join(os.Getenv("HOME"), ".pydistutils.cfg")
+				fileContents, err := ioutil.ReadFile(filePath)
+				Expect(err).ShouldNot(HaveOccurred())
+				configMap := ParsePydistutils(string(fileContents))
+				Expect(configMap).Should(HaveKeyWithValue("index_url", []string{"https://index-url"}))
+				// find_links is array of string
+				Expect(configMap).Should(HaveKeyWithValue("find_links", []string{"https://extra-index-url1", "https://extra-index-url2"}))
+				// allow_hosts is comma separated string
+				Expect(configMap).Should(HaveKeyWithValue("allow_hosts", []string{"extra-index-url1,extra-index-url2"}))
+			})
+		})
 	})
 
 	Describe("RunPipVendored", func() {
