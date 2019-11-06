@@ -3,10 +3,8 @@ package supply_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/ini.v1"
 
-	"bufio"
-	"regexp"
-	"strings"
 	"testing"
 )
 
@@ -16,33 +14,21 @@ func TestSupply(t *testing.T) {
 }
 
 // This will only parse [easy_install] section and return map
-func ParsePydistutils(contents string) map[string][]string {
-	configMap := make(map[string][]string)
-	scanner := bufio.NewScanner(strings.NewReader(contents))
-	var isEasyInstall = false
-	var currentKey = ""
-
-	// regular expression for `key = value`.
-	kv := regexp.MustCompile(`^([^=\n]+)=([^\n]*)`)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line[0] == '[' {
-			if strings.Compare("[easy_install]", line) == 0 {
-				isEasyInstall = true
-			} else {
-				isEasyInstall = false
-			}
-		} else if isEasyInstall {
-			m := kv.FindStringSubmatch(line)
-			if len(m) > 0 {
-				currentKey = strings.Trim(m[len(m)-2], " ")
-				value := strings.Trim(m[len(m)-1], "\r\n\t ")
-				configMap[currentKey] = []string{value}
-			} else {
-				value := strings.Trim(line, "\r\n\t ")
-				configMap[currentKey] = append(configMap[currentKey], value)
-			}
-		}
+func ParsePydistutils(contents string) (map[string][]string, error) {
+	contentBytes := []byte(contents)
+	easyInstall := map[string][]string{}
+	loadOpts := ini.LoadOptions{
+		AllowPythonMultilineValues: true,
 	}
-	return configMap
+
+	iniContent, err := ini.LoadSources(loadOpts, contentBytes)
+	if err != nil {
+		return map[string][]string{}, err
+	}
+
+	for _, key := range iniContent.Section("easy_install").KeyStrings() {
+		easyInstall[key] = iniContent.Section("easy_install").Key(key).Strings("\n")
+	}
+
+	return easyInstall, nil
 }

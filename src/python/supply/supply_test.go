@@ -548,7 +548,9 @@ MarkupSafe==0.21
 				filePath := filepath.Join(os.Getenv("HOME"), ".pydistutils.cfg")
 				fileContents, err := ioutil.ReadFile(filePath)
 				Expect(err).ShouldNot(HaveOccurred())
-				configMap := ParsePydistutils(string(fileContents))
+				configMap, err := ParsePydistutils(string(fileContents))
+				Expect(err).ToNot(HaveOccurred())
+
 				Expect(configMap).Should(HaveKeyWithValue("index_url", []string{"https://index-url"}))
 				// find_links is array of string
 				Expect(configMap).Should(HaveKeyWithValue("find_links", []string{"https://extra-index-url1", "https://extra-index-url2"}))
