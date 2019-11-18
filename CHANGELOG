@@ -1,3 +1,13 @@
+v1.7.2 Nov 18, 2019
+====================
+
+* Update version of pip-pop to match binary being downloaded
+  * Fixes #151
+  (https://www.pivotaltracker.com/story/show/169675855)
+
+* Support trusted-host for the Pipunvendored - add trusted-host, fix index-url, extra-index-url and add unit tests
+
+
 v1.7.1 Nov 04, 2019
 ====================
 
