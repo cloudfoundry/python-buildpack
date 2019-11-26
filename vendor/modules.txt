@@ -74,7 +74,7 @@ golang.org/x/crypto/blowfish
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
-# golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd
+# golang.org/x/sys v0.0.0-20191126131656-8a8471f7e56d
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding

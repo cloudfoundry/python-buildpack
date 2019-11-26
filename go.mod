@@ -13,7 +13,7 @@ require (
 	github.com/tidwall/gjson v1.3.4 // indirect
 	golang.org/x/crypto v0.0.0-20191105034135-c7e5f84aec59
 	golang.org/x/net v0.0.0-20191105084925-a882066a44e0 // indirect
-	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
+	golang.org/x/sys v0.0.0-20191126131656-8a8471f7e56d // indirect
 	gopkg.in/ini.v1 v1.50.0
 	gopkg.in/yaml.v2 v2.2.5 // indirect
 )
