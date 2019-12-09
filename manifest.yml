@@ -12,10 +12,6 @@ dependency_deprecation_dates:
   name: python
   date: 2020-01-01
   link: https://www.python.org/dev/peps/pep-0373/
-- version_line: 3.4.x
-  name: python
-  date: 2019-03-16
-  link: https://www.python.org/dev/peps/pep-0429/
 - version_line: 3.5.x
   name: python
   date: 2020-09-13
@@ -28,6 +24,10 @@ dependency_deprecation_dates:
   name: python
   date: 2023-06-27
   link: https://www.python.org/dev/peps/pep-0537/
+- version_line: 3.8.x
+  name: python
+  date: 2024-10-14
+  link: https://www.python.org/dev/peps/pep-0569/
 dependencies:
 - name: libffi
   version: 3.2.1
