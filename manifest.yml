@@ -110,14 +110,6 @@ dependencies:
   source: https://www.python.org/ftp/python/3.5.9/Python-3.5.9.tgz
   source_sha256: 67a1d4fc6e4540d6a092cadc488e533afa961b3c9becc74dc3d6b55cb56e0cc1
 - name: python
-  version: 3.6.8
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.8-linux-x64-cflinuxfs3-0e8b91a8.tgz
-  sha256: 0e8b91a865827da8da86feefc0c43ecdefe6bb0d3456acf6ef61958552540b67
-  cf_stacks:
-  - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
-  source_sha256: 7f5b1f08b3b0a595387ef6c64c85b1b13b38abef0dd871835ee923262e4f32f0
-- name: python
   version: 3.6.9
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.9-linux-x64-cflinuxfs3-f30bc832.tgz
   sha256: f30bc832807402a93c24d6984182e00575bde327e2e43f00a0a1c5e680ad53b6
@@ -125,6 +117,14 @@ dependencies:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.6.9/Python-3.6.9.tgz
   source_sha256: 47fc92a1dcb946b9ed0abc311d3767b7215c54e655b17fd1d3f9b538195525aa
+- name: python
+  version: 3.6.10
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.6.10-linux-x64-cflinuxfs3-3bb086eb.tgz
+  sha256: 3bb086eb29e7385618a23dff6dbff0e7065bd289b5e075db05613046132a4500
+  cf_stacks:
+  - cflinuxfs3
+  source: https://www.python.org/ftp/python/3.6.10/Python-3.6.10.tgz
+  source_sha256: 7034dd7cba98d4f94c74f9edd7345bac71c8814c41672c64d9044fa2f96f334d
 - name: python
   version: 3.7.4
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.7.4-linux-x64-cflinuxfs3-844697ea.tgz
