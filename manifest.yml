@@ -159,8 +159,8 @@ dependencies:
   source_sha256: c7cfa39a43b994621b245e029769e9126caa2a93571cee2e743b213cceac35fb
 - name: setuptools
   version: 42.0.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-42.0.2-any-stack-c5b37209.zip
-  sha256: c5b372090d7c8709ce79a6a66872a91e518f7d65af97fca78135e1cb10d4b940
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools-42.0.2-any-stack-32d1a764.zip
+  sha256: 32d1a764d22bc2b0e3646f9f3bf77163539d3fd69edf5ba716a1a222b171f6a5
   cf_stacks:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/f7/b6/5b98441b6749ea1db1e41e5e6e7a93cbdd7ffd45e11fe1b22d45884bc777/setuptools-42.0.2.zip
