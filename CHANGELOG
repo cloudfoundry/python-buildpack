@@ -1,3 +1,13 @@
+v1.7.6 Jan 21, 2020
+====================
+
+* Add setuptools 45.1.0, remove setuptools 42.0.2
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/170788612)
+  (https://www.pivotaltracker.com/story/show/170663309)
+  (https://www.pivotaltracker.com/story/show/170496225)
+  (https://www.pivotaltracker.com/story/show/170490605)
+
 v1.7.5 Dec 30, 2019
 ====================
 
