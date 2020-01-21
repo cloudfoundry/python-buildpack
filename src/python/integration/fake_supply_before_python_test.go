@@ -11,6 +11,7 @@ import (
 
 var _ = Describe("running supply buildpacks before the python buildpack", func() {
 	var app *cutlass.App
+
 	AfterEach(func() {
 		if app != nil {
 			app.Destroy()
@@ -20,6 +21,11 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 
 	Context("a simple app is pushed once", func() {
 		BeforeEach(func() {
+
+			if isMinicondaTest {
+				Skip("Skipping non-miniconda tests")
+			}
+
 			if ok, err := cutlass.ApiGreaterThan("2.65.1"); err != nil || !ok {
 				Skip("API version does not have multi-buildpack support")
 			}
@@ -45,6 +51,10 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 		var tmpDir string
 
 		BeforeEach(func() {
+
+			if isMinicondaTest {
+				Skip("Skipping non-miniconda tests")
+			}
 			if ok, err := cutlass.ApiGreaterThan("2.65.1"); err != nil || !ok {
 				Skip("API version does not have multi-buildpack support")
 			}

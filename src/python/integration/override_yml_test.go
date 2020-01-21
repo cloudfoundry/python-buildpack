@@ -10,6 +10,23 @@ import (
 var _ = Describe("override yml", func() {
 	var app *cutlass.App
 	var buildpackName string
+
+	BeforeEach(func() {
+		if !ApiHasMultiBuildpack() {
+			Skip("Multi buildpack support is required")
+		}
+
+		if isMinicondaTest {
+			Skip("Skipping non-miniconda tests")
+		}
+
+		buildpackName = "override_yml_" + cutlass.RandStringRunes(5)
+		Expect(cutlass.CreateOrUpdateBuildpack(buildpackName, Fixtures("overrideyml_bp"), "")).To(Succeed())
+
+		app = cutlass.New(Fixtures("no_deps"))
+		app.Buildpacks = []string{buildpackName + "_buildpack", "python_buildpack"}
+	})
+
 	AfterEach(func() {
 		if buildpackName != "" {
 			cutlass.DeleteBuildpack(buildpackName)
@@ -19,18 +36,6 @@ var _ = Describe("override yml", func() {
 			app.Destroy()
 		}
 		app = nil
-	})
-
-	BeforeEach(func() {
-		if !ApiHasMultiBuildpack() {
-			Skip("Multi buildpack support is required")
-		}
-
-		buildpackName = "override_yml_" + cutlass.RandStringRunes(5)
-		Expect(cutlass.CreateOrUpdateBuildpack(buildpackName, Fixtures("overrideyml_bp"), "")).To(Succeed())
-
-		app = cutlass.New(Fixtures("no_deps"))
-		app.Buildpacks = []string{buildpackName + "_buildpack", "python_buildpack"}
 	})
 
 	It("Forces python from override buildpack", func() {

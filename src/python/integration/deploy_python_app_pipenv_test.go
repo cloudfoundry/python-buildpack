@@ -9,6 +9,12 @@ import (
 var _ = Describe("deploying a flask web app", func() {
 	var app *cutlass.App
 
+	BeforeEach(func() {
+		if isMinicondaTest {
+			Skip("Skipping non-miniconda tests")
+		}
+	})
+
 	AfterEach(func() {
 		if app != nil {
 			app.Destroy()

@@ -9,6 +9,12 @@ import (
 var _ = Describe("download transitive dependencies correctly", func() {
 	var app *cutlass.App
 
+	BeforeEach(func() {
+		if isMinicondaTest {
+			Skip("Skipping non-miniconda tests")
+		}
+	})
+
 	AfterEach(func() {
 		if app != nil {
 			app.Destroy()

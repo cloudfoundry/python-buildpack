@@ -9,20 +9,25 @@ import (
 
 var _ = Describe("pushing an app a second time", func() {
 	var app *cutlass.App
-	AfterEach(func() {
-		if app != nil {
-			app.Destroy()
-		}
-		app = nil
-	})
 
 	BeforeEach(func() {
 		if cutlass.Cached {
 			Skip("but running cached tests")
 		}
 
+		if isMinicondaTest {
+			Skip("Skipping non-miniconda tests")
+		}
+
 		app = cutlass.New(Fixtures("no_deps"))
 		app.Buildpacks = []string{"python_buildpack"}
+	})
+
+	AfterEach(func() {
+		if app != nil {
+			app.Destroy()
+		}
+		app = nil
 	})
 
 	Regexp := `\[.*/python\-[\d\.]+\-linux\-x64\-(cflinuxfs.*-)?[\da-f]+\.tgz\]`
