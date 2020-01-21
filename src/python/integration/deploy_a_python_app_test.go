@@ -198,7 +198,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 				It("deploys", func() {
 					PushAppAndConfirm(app)
-					Expect(app.GetBody("/")).To(ContainSubstring("It worked!"))
+					Expect(app.GetBody("/")).To(ContainSubstring("The install worked successfully!"))
 					Expect(app.Stdout.String()).To(ContainSubstring("collectstatic --noinput"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
 				})

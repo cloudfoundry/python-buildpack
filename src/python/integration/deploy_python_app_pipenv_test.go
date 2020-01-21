@@ -74,22 +74,6 @@ var _ = Describe("deploying a flask web app", func() {
 				})
 			})
 		})
-		Context("python 2", func() {
-			BeforeEach(func() {
-				if !cutlass.Cached {
-					Skip("Running cached tests")
-				}
-				app = cutlass.New(Fixtures("flask_python_2_pipenv_vendored"))
-				app.SetEnv("BP_DEBUG", "1")
-			})
-
-			It("should work", func() {
-				PushAppAndConfirm(app)
-				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
-			})
-
-			AssertNoInternetTraffic("flask_python_2_pipenv_vendored")
-		})
 	})
 
 	Context("no Pipfile", func() {

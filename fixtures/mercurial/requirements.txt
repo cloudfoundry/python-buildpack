@@ -7,4 +7,4 @@ itsdangerous==0.24
 pylibmc==1.4.2
 cffi==0.9.2
 requests
--e hg+https://bitbucket.org/marcinkuzminski/vcs#egg=vcs
+-e hg+https://www.mercurial-scm.org/repo/python-hglib#egg=python-hglib
