@@ -1,8 +1,0 @@
-name: pydata_test
-dependencies:
-- python=2.7.17
-- pip
-- pytest
-- flask
-- nose
-- numpy=1.16.5

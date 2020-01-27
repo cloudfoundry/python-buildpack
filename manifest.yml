@@ -5,9 +5,9 @@ default_versions:
   version: 3.8.x
 dependency_deprecation_dates:
 - version_line: 4.7.x
-  name: miniconda2
-  date: 2020-01-01
-  link: https://www.python.org/dev/peps/pep-0373/
+  name: miniconda3
+  date: 2023-06-27
+  link: https://www.python.org/dev/peps/pep-0537/
 - version_line: 3.5.x
   name: python
   date: 2020-09-13
@@ -41,14 +41,6 @@ dependencies:
   sha256: '009a3476197030e30d0ce924cc044ee4851ef27324e132b29fd12d8cde071915'
   source: https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
   source_sha256: e22c0bb032fde08f53de9ffbc5a128233041d9f33b5de022c0978a2149885f82
-- name: miniconda2
-  version: 4.7.12.1
-  uri: https://repo.continuum.io/miniconda/Miniconda2-4.7.12.1-Linux-x86_64.sh
-  sha256: 383fe7b6c2574e425eee3c65533a5101e68a2d525e66356844a80aa02a556695
-  cf_stacks:
-  - cflinuxfs3
-  source: https://github.com/conda/conda/archive/4.7.12.1.tar.gz
-  source_sha256: 383fe7b6c2574e425eee3c65533a5101e68a2d525e66356844a80aa02a556695
 - name: miniconda3
   version: 4.7.12.1
   uri: https://repo.continuum.io/miniconda/Miniconda3-4.7.12.1-Linux-x86_64.sh

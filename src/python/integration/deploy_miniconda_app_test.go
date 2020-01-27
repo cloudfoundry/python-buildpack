@@ -27,29 +27,6 @@ var _ = Describe("CF Python Buildpack", func() {
 		app = nil
 	})
 
-	CleanAnsi := func(s string) string {
-		r := strings.NewReplacer("\033[31;1m", "", "\033[33;1m", "", "\033[34;1m", "", "\033[0m", "")
-		return r.Replace(s)
-	}
-
-	Context("an app that uses miniconda and python 2", func() {
-		BeforeEach(func() {
-			app = cutlass.New(Fixtures("miniconda_python_2"))
-			app.Disk = "2G"
-			app.Memory = "1G"
-		})
-
-		It("deploys", func() {
-			PushAppAndConfirm(app)
-
-			body, err := app.GetBody("/")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(body).To(ContainSubstring("numpy: 1.16.5"))
-		})
-
-		AssertUsesProxyDuringStagingIfPresent("miniconda_python_2")
-	})
-
 	Context("an app that uses miniconda and python 3", func() {
 		var fixtureDir string
 		BeforeEach(func() {
@@ -100,21 +77,5 @@ var _ = Describe("CF Python Buildpack", func() {
 		})
 
 		AssertUsesProxyDuringStagingIfPresent("miniconda_python_3")
-	})
-
-	Context("an app that uses miniconda and specifies python 2 in runtime.txt but python3 in the environment.yml", func() {
-		BeforeEach(func() {
-			app = cutlass.New(Fixtures("miniconda_python_2_3"))
-			app.Disk = "2G"
-			app.Memory = "1G"
-		})
-
-		It("deploys", func() {
-			PushAppAndConfirm(app)
-			Expect(app.GetBody("/")).To(ContainSubstring("python-version3"))
-			Expect(CleanAnsi(app.Stdout.String())).To(ContainSubstring("**WARNING** you have specified the version of Python runtime both in 'runtime.txt' and 'environment.yml'. You should remove one of the two versions"))
-		})
-
-		AssertUsesProxyDuringStagingIfPresent("miniconda_python_2_3")
 	})
 })
