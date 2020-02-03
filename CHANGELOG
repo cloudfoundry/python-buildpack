@@ -1,3 +1,15 @@
+v1.7.7 Feb 03, 2020
+====================
+
+* Remove miniconda2 dependency
+  * It is not needed now that python 2.7 is deprecated
+
+* Deprecate python 2.7
+  * Change default version to python 3.8
+  * Update fixture apps to work with python 3
+  (https://www.pivotaltracker.com/story/show/170196585)
+
+
 v1.7.6 Jan 21, 2020
 ====================
 
