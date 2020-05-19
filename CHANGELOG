@@ -1,3 +1,18 @@
+v1.7.14 May 19, 2020
+=====================
+
+* Add setuptools 46.4.0, remove setuptools 46.1.3
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/172878015)
+  (https://www.pivotaltracker.com/story/show/172858213)
+  (https://www.pivotaltracker.com/story/show/172822846)
+  (https://www.pivotaltracker.com/story/show/172756817)
+
+* Auto merge pull request 167
+
+* Auto merge pull request 166
+
+
 v1.7.13 Apr 23, 2020
 =====================
 
