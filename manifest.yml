@@ -58,13 +58,13 @@ dependencies:
   source: https://github.com/cloudfoundry/pip-pop/archive/v0.1.4.tar.gz
   source_sha256: b75a582d87dfb9e48b1b396bfcfefcf31a18d0aa1b45c75c7f3b720c93605610
 - name: pipenv
-  version: 2018.11.26
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs3-df1da6e6.tgz
-  sha256: df1da6e65a2db0f6f6ab5637027d9805c69e7f641265ece4fad0950f8cdcc83c
+  version: 2020.5.28
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.5.28_linux_noarch_cflinuxfs3_962aa1c6.tgz
+  sha256: 962aa1c65adb625cb1e01c7e3215c2375d3f511f86c9f13a7449248f501c6124
   cf_stacks:
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/fd/e9/01822318551caa0d62a181ba3b10f0f3757bb1e270da97165bd52db92776/pipenv-2018.11.26.tar.gz
-  source_sha256: a673e606e8452185e9817a987572b55360f4d28b50831ef3b42ac3cab3fee846
+  source: https://files.pythonhosted.org/packages/5f/0a/ef03dd42bed968f779eeaf9a98e32e875bfd18cf9ba61ede407364903c1e/pipenv-2020.5.28.tar.gz
+  source_sha256: 81862314929e3e532502e25bab3c6ba969c0cf67dcaa9d63c2c931ee2d61541c
 - name: python
   version: 3.5.7
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.5.7-linux-x64-cflinuxfs3-81f40b1a.tgz
