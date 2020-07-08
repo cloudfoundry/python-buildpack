@@ -3,12 +3,13 @@ package finalize_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/cloudfoundry/python-buildpack/src/python/finalize"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+
+	"github.com/cloudfoundry/python-buildpack/src/python/finalize"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"

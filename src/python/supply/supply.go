@@ -75,7 +75,6 @@ func RunPython(s *Supplier) error {
 	s.Log.BeginStep("Supplying Python")
 
 	dirSnapshot := snapshot.Dir(s.Stager.BuildDir(), s.Log)
-
 	if err := s.SetupCacheDir(); err != nil {
 		s.Log.Error("Error setting up cache: %v", err)
 		return err
@@ -257,6 +256,11 @@ func (s *Supplier) InstallPython() error {
 	if s.PythonVersion != "" {
 		versions := s.Manifest.AllDependencyVersions("python")
 		shortPythonVersion := strings.TrimLeft(s.PythonVersion, "python-")
+
+		if strings.Split(shortPythonVersion, ".")[0] != "3" {
+			return fmt.Errorf("%s is an unsupported python version, only python 3.x.x is supported", shortPythonVersion)
+		}
+
 		s.Log.Debug("***Version info: (%s) (%s)", s.PythonVersion, shortPythonVersion)
 		ver, err := libbuildpack.FindMatchingVersion(shortPythonVersion, versions)
 		if err != nil {

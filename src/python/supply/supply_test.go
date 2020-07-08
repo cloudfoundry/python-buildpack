@@ -112,6 +112,38 @@ var _ = Describe("Supply", func() {
 				Expect(os.Getenv("PYTHONPATH")).To(Equal(filepath.Join(depDir)))
 			})
 		})
+
+		Context("no runtime.txt is provided", func() {
+			BeforeEach(func() {
+				Expect(os.RemoveAll(filepath.Join(depDir, "runtime.txt"))).To(Succeed())
+			})
+
+			It("installs the default Python version", func() {
+				mockManifest.EXPECT().DefaultVersion("python").Return(libbuildpack.Dependency{Name: "python", Version: "some-default-version"}, nil)
+				mockInstaller.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "some-default-version"}, pythonInstallDir)
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
+				Expect(supplier.InstallPython()).To(Succeed())
+				Expect(os.Getenv("PATH")).To(Equal(fmt.Sprintf("%s:%s", filepath.Join(depDir, "bin"), originalPath)))
+				Expect(os.Getenv("PYTHONPATH")).To(Equal(filepath.Join(depDir)))
+			})
+		})
+
+		Context("runtime.txt sets Python version 2", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(depDir, "runtime.txt"), []byte("\n\n\npython-2.4.2\n\n\n"), 0644)).To(Succeed())
+
+				versions = []string{"2.4.2"}
+			})
+
+			It("errors", func() {
+				mockManifest.EXPECT().AllDependencyVersions("python").Return(versions)
+
+				err := supplier.InstallPython()
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(errors.New("2.4.2 is an unsupported python version, only python 3.x.x is supported")))
+			})
+		})
 	})
 
 	Describe("HandlePipfile", func() {

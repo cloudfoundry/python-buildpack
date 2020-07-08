@@ -243,19 +243,6 @@ var _ = Describe("CF Python Buildpack", func() {
 		})
 
 		Context("when using flask", func() {
-			Context("with Python 2", func() {
-				BeforeEach(func() {
-					app = cutlass.New(Fixtures("flask"))
-				})
-
-				It("deploys", func() {
-					PushAppAndConfirm(app)
-					Expect(app.Stdout.String()).To(ContainSubstring("Copy [/"))
-					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
-				})
-				AssertNoInternetTraffic("flask")
-			})
-
 			Context("with Python 3", func() {
 				BeforeEach(func() {
 					app = cutlass.New(Fixtures("flask_python_3"))

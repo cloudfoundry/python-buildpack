@@ -82,12 +82,7 @@ func Run(c *Conda) error {
 }
 
 func (c *Conda) Version() string {
-	if runtime, err := ioutil.ReadFile(filepath.Join(c.Stager.BuildDir(), "runtime.txt")); err == nil {
-		if strings.HasPrefix(string(runtime), "python-3") {
-			return "miniconda3"
-		}
-	}
-	return "miniconda2"
+	return "miniconda3"
 }
 
 func (c *Conda) Install(version string) error {

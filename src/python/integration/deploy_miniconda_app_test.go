@@ -13,33 +13,32 @@ import (
 
 var _ = Describe("CF Python Buildpack", func() {
 	var app *cutlass.App
+	var fixtureDir string
 
 	BeforeEach(func() {
 		if !isMinicondaTest {
 			Skip("Skipping miniconda tests")
 		}
+		var err error
+		fixtureDir, err = cutlass.CopyFixture(Fixtures("miniconda_python_3"))
+		Expect(err).ToNot(HaveOccurred())
+		app = cutlass.New(fixtureDir)
+		app.Disk = "2G"
+		app.Memory = "1G"
+		app.Buildpacks = []string{"python_buildpack"}
 	})
 
 	AfterEach(func() {
+		Expect(os.RemoveAll(fixtureDir)).To(Succeed())
+
 		if app != nil {
-			app.Destroy()
+			Expect(app.Destroy()).To(Succeed())
 		}
 		app = nil
+
 	})
 
 	Context("an app that uses miniconda and python 3", func() {
-		var fixtureDir string
-		BeforeEach(func() {
-			var err error
-			fixtureDir, err = cutlass.CopyFixture(Fixtures("miniconda_python_3"))
-			Expect(err).ToNot(HaveOccurred())
-			app = cutlass.New(fixtureDir)
-			app.Disk = "2G"
-			app.Memory = "1G"
-			app.Buildpacks = []string{"python_buildpack"}
-		})
-		AfterEach(func() { _ = os.RemoveAll(fixtureDir) })
-
 		It("keeps track of environment.yml", func() {
 			PushAppAndConfirm(app)
 
@@ -77,5 +76,22 @@ var _ = Describe("CF Python Buildpack", func() {
 		})
 
 		AssertUsesProxyDuringStagingIfPresent("miniconda_python_3")
+	})
+
+	Context("an app that has no runtime.txt", func() {
+		BeforeEach(func() {
+			Expect(os.RemoveAll(filepath.Join(fixtureDir, "runtime.txt"))).To(Succeed())
+		})
+
+		It("works as expected", func() {
+			PushAppAndConfirm(app)
+
+			Expect(app.Stdout.String()).To(ContainSubstring("numpy"))
+
+			body, err := app.GetBody("/")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(body).To(ContainSubstring("numpy: 1.15.2"))
+			Expect(body).To(ContainSubstring("python-version3"))
+		})
 	})
 })
