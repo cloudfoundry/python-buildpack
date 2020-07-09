@@ -257,10 +257,6 @@ func (s *Supplier) InstallPython() error {
 		versions := s.Manifest.AllDependencyVersions("python")
 		shortPythonVersion := strings.TrimLeft(s.PythonVersion, "python-")
 
-		if strings.Split(shortPythonVersion, ".")[0] != "3" {
-			return fmt.Errorf("%s is an unsupported python version, only python 3.x.x is supported", shortPythonVersion)
-		}
-
 		s.Log.Debug("***Version info: (%s) (%s)", s.PythonVersion, shortPythonVersion)
 		ver, err := libbuildpack.FindMatchingVersion(shortPythonVersion, versions)
 		if err != nil {

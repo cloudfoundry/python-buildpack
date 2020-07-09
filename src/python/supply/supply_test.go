@@ -128,22 +128,6 @@ var _ = Describe("Supply", func() {
 				Expect(os.Getenv("PYTHONPATH")).To(Equal(filepath.Join(depDir)))
 			})
 		})
-
-		Context("runtime.txt sets Python version 2", func() {
-			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(depDir, "runtime.txt"), []byte("\n\n\npython-2.4.2\n\n\n"), 0644)).To(Succeed())
-
-				versions = []string{"2.4.2"}
-			})
-
-			It("errors", func() {
-				mockManifest.EXPECT().AllDependencyVersions("python").Return(versions)
-
-				err := supplier.InstallPython()
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError(errors.New("2.4.2 is an unsupported python version, only python 3.x.x is supported")))
-			})
-		})
 	})
 
 	Describe("HandlePipfile", func() {

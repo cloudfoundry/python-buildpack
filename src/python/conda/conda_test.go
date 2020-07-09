@@ -2,7 +2,6 @@ package conda_test
 
 import (
 	"bytes"
-	"errors"
 	io "io"
 	"io/ioutil"
 	"os"
@@ -74,27 +73,12 @@ var _ = Describe("Conda", func() {
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "runtime.txt"), []byte("python-3.2.3"), 0644)).To(Succeed())
 			})
 			It("returns 'miniconda3'", func() {
-				version, err := subject.Version()
-				Expect(err).NotTo(HaveOccurred())
-				Expect(version).To(Equal("miniconda3"))
+				Expect(subject.Version()).To(Equal("miniconda3"))
 			})
 		})
 		Context("runtime.txt does not exist", func() {
 			It("returns 'miniconda3'", func() {
-				version, err := subject.Version()
-				Expect(err).NotTo(HaveOccurred())
-				Expect(version).To(Equal("miniconda3"))
-			})
-		})
-		Context("runtime.txt specifies python 2", func() {
-			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(buildDir, "runtime.txt"), []byte("python-2.2.3"), 0644)).To(Succeed())
-			})
-			It("errors", func() {
-				version, err := subject.Version()
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError(errors.New("Python 2 not supported")))
-				Expect(version).To(Equal(""))
+				Expect(subject.Version()).To(Equal("miniconda3"))
 			})
 		})
 	})

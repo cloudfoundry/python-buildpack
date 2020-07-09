@@ -51,12 +51,7 @@ func New(i Installer, s Stager, c Command, l *libbuildpack.Logger) *Conda {
 func Run(c *Conda) error {
 	c.Warning()
 
-	version, err := c.Version()
-	if err != nil {
-		return err
-	}
-
-	if err = c.Install(version); err != nil {
+	if err := c.Install(c.Version()); err != nil {
 		c.Log.Error("Could not install conda: %v", err)
 		return err
 	}
@@ -86,13 +81,8 @@ func Run(c *Conda) error {
 	return nil
 }
 
-func (c *Conda) Version() (string, error) {
-	if runtime, err := ioutil.ReadFile(filepath.Join(c.Stager.BuildDir(), "runtime.txt")); err == nil {
-		if strings.HasPrefix(string(runtime), "python-2") {
-			return "", fmt.Errorf("Python 2 not supported")
-		}
-	}
-	return "miniconda3", nil
+func (c *Conda) Version() string {
+	return "miniconda3"
 }
 
 func (c *Conda) Install(version string) error {

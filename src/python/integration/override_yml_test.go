@@ -1,6 +1,8 @@
 package integration_test
 
 import (
+	"os/exec"
+
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 
 	. "github.com/onsi/ginkgo"
@@ -40,11 +42,14 @@ var _ = Describe("override yml", func() {
 
 	It("Forces python from override buildpack", func() {
 		Expect(app.Push()).ToNot(Succeed())
-		Expect(app.Stdout.String()).To(ContainSubstring("-----> OverrideYML Buildpack"))
+		logs := exec.Command("cf", "logs", "--recent", app.Name)
+		stdoutStderr, err := logs.CombinedOutput()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(stdoutStderr).To(ContainSubstring("-----> OverrideYML Buildpack"))
 		Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 
-		Eventually(app.Stdout.String).Should(ContainSubstring("-----> Installing python"))
-		Eventually(app.Stdout.String).Should(MatchRegexp("Copy .*/python.tgz"))
-		Eventually(app.Stdout.String).Should(ContainSubstring("Could not install python: dependency sha256 mismatch: expected sha256 062d906c87839d03b243e2821e10653c89b4c92878bfe2bf995dec231e117bfc, actual sha256 b56b58ac21f9f42d032e1e4b8bf8b8823e69af5411caa15aee2b140bc756962f"))
+		Eventually(stdoutStderr).Should(ContainSubstring("-----> Installing python"))
+		Eventually(stdoutStderr).Should(MatchRegexp("Copy .*/python.tgz"))
+		Eventually(stdoutStderr).Should(ContainSubstring("Could not install python: dependency sha256 mismatch: expected sha256 062d906c87839d03b243e2821e10653c89b4c92878bfe2bf995dec231e117bfc, actual sha256 b56b58ac21f9f42d032e1e4b8bf8b8823e69af5411caa15aee2b140bc756962f"))
 	})
 })
