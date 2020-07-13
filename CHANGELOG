@@ -1,3 +1,22 @@
+v1.7.16 Jul 13, 2020
+=====================
+
+* defaults to miniconda3
+  - also fails fast if python2 is specified as the version
+  [finishes https://github.com/cloudfoundry/python-buildpack/issues/164]
+
+* Add setuptools 49.1.0, remove setuptools 47.1.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/173646517)
+
+* Add python 3.7.8, remove python 3.7.6
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/173549567)
+
+* Add python 3.6.11, remove python 3.6.9
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/173546172)
+
 v1.7.15 Jun 09, 2020
 =====================
 
