@@ -114,14 +114,6 @@ dependencies:
   source: https://www.python.org/ftp/python/3.7.8/Python-3.7.8.tgz
   source_sha256: 0e25835614dc221e3ecea5831b38fa90788b5389b99b675a751414c858789ab0
 - name: python
-  version: 3.8.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python-3.8.2-linux-x64-cflinuxfs3-580151dd.tgz
-  sha256: 580151dd49bee64fef5dda285a7e7308770d23523a0628580954bdfb3c7ba7df
-  cf_stacks:
-  - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tgz
-  source_sha256: e634a7a74776c2b89516b2e013dda1728c89c8149b9863b8cea21946daf9d561
-- name: python
   version: 3.8.3
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.8.3_linux_x64_cflinuxfs3_b4dbe926.tgz
   sha256: b4dbe9269f76d37f0ddc8315443e145b1aa9103a64218339d9fcbd3733304e5d
@@ -129,6 +121,14 @@ dependencies:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tgz
   source_sha256: 6af6d4d2e010f9655518d0fc6738c7ff7069f10a4d2fbd55509e467f092a8b90
+- name: python
+  version: 3.8.4
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.8.4_linux_x64_cflinuxfs3_de6ad7bf.tgz
+  sha256: de6ad7bf59f0e92513aa69f9c884fa18f7801867f48f2daa8f6552099f833e13
+  cf_stacks:
+  - cflinuxfs3
+  source: https://www.python.org/ftp/python/3.8.4/Python-3.8.4.tgz
+  source_sha256: 32c4d9817ef11793da4d0d95b3191c4db81d2e45544614e8449255ca9ae3cc18
 - name: setuptools
   version: 49.2.0
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_49.2.0_linux_noarch_any-stack_adaa03d5.zip
