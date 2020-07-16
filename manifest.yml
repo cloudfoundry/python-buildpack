@@ -50,13 +50,13 @@ dependencies:
   source: https://github.com/conda/conda/archive/4.7.12.1.tar.gz
   source_sha256: bfe34e1fa28d6d75a7ad05fd02fa5472275673d5f5621b77380898dee1be15d2
 - name: pip-pop
-  version: 0.1.4
+  version: 0.1.5
   cf_stacks:
   - cflinuxfs3
-  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip-pop/pip-pop-0.1.4-0a3b0f1b.tar.gz
-  sha256: 0a3b0f1b65fa13d63f5d2c32556ef92fae91c3eea16fe1ccc643e3d767d9da08
-  source: https://github.com/cloudfoundry/pip-pop/archive/v0.1.4.tar.gz
-  source_sha256: b75a582d87dfb9e48b1b396bfcfefcf31a18d0aa1b45c75c7f3b720c93605610
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip-pop/pip-pop-0.1.5-b32efe86.tar.gz
+  sha256: b32efe865fc6d956e3345690215bc92a7038acf728db228243097b254403048f
+  source: https://github.com/cloudfoundry/pip-pop/archive/v0.1.5.tar.gz
+  source_sha256: 879221acbf123fb24e4a91b3d02e400031f89799bb70316fd97f36d2307a8230
 - name: pipenv
   version: 2020.6.2
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.6.2_linux_noarch_cflinuxfs3_f07d3559.tgz
