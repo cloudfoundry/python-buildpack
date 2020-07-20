@@ -122,13 +122,13 @@ dependencies:
   source: https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tgz
   source_sha256: 6af6d4d2e010f9655518d0fc6738c7ff7069f10a4d2fbd55509e467f092a8b90
 - name: python
-  version: 3.8.4
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.8.4_linux_x64_cflinuxfs3_de6ad7bf.tgz
-  sha256: de6ad7bf59f0e92513aa69f9c884fa18f7801867f48f2daa8f6552099f833e13
+  version: 3.8.5
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.8.5_linux_x64_cflinuxfs3_08613f97.tgz
+  sha256: '08613f978823470ce6b51f284c04bdf7af4b395153dcc49f288e5f6a1bbb75e2'
   cf_stacks:
   - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.8.4/Python-3.8.4.tgz
-  source_sha256: 32c4d9817ef11793da4d0d95b3191c4db81d2e45544614e8449255ca9ae3cc18
+  source: https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz
+  source_sha256: 015115023c382eb6ab83d512762fe3c5502fa0c6c52ffebc4831c4e1a06ffc49
 - name: setuptools
   version: 49.2.0
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_49.2.0_linux_noarch_any-stack_adaa03d5.zip
