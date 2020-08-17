@@ -1,3 +1,17 @@
+v1.7.19 Aug 17, 2020
+=====================
+
+* Add setuptools 49.6.0, remove setuptools 49.3.1
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/174332050)
+  (https://www.pivotaltracker.com/story/show/174330884)
+  (https://www.pivotaltracker.com/story/show/174307075)
+
+* Add pipenv 2020.8.13, remove pipenv 2020.6.2
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/174318239)
+
+
 v1.7.18 Aug 11, 2020
 =====================
 
