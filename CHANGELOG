@@ -1,3 +1,15 @@
+v1.7.20 Aug 24, 2020
+=====================
+
+* Add python 3.6.12, remove python 3.6.10
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/174372430)
+
+* Add python 3.7.9, remove python 3.7.7
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/174372278)
+
+
 v1.7.19 Aug 17, 2020
 =====================
 
