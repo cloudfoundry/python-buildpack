@@ -11,7 +11,7 @@ MarkupSafe = "==0.21"
 Werkzeug = "==0.10.4"
 
 [requires]
-python_version='3.5'
+python_version='3.6'
 
 [dev-packages]
 tox = "*"

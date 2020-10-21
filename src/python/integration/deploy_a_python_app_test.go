@@ -144,7 +144,7 @@ var _ = Describe("CF Python Buildpack", func() {
 				It("deploys", func() {
 					PushAppAndConfirm(app)
 					Expect(app.GetBody("/")).To(ContainSubstring("It worked!"))
-					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.5"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.6"))
 					Expect(app.Stdout.String()).To(ContainSubstring("collectstatic --noinput"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Copying "))
