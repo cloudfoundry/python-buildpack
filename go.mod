@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.10.3
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
+	golang.org/x/sys v0.0.0-20201112073958-5cba982894dd // indirect
 	gopkg.in/ini.v1 v1.50.0
 )
 
