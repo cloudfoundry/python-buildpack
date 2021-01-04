@@ -421,6 +421,8 @@ func pipfileToRequirements(lockFilePath string) (string, error) {
 			}
 		} `json:"_meta"`
 		Default map[string]struct {
+			Extras  string
+			File    string
 			Version string
 		}
 	}
@@ -442,7 +444,15 @@ func pipfileToRequirements(lockFilePath string) (string, error) {
 	}
 
 	for pkg, obj := range lockFile.Default {
-		fmt.Fprintf(buf, "%s%s\n", pkg, obj.Version)
+		if obj.File != "" {
+			if obj.Extras != "" {
+				fmt.Fprintf(buf, "%s#egg=%s[%s]\n", obj.File, pkg, obj.Extras)
+			} else {
+				fmt.Fprintf(buf, "%s#egg=%s\n", obj.File, pkg)
+			}
+		} else {
+			fmt.Fprintf(buf, "%s%s\n", pkg, obj.Version)
+		}
 	}
 
 	return buf.String(), nil
