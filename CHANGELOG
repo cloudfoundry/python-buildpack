@@ -1,3 +1,15 @@
+v1.7.28 Jan 05, 2021
+=====================
+
+* Add setuptools 51.1.1, remove setuptools 51.0.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/176304538)
+
+* Add python 3.8.7, remove python 3.8.5
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/176249602)
+
+
 v1.7.27 Dec 14, 2020
 =====================
 
