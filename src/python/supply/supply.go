@@ -437,8 +437,12 @@ func pipfileToRequirements(lockFilePath string) (string, error) {
 
 	buf := &bytes.Buffer{}
 
-	for _, source := range lockFile.Meta.Sources {
-		fmt.Fprintf(buf, "-i %s\n", source.URL)
+	for i, source := range lockFile.Meta.Sources {
+		if i == 0 {
+			fmt.Fprintf(buf, "-i %s\n", source.URL)
+		} else {
+			fmt.Fprintf(buf, "--extra-index-url %s\n", source.URL)
+		}
 	}
 
 	for pkg, obj := range lockFile.Default {

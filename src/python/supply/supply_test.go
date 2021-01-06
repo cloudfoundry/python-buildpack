@@ -211,7 +211,7 @@ var _ = Describe("Supply", func() {
 
 		Context("when Pipfile.lock exists but requirements.txt does not exist", func() {
 			BeforeEach(func() {
-				const lockFileContnet string = `{"_meta":{"sources":[{"url":"https://pypi.org/simple"}]},"default":{"test":{"version":"==1.2.3"}}}`
+				const lockFileContnet string = `{"_meta":{"sources":[{"url":"https://pypi.org/simple"},{"url":"https://pypi.example.org/simple"}]},"default":{"test":{"version":"==1.2.3"}}}`
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(lockFileContnet), 0644)).To(Succeed())
 			})
@@ -222,6 +222,7 @@ var _ = Describe("Supply", func() {
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(requirementsContents).To(ContainSubstring("-i https://pypi.org/simple"))
+				Expect(requirementsContents).To(ContainSubstring("--extra-index-url https://pypi.example.org/simple"))
 				Expect(requirementsContents).To(ContainSubstring("test==1.2.3"))
 			})
 		})
