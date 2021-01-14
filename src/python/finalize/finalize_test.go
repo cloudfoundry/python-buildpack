@@ -92,26 +92,38 @@ var _ = Describe("Finalize", func() {
 				os.Setenv("DISABLE_COLLECTSTATIC", "")
 			})
 			Context("app uses Django", func() {
-				BeforeEach(func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(nil)
-					mockManagePyFinder.EXPECT().FindManagePy(buildDir).Return("/foo/bar/manage.py", nil)
+				Context("specified in Pipfile", func() {
+					It("runs collectstatic with the most top-level manage.py", func() {
+						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(fmt.Errorf("Not found"))
+						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "Pipfile", "django", "Django").Return(nil)
+						mockManagePyFinder.EXPECT().FindManagePy(buildDir).Return("/foo/bar/manage.py", nil)
+						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "/foo/bar/manage.py", "collectstatic", "--noinput", "--traceback").Return(nil)
+						Expect(finalizer.HandleCollectstatic()).To(Succeed())
+					})
 				})
 
-				It("runs collectstatic with the most top-level manage.py", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "/foo/bar/manage.py", "collectstatic", "--noinput", "--traceback").Return(nil)
-					Expect(finalizer.HandleCollectstatic()).To(Succeed())
-				})
+				Context("specified in requirements.txt", func() {
+					BeforeEach(func() {
+						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(nil)
+						mockManagePyFinder.EXPECT().FindManagePy(buildDir).Return("/foo/bar/manage.py", nil)
+					})
 
-				Context("when collectstatic fails", func() {
-					It("prints an error", func() {
-						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "/foo/bar/manage.py", "collectstatic", "--noinput", "--traceback").Return(fmt.Errorf("oh no it failed"))
-						Expect(finalizer.HandleCollectstatic()).NotTo(Succeed())
-						Expect(buffer.String()).To(ContainSubstring(` !     Error while running '$ python /foo/bar/manage.py collectstatic --noinput'.`))
-						Expect(buffer.String()).To(ContainSubstring(`     See traceback above for details.`))
-						Expect(buffer.String()).To(ContainSubstring(`      You may need to update application code to resolve this error.`))
-						Expect(buffer.String()).To(ContainSubstring(`      Or, you can disable collectstatic for this application:`))
-						Expect(buffer.String()).To(ContainSubstring(`         $ cf set-env <app> DISABLE_COLLECTSTATIC 1`))
-						Expect(buffer.String()).To(ContainSubstring(`      https://devcenter.heroku.com/articles/django-assets`))
+					It("runs collectstatic with the most top-level manage.py", func() {
+						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "/foo/bar/manage.py", "collectstatic", "--noinput", "--traceback").Return(nil)
+						Expect(finalizer.HandleCollectstatic()).To(Succeed())
+					})
+
+					Context("when collectstatic fails", func() {
+						It("prints an error", func() {
+							mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "/foo/bar/manage.py", "collectstatic", "--noinput", "--traceback").Return(fmt.Errorf("oh no it failed"))
+							Expect(finalizer.HandleCollectstatic()).NotTo(Succeed())
+							Expect(buffer.String()).To(ContainSubstring(` !     Error while running '$ python /foo/bar/manage.py collectstatic --noinput'.`))
+							Expect(buffer.String()).To(ContainSubstring(`     See traceback above for details.`))
+							Expect(buffer.String()).To(ContainSubstring(`      You may need to update application code to resolve this error.`))
+							Expect(buffer.String()).To(ContainSubstring(`      Or, you can disable collectstatic for this application:`))
+							Expect(buffer.String()).To(ContainSubstring(`         $ cf set-env <app> DISABLE_COLLECTSTATIC 1`))
+							Expect(buffer.String()).To(ContainSubstring(`      https://devcenter.heroku.com/articles/django-assets`))
+						})
 					})
 				})
 			})
@@ -119,6 +131,7 @@ var _ = Describe("Finalize", func() {
 			Context("app does not use Django", func() {
 				BeforeEach(func() {
 					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(fmt.Errorf("Not found"))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "Pipfile", "django", "Django").Return(fmt.Errorf("Not found"))
 				})
 
 				It("does not run anything", func() {
