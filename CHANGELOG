@@ -1,3 +1,13 @@
+v1.7.29 Jan 26, 2021
+=====================
+
+* Add setuptools 52.0.0, remove setuptools 51.1.1
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/176625307)
+
+* support multiple sources in pipfile.lock
+
+
 v1.7.28 Jan 05, 2021
 =====================
 
