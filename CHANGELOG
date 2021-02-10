@@ -1,3 +1,13 @@
+v1.7.30 Feb 10, 2021
+=====================
+
+* Adds --disable-pip-version-check to installArgs to remove warning text
+
+* Add setuptools 53.0.0, remove setuptools 52.0.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/176746028)
+
+
 v1.7.29 Jan 26, 2021
 =====================
 
