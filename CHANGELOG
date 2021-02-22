@@ -1,3 +1,23 @@
+v1.7.31 Feb 22, 2021
+=====================
+
+* Add python 3.9.2, remove python 3.9.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/177017557)
+
+* Add python 3.8.8, remove python 3.8.6
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/177017594)
+
+* Add python 3.6.13, remove python 3.6.11
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/176955623)
+
+* Add python 3.7.10, remove python 3.7.8
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/176955488)
+
+
 v1.7.30 Feb 10, 2021
 =====================
 
