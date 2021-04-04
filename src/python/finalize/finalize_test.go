@@ -95,7 +95,7 @@ var _ = Describe("Finalize", func() {
 				Context("specified in Pipfile", func() {
 					It("runs collectstatic with the most top-level manage.py", func() {
 						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(fmt.Errorf("Not found"))
-						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "Pipfile", "django", "Django").Return(nil)
+						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "grep", "-i", "Django", "-q", "-S", "Pipfile").Return(nil)
 						mockManagePyFinder.EXPECT().FindManagePy(buildDir).Return("/foo/bar/manage.py", nil)
 						mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "/foo/bar/manage.py", "collectstatic", "--noinput", "--traceback").Return(nil)
 						Expect(finalizer.HandleCollectstatic()).To(Succeed())
@@ -131,7 +131,7 @@ var _ = Describe("Finalize", func() {
 			Context("app does not use Django", func() {
 				BeforeEach(func() {
 					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(fmt.Errorf("Not found"))
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "Pipfile", "django", "Django").Return(fmt.Errorf("Not found"))
+                    mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "grep", "-i", "Django", "-q", "-S", "Pipfile").Return(fmt.Errorf("Not found"))
 				})
 
 				It("does not run anything", func() {

@@ -98,7 +98,7 @@ func (f *Finalizer) HandleCollectstatic() error {
 
 func hasDjangoAsDependency(f *Finalizer) error {
 	if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stderr, "pip-grep", "-s", "requirements.txt", "django", "Django"); err != nil {
-		return f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stderr, "pip-grep", "-s", "Pipfile", "django", "Django")
+		return f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stderr, "grep", "-i", "Django", "-q", "-S", "Pipfile")
 	}
 
 	return nil
