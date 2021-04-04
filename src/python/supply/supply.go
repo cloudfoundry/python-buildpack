@@ -437,8 +437,12 @@ func pipfileToRequirements(lockFilePath string) (string, error) {
 
 	buf := &bytes.Buffer{}
 
-	for _, source := range lockFile.Meta.Sources {
-		fmt.Fprintf(buf, "-i %s\n", source.URL)
+	for i, source := range lockFile.Meta.Sources {
+		if i == 0 {
+			fmt.Fprintf(buf, "-i %s\n", source.URL)
+		} else {
+			fmt.Fprintf(buf, "--extra-index-url %s\n", source.URL)
+		}
 	}
 
 	for pkg, obj := range lockFile.Default {
@@ -610,7 +614,7 @@ func (s *Supplier) RunPipUnvendored() error {
 		return err
 	}
 
-	installArgs := []string{"-m", "pip", "install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src")}
+	installArgs := []string{"-m", "pip", "install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src"), "--disable-pip-version-check"}
 	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
 		return fmt.Errorf("could not run pip: %v", err)
 	}
@@ -645,6 +649,7 @@ func (s *Supplier) RunPipVendored() error {
 		"--src=" + filepath.Join(s.Stager.DepDir(), "src"),
 		"--no-index",
 		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"),
+		"--disable-pip-version-check",
 	}
 
 	if s.hasBuildOptions() {

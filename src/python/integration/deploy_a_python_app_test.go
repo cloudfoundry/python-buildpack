@@ -201,6 +201,7 @@ var _ = Describe("CF Python Buildpack", func() {
 					Expect(app.GetBody("/")).To(ContainSubstring("The install worked successfully!"))
 					Expect(app.Stdout.String()).To(ContainSubstring("collectstatic --noinput"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
+					Eventually(app.Stdout.String()).ShouldNot(MatchRegexp(`WARNING: You are using pip version \d+.\d+.\d+; however, version \d+.\d+.\d+ is available.`))
 				})
 			})
 

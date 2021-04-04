@@ -211,7 +211,7 @@ var _ = Describe("Supply", func() {
 
 		Context("when Pipfile.lock exists but requirements.txt does not exist", func() {
 			BeforeEach(func() {
-				const lockFileContnet string = `{"_meta":{"sources":[{"url":"https://pypi.org/simple"}]},"default":{"test":{"version":"==1.2.3"}}}`
+				const lockFileContnet string = `{"_meta":{"sources":[{"url":"https://pypi.org/simple"},{"url":"https://pypi.example.org/simple"}]},"default":{"test":{"version":"==1.2.3"}}}`
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(lockFileContnet), 0644)).To(Succeed())
 			})
@@ -222,6 +222,7 @@ var _ = Describe("Supply", func() {
 				requirementsContents, err := ioutil.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(requirementsContents).To(ContainSubstring("-i https://pypi.org/simple"))
+				Expect(requirementsContents).To(ContainSubstring("--extra-index-url https://pypi.example.org/simple"))
 				Expect(requirementsContents).To(ContainSubstring("test==1.2.3"))
 			})
 		})
@@ -517,7 +518,7 @@ cffi==0.9.2
 			})
 
 			It("Runs and outputs pip", func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--disable-pip-version-check")
 				Expect(supplier.RunPipUnvendored()).To(Succeed())
 			})
 		})
@@ -525,7 +526,7 @@ cffi==0.9.2
 		Context("requirements.txt exists in dep dir and pip install fails", func() {
 			BeforeEach(func() {
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--disable-pip-version-check").Return(fmt.Errorf("exit 28"))
 			})
 
 			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
@@ -559,7 +560,7 @@ MarkupSafe==0.21
 			})
 
 			It("check index_url, find_links, allow_hosts values", func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--disable-pip-version-check")
 				Expect(supplier.RunPipUnvendored()).To(Succeed())
 				filePath := filepath.Join(os.Getenv("HOME"), ".pydistutils.cfg")
 				fileContents, err := ioutil.ReadFile(filePath)
@@ -590,7 +591,7 @@ MarkupSafe==0.21
 
 			It("installs the vendor directory", func() {
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "--no-build-isolation", "-h").Return(nil)
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--no-build-isolation")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", "--no-build-isolation")
 				Expect(supplier.RunPipVendored()).To(Succeed())
 			})
 		})
@@ -600,8 +601,8 @@ MarkupSafe==0.21
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
 				Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "--no-build-isolation", "-h").Return(nil)
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--no-build-isolation").Return(fmt.Errorf("exit 28"))
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir)).Return(fmt.Errorf("exit 28"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", "--no-build-isolation").Return(fmt.Errorf("exit 28"))
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--disable-pip-version-check").Return(fmt.Errorf("exit 28"))
 			})
 
 			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
