@@ -1,5 +1,6 @@
+-i https://pypi.python.org/simple/
 flask==0.10.1
-gunicorn==19.3.0
+gunicorn==19.5.0
 itsdangerous==0.24
 jinja2==2.7.2
 markupsafe==0.21
