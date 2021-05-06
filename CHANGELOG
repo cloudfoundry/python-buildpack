@@ -1,3 +1,21 @@
+v1.7.38 May 06, 2021
+=====================
+
+* Add setuptools 56.1.0, remove setuptools 56.0.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/178029689)
+
+* Add python 3.9.5, remove python 3.9.2
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/178010679)
+
+* Add python 3.8.10, remove python 3.8.8
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/178005144)
+
+* Update libbuildpack
+
+
 v1.7.37 Apr 16, 2021
 =====================
 
