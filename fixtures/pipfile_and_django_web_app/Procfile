@@ -1,0 +1,1 @@
+web: gunicorn --bind="0.0.0.0:$PORT" --workers=4 --access-logfile - django_web_app.wsgi:application
