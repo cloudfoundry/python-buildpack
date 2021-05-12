@@ -1,3 +1,11 @@
+v1.7.39 May 12, 2021
+=====================
+
+* Add setuptools 56.2.0, remove setuptools 56.1.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/178085536)
+
+
 v1.7.38 May 06, 2021
 =====================
 
