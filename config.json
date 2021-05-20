@@ -1,0 +1,7 @@
+{
+  "stack": "cflinuxfs3",
+  "oses": [
+    "linux",
+    "windows"
+  ]
+}

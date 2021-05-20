@@ -7,16 +7,13 @@ set -o pipefail
 ROOTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly ROOTDIR
 
-source "${ROOTDIR}/.envrc"
+# shellcheck source=SCRIPTDIR/.util/tools.sh
+source "${ROOTDIR}/scripts/.util/tools.sh"
 
 function main() {
-  pushd "${ROOTDIR}" > /dev/null || return
-    go get -u github.com/onsi/ginkgo/ginkgo
-
-    if [[ ! -f "${ROOTDIR}/.bin/buildpack-packager" ]]; then
-      go install github.com/cloudfoundry/libbuildpack/packager/buildpack-packager
-    fi
-  popd > /dev/null || return
+  util::tools::ginkgo::install --directory "${ROOTDIR}/.bin"
+  util::tools::buildpack-packager::install --directory "${ROOTDIR}/.bin"
+  util::tools::jq::install --directory "${ROOTDIR}/.bin"
 }
 
 main "${@:-}"

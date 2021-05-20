@@ -7,7 +7,8 @@ set -o pipefail
 ROOTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly ROOTDIR
 
-source "${ROOTDIR}/.envrc"
+# shellcheck source=SCRIPTDIR/.util/tools.sh
+source "${ROOTDIR}/scripts/.util/tools.sh"
 
 function main() {
   local src
@@ -18,10 +19,15 @@ function main() {
     exit 0
   fi
 
-  "${ROOTDIR}/scripts/install_tools.sh"
+  util::tools::ginkgo::install --directory "${ROOTDIR}/.bin"
+  util::tools::buildpack-packager::install --directory "${ROOTDIR}/.bin"
+  util::tools::jq::install --directory "${ROOTDIR}/.bin"
+
+  local stack
+  stack="$(jq -r -S .stack "${ROOTDIR}/config.json")"
 
   echo "Run Buildpack Runtime Acceptance Tests"
-  CF_STACK="${CF_STACK:-cflinuxfs3}" \
+  CF_STACK="${CF_STACK:-"${stack}"}" \
     ginkgo \
       -r \
       -mod vendor \
