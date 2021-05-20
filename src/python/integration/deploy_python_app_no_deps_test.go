@@ -9,12 +9,6 @@ import (
 var _ = Describe("deploying a web app without dependencies", func() {
 	var app *cutlass.App
 
-	BeforeEach(func() {
-		if isMinicondaTest {
-			Skip("Skipping non-miniconda tests")
-		}
-	})
-
 	AfterEach(func() {
 		if app != nil {
 			app.Destroy()

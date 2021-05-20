@@ -18,10 +18,6 @@ var _ = Describe("override yml", func() {
 			Skip("Multi buildpack support is required")
 		}
 
-		if isMinicondaTest {
-			Skip("Skipping non-miniconda tests")
-		}
-
 		buildpackName = "override_yml_" + cutlass.RandStringRunes(5)
 		Expect(cutlass.CreateOrUpdateBuildpack(buildpackName, Fixtures("overrideyml_bp"), "")).To(Succeed())
 

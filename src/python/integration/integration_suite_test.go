@@ -21,7 +21,6 @@ import (
 
 var bpDir string
 var buildpackVersion string
-var isMinicondaTest bool
 var packagedBuildpack cutlass.VersionedBuildpackPackage
 
 var _ = func() bool {
@@ -30,7 +29,6 @@ var _ = func() bool {
 }()
 
 func init() {
-	flag.BoolVar(&isMinicondaTest, "miniconda", false, "run just miniconda tests")
 	flag.StringVar(&buildpackVersion, "version", "", "version to use (builds if empty)")
 	flag.BoolVar(&cutlass.Cached, "cached", true, "cached buildpack")
 	flag.StringVar(&cutlass.DefaultMemory, "memory", "128M", "default memory for pushed apps")

@@ -19,9 +19,6 @@ var _ = Describe("appdynamics", func() {
 	)
 
 	BeforeEach(func() {
-		if isMinicondaTest {
-			Skip("Skipping non-miniconda tests")
-		}
 		serviceOffering = "appdynamics-" + cutlass.RandStringRunes(20)
 		serviceName = "appdynamics-" + cutlass.RandStringRunes(20)
 
