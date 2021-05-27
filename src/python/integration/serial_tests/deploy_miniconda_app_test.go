@@ -1,4 +1,4 @@
-package integration_test
+package serial_integration_test
 
 import (
 	"io/ioutil"
