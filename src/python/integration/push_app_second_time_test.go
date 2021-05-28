@@ -15,6 +15,10 @@ var _ = Describe("pushing an app a second time", func() {
 			Skip("but running cached tests")
 		}
 
+		if isSerialTest {
+			Skip("Skipping parallel tests")
+		}
+
 		app = cutlass.New(Fixtures("no_deps"))
 		app.Buildpacks = []string{"python_buildpack"}
 	})

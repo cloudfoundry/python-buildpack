@@ -16,6 +16,10 @@ var _ = Describe("CF Python Buildpack", func() {
 	var fixtureDir string
 
 	BeforeEach(func() {
+		if !isSerialTest {
+			Skip("Skipping serial tests")
+		}
+
 		var err error
 		fixtureDir, err = cutlass.CopyFixture(Fixtures("miniconda_python_3"))
 		Expect(err).ToNot(HaveOccurred())

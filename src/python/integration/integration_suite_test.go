@@ -21,6 +21,7 @@ import (
 
 var bpDir string
 var buildpackVersion string
+var isSerialTest bool
 var packagedBuildpack cutlass.VersionedBuildpackPackage
 
 var _ = func() bool {
@@ -31,6 +32,7 @@ var _ = func() bool {
 func init() {
 	flag.StringVar(&buildpackVersion, "version", "", "version to use (builds if empty)")
 	flag.BoolVar(&cutlass.Cached, "cached", true, "cached buildpack")
+	flag.BoolVar(&isSerialTest, "serial", false, "run just serial tests")
 	flag.StringVar(&cutlass.DefaultMemory, "memory", "128M", "default memory for pushed apps")
 	flag.StringVar(&cutlass.DefaultDisk, "disk", "384M", "default disk for pushed apps")
 	flag.Parse()

@@ -18,6 +18,10 @@ var _ = Describe("override yml", func() {
 			Skip("Multi buildpack support is required")
 		}
 
+		if isSerialTest {
+			Skip("Skipping parallel tests")
+		}
+
 		buildpackName = "override_yml_" + cutlass.RandStringRunes(5)
 		Expect(cutlass.CreateOrUpdateBuildpack(buildpackName, Fixtures("overrideyml_bp"), "")).To(Succeed())
 

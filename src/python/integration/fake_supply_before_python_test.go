@@ -12,6 +12,12 @@ import (
 var _ = Describe("running supply buildpacks before the python buildpack", func() {
 	var app *cutlass.App
 
+	BeforeEach(func() {
+		if isSerialTest {
+			Skip("Skipping parallel tests")
+		}
+	})
+
 	AfterEach(func() {
 		if app != nil {
 			app.Destroy()

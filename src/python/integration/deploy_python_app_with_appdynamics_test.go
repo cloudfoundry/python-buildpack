@@ -19,6 +19,10 @@ var _ = Describe("appdynamics", func() {
 	)
 
 	BeforeEach(func() {
+		if isSerialTest {
+			Skip("Skipping parallel tests")
+		}
+
 		serviceOffering = "appdynamics-" + cutlass.RandStringRunes(20)
 		serviceName = "appdynamics-" + cutlass.RandStringRunes(20)
 
