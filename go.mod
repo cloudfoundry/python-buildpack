@@ -9,7 +9,7 @@ require (
 	github.com/golang/mock v1.5.0
 	github.com/kr/text v0.2.0
 	github.com/onsi/ginkgo v1.16.2
-	github.com/onsi/gomega v1.12.0
+	github.com/onsi/gomega v1.13.0
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
 	golang.org/x/sys v0.0.0-20210514084401-e8d321eab015 // indirect
 	gopkg.in/ini.v1 v1.51.0
