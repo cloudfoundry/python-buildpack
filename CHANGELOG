@@ -1,3 +1,10 @@
+v1.7.41 Jun 03, 2021
+=====================
+
+* Add pipenv 2021.5.29, remove pipenv 2020.11.15
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/178340332)
+
 v1.7.40 May 28, 2021
 =====================
 
