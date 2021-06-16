@@ -97,7 +97,7 @@ var _ = Describe("Conda", func() {
 			mockInstaller.EXPECT().InstallOnlyVersion("Miniconda7", gomock.Any()).Do(func(_, path string) {
 				Expect(ioutil.WriteFile(path, []byte{}, 0644)).To(Succeed())
 			})
-			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), gomock.Any(), "-b", "-p", filepath.Join(depDir, "conda")).Do(func(_ string, _, _ io.Writer, path, _, _, _ string) {
+			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), gomock.Any(), "-b", "-p", filepath.Join(depDir, "conda")).Do(func(_ string, _, _ io.Writer, path string, _ ...string) {
 				fi, err := os.Lstat(path)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(fi.Mode()).To(Equal(os.FileMode(0755)))
@@ -112,7 +112,7 @@ var _ = Describe("Conda", func() {
 				Expect(ioutil.WriteFile(path, []byte{}, 0644)).To(Succeed())
 				installerPath = path
 			})
-			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), gomock.Any(), "-b", "-p", filepath.Join(depDir, "conda")).Do(func(_ string, _, _ io.Writer, path, _, _, _ string) {
+			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), gomock.Any(), "-b", "-p", filepath.Join(depDir, "conda")).Do(func(_ string, _, _ io.Writer, path string, _ ...string) {
 				Expect(path).To(Equal(installerPath))
 			})
 
