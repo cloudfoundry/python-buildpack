@@ -39,6 +39,7 @@ var _ = Describe("appdynamics", func() {
 		Expect(RunCf("create-service", serviceOffering, "public", serviceName)).To(Succeed())
 
 		app = cutlass.New(Fixtures("with_appdynamics"))
+		app.Disk = "1G"
 		app.SetEnv("BP_DEBUG", "true")
 		PushAppAndConfirm(app)
 	})

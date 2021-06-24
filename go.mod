@@ -12,6 +12,7 @@ require (
 	github.com/onsi/gomega v1.13.0
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
+	golang.org/x/tools v0.1.4 // indirect
 	gopkg.in/ini.v1 v1.51.0
 )
 
