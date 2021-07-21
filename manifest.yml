@@ -45,6 +45,14 @@ dependencies:
   - cflinuxfs3
   source: https://github.com/conda/conda/archive/4.9.2.tar.gz
   source_sha256: d7f946e5c770e45da8961323ca96399bf1a881eb68bbaecc7cb1e249f5c86d54
+- name: miniconda38
+  version: 4.10.3
+  uri: https://repo.continuum.io/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh
+  sha256: 935d72deb16e42739d69644977290395561b7a6db059b316958d97939e9bdf3d
+  cf_stacks:
+  - cflinuxfs3
+  source: https://github.com/conda/conda/archive/4.10.3.tar.gz
+  source_sha256: 935d72deb16e42739d69644977290395561b7a6db059b316958d97939e9bdf3d
 - name: pip-pop
   version: 0.1.5
   cf_stacks:
