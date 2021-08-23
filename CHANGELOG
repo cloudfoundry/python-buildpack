@@ -1,3 +1,15 @@
+v1.7.45 Aug 23, 2021
+=====================
+
+* Add miniconda37 4.10.3
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/178964840)
+
+* Add miniconda38 4.10.3
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/178964620)
+
+
 v1.7.44 Jul 20, 2021
 =====================
 
