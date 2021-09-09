@@ -24,6 +24,7 @@ var buildpackVersion string
 var isSerialTest bool
 var packagedBuildpack cutlass.VersionedBuildpackPackage
 var token string
+var platform string
 
 var _ = func() bool {
 	testing.Init()
@@ -37,6 +38,7 @@ func init() {
 	flag.StringVar(&cutlass.DefaultMemory, "memory", "128M", "default memory for pushed apps")
 	flag.StringVar(&cutlass.DefaultDisk, "disk", "384M", "default disk for pushed apps")
 	flag.StringVar(&token, "github-token", "", "use the token to make GitHub API requests")
+	flag.StringVar(&platform, "platform", "cf", "platform to run tests against")
 	flag.Parse()
 }
 
