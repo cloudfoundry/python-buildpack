@@ -278,4 +278,33 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 		Eventually(app.Stdout.String).Should(MatchRegexp(`\[APP/PROC/WEB/0\] .* "GET / HTTP/1.1"`))
 	})
+
+	Context("specifying pip version", func() {
+		Context("default", func() {
+			BeforeEach(func() {
+				app = cutlass.New(Fixtures("flask"))
+				app.SetEnv("BP_PIP_VERSION", "")
+			})
+
+			It("uses python's pip module", func() {
+				PushAppAndConfirm(app)
+				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+				Expect(app.Stdout.String()).To(ContainSubstring("Using python's pip module"))
+			})
+		})
+
+		Context("latest", func() {
+			BeforeEach(func() {
+				app = cutlass.New(Fixtures("flask"))
+				app.SetEnv("BP_PIP_VERSION", "latest")
+			})
+
+			It("uses latest from manifest", func() {
+				PushAppAndConfirm(app)
+				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
+				Expect(app.Stdout.String()).To(ContainSubstring("Installing pip"))
+				Expect(app.Stdout.String()).To(MatchRegexp(`Successfully installed pip-\d+.\d+.\d+`))
+			})
+		})
+	})
 })
