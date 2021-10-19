@@ -303,7 +303,7 @@ var _ = Describe("CF Python Buildpack", func() {
 				PushAppAndConfirm(app)
 				Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
 				Expect(app.Stdout.String()).To(ContainSubstring("Installing pip"))
-				Expect(app.Stdout.String()).To(MatchRegexp(`Successfully installed pip-\d+.\d+.\d+`))
+				Expect(app.Stdout.String()).To(MatchRegexp(`Successfully installed pip-\d+.\d+(.\d+)?`))
 			})
 		})
 	})
