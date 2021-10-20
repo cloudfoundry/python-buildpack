@@ -1,3 +1,19 @@
+v1.7.47 Oct 20, 2021
+=====================
+
+* Support independently-installed pip
+  Adds pip as a dependency to this buildpack. When BP_PIP_VERSION=latest, this
+  version will be used. When unset, python's own pip module will be used.
+
+* Add pip 21.3
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/179924726)
+
+* Add setuptools 58.2.0, remove setuptools 58.1.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/179789763)
+
+
 v1.7.46 Sep 28, 2021
 =====================
 
