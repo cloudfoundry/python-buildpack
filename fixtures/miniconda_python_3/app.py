@@ -43,6 +43,9 @@ def module_version(module_name):
         version_string = "{}: {}".format(module_name, m.__version__)
     return version_string
 
+@app.route('/health')
+def health():
+    return 'healthy'
 
 @app.route('/')
 def root():

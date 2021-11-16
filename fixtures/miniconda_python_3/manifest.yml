@@ -4,3 +4,5 @@ applications:
   memory: 1GB
   disk_quota: 2GB
   command: python app.py
+  health-check-type: http
+  health-check-http-endpoint: /health
