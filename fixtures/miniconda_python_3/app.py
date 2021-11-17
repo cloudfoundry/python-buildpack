@@ -61,6 +61,6 @@ if __name__ == '__main__':
     try:
         port = int(os.getenv("PORT", 8080))
         app.run(host='0.0.0.0', port=port, debug=True)
-    except Exception:
-        print(traceback.format_exc()
-        raise
+    except Exception as e:
+        traceback.print_exc()
+        raise e
