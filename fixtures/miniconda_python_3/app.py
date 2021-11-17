@@ -3,6 +3,7 @@ import pytest
 import os
 import importlib
 import sys
+import traceback
 
 MODULE_NAMES = ['numpy']
 modules = {}
@@ -43,9 +44,6 @@ def module_version(module_name):
         version_string = "{}: {}".format(module_name, m.__version__)
     return version_string
 
-@app.route('/health')
-def health():
-    return 'healthy'
 
 @app.route('/')
 def root():
@@ -60,7 +58,9 @@ def root():
     return python_version + versions + r
 
 if __name__ == '__main__':
-    # Get port from environment variable or choose 9099 as local default
-    port = int(os.getenv("PORT", 9099))
-    # Run the app, listening on all IPs with our chosen port number
-    app.run(host='0.0.0.0', port=port, debug=True)
+    try:
+        port = int(os.getenv("PORT", 8080))
+        app.run(host='0.0.0.0', port=port, debug=True)
+    except Exception:
+        print(traceback.format_exc()
+        raise
