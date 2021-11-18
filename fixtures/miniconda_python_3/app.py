@@ -3,6 +3,7 @@ import pytest
 import os
 import importlib
 import sys
+import traceback
 
 MODULE_NAMES = ['numpy']
 modules = {}
@@ -57,7 +58,9 @@ def root():
     return python_version + versions + r
 
 if __name__ == '__main__':
-    # Get port from environment variable or choose 9099 as local default
-    port = int(os.getenv("PORT", 9099))
-    # Run the app, listening on all IPs with our chosen port number
-    app.run(host='0.0.0.0', port=port, debug=True)
+    try:
+        port = int(os.getenv("PORT", 8080))
+        app.run(host='0.0.0.0', port=port, debug=True)
+    except Exception as e:
+        traceback.print_exc()
+        raise e

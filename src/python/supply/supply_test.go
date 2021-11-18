@@ -130,6 +130,74 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
+	Describe("InstallPip", func() {
+		Describe("BP_PIP_VERSION not set", func() {
+			BeforeEach(func() {
+				Expect(os.Unsetenv("BP_PIP_VERSION")).To(Succeed())
+			})
+
+			It("skips install", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion(gomock.Any(), gomock.Any()).Times(0)
+				mockCommand.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+				mockStager.EXPECT().LinkDirectoryInDepDir(gomock.Any(), gomock.Any()).Times(0)
+
+				Expect(supplier.InstallPip()).To(Succeed())
+			})
+
+			It("uses python's pip module for installs", func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+				mockStager.EXPECT().LinkDirectoryInDepDir(gomock.Any(), gomock.Any())
+
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--disable-pip-version-check")
+				Expect(supplier.RunPipUnvendored()).To(Succeed())
+			})
+		})
+
+		Describe("BP_PIP_VERSION set to 'latest'", func() {
+			BeforeEach(func() {
+				Expect(os.Setenv("BP_PIP_VERSION", "latest")).To(Succeed())
+			})
+
+			AfterEach(func() {
+				Expect(os.Unsetenv("BP_PIP_VERSION")).To(Succeed())
+			})
+
+			It("installs latest from manifest", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/pip")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "pip", "--exists-action=w", "--no-index", "--ignore-installed", "--find-links=/tmp/pip")
+				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
+
+				Expect(supplier.InstallPip()).To(Succeed())
+			})
+
+			It("uses installed pip for installs", func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
+				mockStager.EXPECT().LinkDirectoryInDepDir(gomock.Any(), gomock.Any())
+
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--disable-pip-version-check")
+				Expect(supplier.RunPipUnvendored()).To(Succeed())
+			})
+		})
+
+		Describe("BP_PIP_VERSION is invalid", func() {
+			BeforeEach(func() {
+				Expect(os.Setenv("BP_PIP_VERSION", "something-else")).To(Succeed())
+			})
+
+			AfterEach(func() {
+				Expect(os.Unsetenv("BP_PIP_VERSION")).To(Succeed())
+			})
+
+			It("returns an error without installing", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion(gomock.Any(), gomock.Any()).Times(0)
+				mockCommand.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+				mockStager.EXPECT().LinkDirectoryInDepDir(gomock.Any(), gomock.Any()).Times(0)
+
+				Expect(supplier.InstallPip()).To(MatchError("invalid pip version: something-else"))
+			})
+		})
+	})
+
 	Describe("HandlePipfile", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())

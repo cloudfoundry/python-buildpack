@@ -21,31 +21,33 @@ import (
 	"github.com/kr/text"
 )
 
+const EnvPipVersion = "BP_PIP_VERSION"
+
 type Stager interface {
 	BuildDir() string
 	CacheDir() string
 	DepDir() string
 	DepsIdx() string
-	LinkDirectoryInDepDir(string, string) error
-	WriteEnvFile(string, string) error
-	WriteProfileD(string, string) error
+	LinkDirectoryInDepDir(destDir, destSubDir string) error
+	WriteEnvFile(envVar, envVal string) error
+	WriteProfileD(scriptName, scriptContents string) error
 }
 
 type Manifest interface {
-	AllDependencyVersions(string) []string
-	DefaultVersion(string) (libbuildpack.Dependency, error)
+	AllDependencyVersions(depName string) []string
+	DefaultVersion(depName string) (libbuildpack.Dependency, error)
 	IsCached() bool
 }
 
 type Installer interface {
-	InstallDependency(libbuildpack.Dependency, string) error
-	InstallOnlyVersion(string, string) error
+	InstallDependency(dep libbuildpack.Dependency, outputDir string) error
+	InstallOnlyVersion(depName, installDir string) error
 }
 
 type Command interface {
-	Execute(string, io.Writer, io.Writer, string, ...string) error
+	Execute(dir string, stdout io.Writer, stderr io.Writer, program string, args ...string) error
 	Output(dir string, program string, args ...string) (string, error)
-	RunWithOutput(*exec.Cmd) ([]byte, error)
+	RunWithOutput(cmd *exec.Cmd) ([]byte, error)
 }
 
 type Supplier struct {
@@ -92,6 +94,11 @@ func RunPython(s *Supplier) error {
 
 	if err := s.InstallPython(); err != nil {
 		s.Log.Error("Could not install python: %v", err)
+		return err
+	}
+
+	if err := s.InstallPip(); err != nil {
+		s.Log.Error("Could not install pip: %v", err)
 		return err
 	}
 
@@ -198,7 +205,7 @@ func (s *Supplier) HandleMercurial() error {
 		s.Log.Warning("Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.")
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", "-m", "pip", "install", "mercurial"); err != nil {
+	if err := s.runPipInstall("mercurial"); err != nil {
 		return err
 	}
 
@@ -328,14 +335,43 @@ func (s *Supplier) RewriteShebangs() error {
 	return nil
 }
 
+func (s *Supplier) InstallPip() error {
+	pipVersion := os.Getenv(EnvPipVersion)
+	if pipVersion == "" {
+		s.Log.Info("Using python's pip module")
+		return nil
+	}
+	if pipVersion != "latest" {
+		return fmt.Errorf("invalid pip version: %s", pipVersion)
+	}
+
+	tempPath := filepath.Join("/tmp", "pip")
+	if err := s.Installer.InstallOnlyVersion("pip", tempPath); err != nil {
+		return err
+	}
+
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
+		"python",
+		"-m", "pip",
+		"install", "pip",
+		"--exists-action=w",
+		"--no-index",
+		"--ignore-installed",
+		fmt.Sprintf("--find-links=%s", tempPath),
+	); err != nil {
+		return err
+	}
+
+	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
+}
+
 func (s *Supplier) InstallPipPop() error {
 	tempPath := filepath.Join("/tmp", "pip-pop")
 	if err := s.Installer.InstallOnlyVersion("pip-pop", tempPath); err != nil {
 		return err
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "python", "-m", "pip", "install", "pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
-		s.Log.Debug("******Path val: %s", os.Getenv("PATH"))
+	if err := s.runPipInstall("pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
 		return err
 	}
 
@@ -386,7 +422,12 @@ func (s *Supplier) InstallPipEnv() error {
 		s.Log.Info("Installing %s", dep)
 		out := &bytes.Buffer{}
 		stderr := &bytes.Buffer{}
-		if err := s.Command.Execute(s.Stager.BuildDir(), out, stderr, "python", "-m", "pip", "install", dep, "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv"))); err != nil {
+		if err := s.runPipInstall(
+			dep,
+			"--exists-action=w",
+			"--no-index",
+			fmt.Sprintf("--find-links=%s", filepath.Join("/tmp", "pipenv")),
+		); err != nil {
 			return fmt.Errorf("Failed to install %s: %v.\nStdout: %v\nStderr: %v", dep, err, out, stderr)
 		}
 	}
@@ -614,8 +655,13 @@ func (s *Supplier) RunPipUnvendored() error {
 		return err
 	}
 
-	installArgs := []string{"-m", "pip", "install", "-r", requirementsPath, "--ignore-installed", "--exists-action=w", "--src=" + filepath.Join(s.Stager.DepDir(), "src"), "--disable-pip-version-check"}
-	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
+	if err := s.runPipInstall(
+		"-r", requirementsPath,
+		"--ignore-installed",
+		"--exists-action=w",
+		"--src="+filepath.Join(s.Stager.DepDir(), "src"),
+		"--disable-pip-version-check",
+	); err != nil {
 		return fmt.Errorf("could not run pip: %v", err)
 	}
 
@@ -639,11 +685,7 @@ func (s *Supplier) RunPipVendored() error {
 	}
 
 	installArgs := []string{
-		"-m",
-		"pip",
-		"install",
-		"-r",
-		requirementsPath,
+		"-r", requirementsPath,
 		"--ignore-installed",
 		"--exists-action=w",
 		"--src=" + filepath.Join(s.Stager.DepDir(), "src"),
@@ -672,7 +714,7 @@ func (s *Supplier) RunPipVendored() error {
 		return fmt.Errorf("could not overwrite requirements file: %v", err)
 	}
 
-	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), "python", installArgs...); err != nil {
+	if err := s.runPipInstall(installArgs...); err != nil {
 		s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
 
 		if err := ioutil.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
@@ -797,6 +839,18 @@ func (s *Supplier) shouldRunPip() (bool, string, error) {
 	return true, requirementsPath, nil
 }
 
+func pipCommand() []string {
+	if os.Getenv(EnvPipVersion) != "" {
+		return []string{"pip"}
+	}
+	return []string{"python", "-m", "pip"}
+}
+
+func (s *Supplier) runPipInstall(args ...string) error {
+	installCmd := append(append(pipCommand(), "install"), args...)
+	return s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), installCmd[0], installCmd[1:]...)
+}
+
 func (s *Supplier) formatVersion(version string) string {
 	verSlice := strings.Split(version, ".")
 
@@ -814,7 +868,8 @@ func (s *Supplier) writeTempRequirementsTxt(content string) error {
 }
 
 func (s *Supplier) hasBuildOptions() bool {
-	err := s.Command.Execute(s.Stager.BuildDir(), nil, nil, "python", "-m", "pip", "install", "--no-build-isolation", "-h")
+	helpCommand := append(pipCommand(), "install", "--no-build-isolation", "-h")
+	err := s.Command.Execute(s.Stager.BuildDir(), nil, nil, helpCommand[0], helpCommand[1:]...)
 	return nil == err
 }
 
