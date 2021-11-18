@@ -1,8 +1,5 @@
 name: pydata_test
 dependencies:
 - python=3.7
-- pip
-- pytest
-- flask
-- nose
+- flask=2.0.2
 - numpy=1.15.2
