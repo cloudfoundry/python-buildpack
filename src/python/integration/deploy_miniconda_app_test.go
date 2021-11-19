@@ -24,8 +24,6 @@ var _ = Describe("CF Python Buildpack", func() {
 		fixtureDir, err = cutlass.CopyFixture(Fixtures("miniconda_python_3"))
 		Expect(err).ToNot(HaveOccurred())
 		app = cutlass.New(fixtureDir)
-		app.Disk = "2G"
-		app.Memory = "1G"
 		app.Buildpacks = []string{"python_buildpack"}
 	})
 
