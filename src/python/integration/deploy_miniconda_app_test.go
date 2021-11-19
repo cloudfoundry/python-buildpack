@@ -25,6 +25,8 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(err).ToNot(HaveOccurred())
 		app = cutlass.New(fixtureDir)
 		app.Buildpacks = []string{"python_buildpack"}
+		app.Disk = "2G"
+		app.Memory = "2G"
 	})
 
 	AfterEach(func() {

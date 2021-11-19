@@ -1,6 +1,0 @@
----
-applications:
-- name: pydata_cf_test
-  memory: 2GB
-  disk_quota: 4GB
-  command: python app.py

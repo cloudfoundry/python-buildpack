@@ -95,6 +95,8 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 				"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",
 				"python_buildpack",
 			}
+			app.Disk = "2G"
+			app.Memory = "2G"
 		})
 
 		It("uses miniconda", func() {
