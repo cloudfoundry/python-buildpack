@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -57,6 +58,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			app.Stdout.Reset()
 
+			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
 			PushAppAndConfirm(app)
 			// Check that numpy was not re-installed in the logs
 			Expect(app.Stdout.String()).ToNot(ContainSubstring("numpy"))
@@ -72,6 +74,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			output := strings.Replace(string(input), "numpy=1.21.2", "numpy=1.20.2", 1)
 			Expect(ioutil.WriteFile(filepath.Join(fixtureDir, "environment.yml"), []byte(output), 0644)).To(Succeed())
 
+			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
 			PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.20.2"))
 		})
