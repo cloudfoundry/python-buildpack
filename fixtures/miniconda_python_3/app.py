@@ -8,10 +8,7 @@ MODULE_NAMES = ['numpy']
 modules = {}
 
 for m in MODULE_NAMES:
-    try:
-        modules[m] = importlib.import_module(m)
-    except ImportError:
-        modules[m] = None
+    modules[m] = importlib.import_module(m)
 
 app = Flask(__name__)
 
