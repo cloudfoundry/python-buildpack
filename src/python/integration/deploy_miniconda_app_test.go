@@ -60,6 +60,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			app.Stdout.Reset()
 
 			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
+			Stop(app)
 			PushAppAndConfirm(app)
 			// Check that numpy was not re-installed in the logs
 			Expect(app.Stdout.String()).ToNot(ContainSubstring("numpy"))
@@ -77,6 +78,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			Expect(ioutil.WriteFile(filepath.Join(fixtureDir, "environment.yml"), []byte(output), 0644)).To(Succeed())
 
 			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
+			Stop(app)
 			PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.20.2"))
 		})
