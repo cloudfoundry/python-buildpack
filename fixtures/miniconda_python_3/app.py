@@ -34,5 +34,6 @@ if __name__ == '__main__':
         port = int(os.getenv("PORT", 8080))
         app.run(host='0.0.0.0', port=port, debug=True)
     except Exception as e:
+        print("*** CRASHED!!!")
         traceback.print_exc()
         raise e
