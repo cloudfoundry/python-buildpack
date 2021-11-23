@@ -7,10 +7,7 @@
   "integration": {
     "harness": "ginkgo",
     "matrix": [
-      { "cached": false, "parallel": true },
-      { "cached": false, "parallel": false },
-      { "cached": true,  "parallel": true },
-      { "cached": true,  "parallel": false }
+      { "cached": false,  "parallel": false }
     ]
   }
 }

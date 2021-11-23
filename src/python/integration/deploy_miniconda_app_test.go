@@ -34,7 +34,7 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(os.RemoveAll(fixtureDir)).To(Succeed())
 
 		if app != nil {
-			Expect(app.Destroy()).To(Succeed())
+			//Expect(app.Destroy()).To(Succeed())  // TODO: FOR DEBUG -- REMOVE!
 		}
 		app = nil
 
