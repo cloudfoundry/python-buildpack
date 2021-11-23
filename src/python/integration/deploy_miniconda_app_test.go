@@ -34,7 +34,7 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(os.RemoveAll(fixtureDir)).To(Succeed())
 
 		if app != nil {
-			//Expect(app.Destroy()).To(Succeed())  // TODO: FOR DEBUG -- REMOVE!
+			//Expect(app.Destroy()).To(Succeed())  // TODO: FOR DEBUG -- UNCOMMENT AFTER DEBUGGING!
 		}
 		app = nil
 
@@ -52,7 +52,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			Expect(body).To(ContainSubstring("python-version3"))
 		})
 
-		FIt("doesn't re-download unchanged dependencies", func() {
+		It("doesn't re-download unchanged dependencies", func() {
 			fmt.Fprintln(GinkgoWriter, "Pushing original app...")
 			PushAppAndConfirm(app)
 			Expect(app.Stdout.String()).To(ContainSubstring("numpy"))
