@@ -27,7 +27,7 @@ var _ = Describe("CF Python Buildpack", func() {
 		app = cutlass.New(fixtureDir)
 		app.Buildpacks = []string{"python_buildpack"}
 		app.Disk = "2G"
-		app.Memory = "2G"
+		app.Memory = "1G"
 	})
 
 	AfterEach(func() {
@@ -54,21 +54,20 @@ var _ = Describe("CF Python Buildpack", func() {
 
 		It("doesn't re-download unchanged dependencies", func() {
 			fmt.Fprintln(GinkgoWriter, "Pushing original app...")
-			PushAppAndConfirm(app)
+			V3PushAppAndConfirm(app)
 			Expect(app.Stdout.String()).To(ContainSubstring("numpy"))
 
 			app.Stdout.Reset()
 
 			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
-			Stop(app)
-			PushAppAndConfirm(app)
+			V3PushAppAndConfirm(app)
 			// Check that numpy was not re-installed in the logs
 			Expect(app.Stdout.String()).ToNot(ContainSubstring("numpy"))
 		})
 
 		It("it updates dependencies if environment.yml changes", func() {
 			fmt.Fprintln(GinkgoWriter, "Pushing original app...")
-			PushAppAndConfirm(app)
+			V3PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.21.2"))
 			Expect(app.GetBody("/")).ToNot(ContainSubstring("numpy: 1.20.2"))
 
@@ -78,8 +77,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			Expect(ioutil.WriteFile(filepath.Join(fixtureDir, "environment.yml"), []byte(output), 0644)).To(Succeed())
 
 			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
-			Stop(app)
-			PushAppAndConfirm(app)
+			V3PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.20.2"))
 		})
 

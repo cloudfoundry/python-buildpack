@@ -96,7 +96,7 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 				"python_buildpack",
 			}
 			app.Disk = "2G"
-			app.Memory = "2G"
+			app.Memory = "1G"
 		})
 
 		It("uses miniconda", func() {

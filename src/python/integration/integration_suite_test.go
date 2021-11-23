@@ -92,9 +92,10 @@ func PushAppAndConfirm(app *cutlass.App) {
 	Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 }
 
-func Stop(app *cutlass.App) {
-	Expect(app.Stop()).To(Succeed())
-	Eventually(func() ([]string, error) { return app.InstanceStates() }, 20*time.Second).Should(Equal([]string{"STOPPED"}))
+func V3PushAppAndConfirm(app *cutlass.App) {
+	Expect(app.V3Push()).To(Succeed())
+	Eventually(func() ([]string, error) { return app.InstanceStates() }, 20*time.Second).Should(Equal([]string{"RUNNING"}))
+	Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 }
 
 func Restart(app *cutlass.App) {
