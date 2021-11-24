@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -56,22 +55,12 @@ func Run(c *Conda) error {
 		return err
 	}
 
-	if err := c.RestoreCache(); err != nil {
-		c.Log.Error("Could not restore conda envs cache: %v", err)
-		return err
-	}
-
 	if err := c.UpdateAndClean(); err != nil {
 		c.Log.Error("Could not update conda env: %v", err)
 		return err
 	}
 
-	if err := c.SaveCache(); err != nil {
-		c.Log.Error("Could not save conda envs cache: %v", err)
-		return err
-	}
-
-	c.Stager.LinkDirectoryInDepDir(filepath.Join(c.Stager.DepDir(), "conda", "bin"), "bin")
+	c.Stager.LinkDirectoryInDepDir(c.condaBin(), "bin")
 	if err := c.Stager.WriteProfileD("conda.sh", c.ProfileD()); err != nil {
 		c.Log.Error("Could not write profile.d script: %v", err)
 		return err
@@ -103,8 +92,7 @@ func (c *Conda) Install(version string) error {
 	}
 
 	c.Log.BeginStep("Installing Miniconda")
-	condaHome := filepath.Join(c.Stager.DepDir(), "conda")
-	if err := c.Command.Execute("/", indentWriter(os.Stdout), ioutil.Discard, installer, "-b", "-p", condaHome); err != nil {
+	if err := c.Command.Execute("/", indentWriter(os.Stdout), ioutil.Discard, installer, "-b", "-p", c.condaHome()); err != nil {
 		return fmt.Errorf("Error installing miniconda: %v", err)
 	}
 
@@ -120,13 +108,18 @@ func (c *Conda) UpdateAndClean() error {
 		verbosity = []string{"--debug", "--verbose"}
 	}
 
-	condaHome := filepath.Join(c.Stager.DepDir(), "conda")
+	condaCache := filepath.Join(c.Stager.CacheDir(), "conda")
+	c.Log.Debug("Setting CONDA_PKGS_DIRS to %s", condaCache)
+	if err := os.Setenv("CONDA_PKGS_DIRS", condaCache); err != nil {
+		return fmt.Errorf("setting CONDA_PKGS_DIRS: %w", err)
+	}
+
 	args := append(append([]string{"env", "update"}, verbosity...), "-n", "dep_env", "-f", filepath.Join(c.Stager.BuildDir(), "environment.yml"))
-	c.Log.Debug("Run Conda: %s %s", filepath.Join(condaHome, "bin", "conda"), strings.Join(args, " "))
-	if err := c.Command.Execute("/", indentWriter(os.Stdout), indentWriter(os.Stderr), filepath.Join(condaHome, "bin", "conda"), args...); err != nil {
+	c.Log.Debug("Run Conda: %s %s", c.condaExec(), strings.Join(args, " "))
+	if err := c.Command.Execute("/", indentWriter(os.Stdout), indentWriter(os.Stderr), c.condaExec(), args...); err != nil {
 		return fmt.Errorf("Could not run conda env update: %v", err)
 	}
-	if err := c.Command.Execute("/", indentWriter(os.Stdout), indentWriter(os.Stderr), filepath.Join(condaHome, "bin", "conda"), "clean", "-pt"); err != nil {
+	if err := c.Command.Execute("/", indentWriter(os.Stdout), indentWriter(os.Stderr), c.condaExec(), "clean", "-pt"); err != nil {
 		c.Log.Error("Could not run conda clean: %v", err)
 		return fmt.Errorf("Could not run conda clean: %v", err)
 	}
@@ -134,81 +127,22 @@ func (c *Conda) UpdateAndClean() error {
 	return nil
 }
 
+func (c *Conda) condaHome() string {
+	return filepath.Join(c.Stager.DepDir(), "conda")
+}
+
+func (c *Conda) condaBin() string {
+	return filepath.Join(c.condaHome(), "bin")
+}
+
+func (c *Conda) condaExec() string {
+	return filepath.Join(c.condaBin(), "conda")
+}
+
 func (c *Conda) ProfileD() string {
 	return fmt.Sprintf(`grep -rlI %s $DEPS_DIR/%s/conda | xargs sed -i -e "s|%s|$DEPS_DIR/%s|g"
 source activate dep_env
 `, c.Stager.DepDir(), c.Stager.DepsIdx(), c.Stager.DepDir(), c.Stager.DepsIdx())
-}
-
-func (c *Conda) SaveCache() error {
-	if err := os.MkdirAll(filepath.Join(c.Stager.CacheDir(), "envs"), 0755); err != nil {
-		return err
-	}
-	if err := ioutil.WriteFile(filepath.Join(c.Stager.CacheDir(), "conda_prefix"), []byte(c.Stager.DepDir()), 0644); err != nil {
-		return err
-	}
-	if err := os.RemoveAll(filepath.Join(c.Stager.CacheDir(), "envs")); err != nil {
-		return err
-	}
-
-	if output, err := c.Command.Output("/", "cp", "-Rl", filepath.Join(c.Stager.DepDir(), "conda", "envs"), filepath.Join(c.Stager.CacheDir(), "envs")); err != nil {
-		return fmt.Errorf("%s\n%v", output, err)
-	}
-
-	return nil
-}
-
-func (c *Conda) RestoreCache() error {
-	if err := os.MkdirAll(filepath.Join(c.Stager.DepDir(), "conda", "envs"), 0755); err != nil {
-		return err
-	}
-	dirs, err := filepath.Glob(filepath.Join(c.Stager.CacheDir(), "envs", "*"))
-	if err != nil {
-		return err
-	}
-
-	if len(dirs) > 0 {
-		c.Log.BeginStep("Using dependency cache at %s", filepath.Join(c.Stager.CacheDir(), "envs"))
-	}
-
-	for _, dir := range dirs {
-		os.Rename(dir, filepath.Join(c.Stager.DepDir(), "conda", "envs", path.Base(dir)))
-	}
-
-	return c.restoreCacheRewriteOldDepDir()
-}
-
-func (c *Conda) restoreCacheRewriteOldDepDir() error {
-	bPrefix, err := ioutil.ReadFile(filepath.Join(c.Stager.CacheDir(), "conda_prefix"))
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return err
-	}
-	prefix := strings.TrimSpace(string(bPrefix))
-
-	// grep -rlI $prefix $DEPS_DIR/$DEPS_IDX/conda | xargs sed -i -e "s|$prefix|$DEPS_DIR/$DEPS_IDX|g"
-	if err := filepath.Walk(filepath.Join(c.Stager.DepDir(), "conda", "envs"), func(path string, info os.FileInfo, err error) error {
-		if !info.Mode().IsRegular() {
-			return nil
-		}
-		if contents, err := ioutil.ReadFile(path); err != nil {
-			return fmt.Errorf("Readfile: %v", err)
-		} else {
-			if bytes.Contains(contents, []byte(prefix)) {
-				contents = bytes.Replace(contents, []byte(prefix), []byte(c.Stager.DepDir()), -1)
-				if err := ioutil.WriteFile(path, contents, 0644); err != nil {
-					return fmt.Errorf("WriteFile: %v", err)
-				}
-			}
-		}
-		return nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (c *Conda) Warning() error {

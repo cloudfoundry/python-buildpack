@@ -34,10 +34,9 @@ var _ = Describe("CF Python Buildpack", func() {
 		Expect(os.RemoveAll(fixtureDir)).To(Succeed())
 
 		if app != nil {
-			//Expect(app.Destroy()).To(Succeed())  // TODO: FOR DEBUG -- UNCOMMENT AFTER DEBUGGING!
+			Expect(app.Destroy()).To(Succeed())
+			app = nil
 		}
-		app = nil
-
 	})
 
 	Context("an app that uses miniconda and python 3", func() {
@@ -50,19 +49,6 @@ var _ = Describe("CF Python Buildpack", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("numpy: 1.21.2"))
 			Expect(body).To(ContainSubstring("python-version3"))
-		})
-
-		It("doesn't re-download unchanged dependencies", func() {
-			fmt.Fprintln(GinkgoWriter, "Pushing original app...")
-			PushAppAndConfirm(app)
-			Expect(app.Stdout.String()).To(ContainSubstring("numpy"))
-
-			app.Stdout.Reset()
-
-			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
-			PushAppAndConfirm(app)
-			// Check that numpy was not re-installed in the logs
-			Expect(app.Stdout.String()).ToNot(ContainSubstring("numpy"))
 		})
 
 		It("it updates dependencies if environment.yml changes", func() {
