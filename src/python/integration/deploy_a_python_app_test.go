@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/libbuildpack"
@@ -36,7 +37,7 @@ var _ = Describe("CF Python Buildpack", func() {
 		It("displays a nice error messages and gracefully fails", func() {
 			Expect(app.Push()).ToNot(Succeed())
 
-			Eventually(app.Stdout.String()).Should(ContainSubstring("-----> Python Buildpack version"))
+			Eventually(app.Stdout.String(), 30*time.Second).Should(ContainSubstring("-----> Python Buildpack version"))
 			Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 
 			Eventually(app.Stdout.String()).Should(ContainSubstring("Could not install python: no match found for 99.99.99"))
