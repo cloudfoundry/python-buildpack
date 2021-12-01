@@ -43,8 +43,8 @@ var _ = Describe("override yml", func() {
 	It("Forces python from override buildpack", func() {
 		Expect(app.Push()).ToNot(Succeed())
 
-		Eventually(app.Stdout.String(), 30*time.Second).Should(ContainSubstring("-----> OverrideYML Buildpack"))
-		Eventually(app.Stdout.String(), 30*time.Second).Should(ContainSubstring("-----> Python Buildpack version"))
+		Eventually(app.Stdout.String(), 60*time.Second).Should(ContainSubstring("-----> OverrideYML Buildpack"))
+		Eventually(app.Stdout.String(), 60*time.Second).Should(ContainSubstring("-----> Python Buildpack version"))
 		Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 
 		Eventually(app.Stdout.String()).Should(ContainSubstring("-----> Installing python"))
