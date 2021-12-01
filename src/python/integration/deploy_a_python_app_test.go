@@ -24,8 +24,8 @@ var _ = Describe("CF Python Buildpack", func() {
 	AfterEach(func() {
 		if app != nil {
 			app.Destroy()
+			app = nil
 		}
-		app = nil
 	})
 
 	Context("with an unsupported dependency", func() {
@@ -35,6 +35,8 @@ var _ = Describe("CF Python Buildpack", func() {
 
 		It("displays a nice error messages and gracefully fails", func() {
 			Expect(app.Push()).ToNot(Succeed())
+
+			Eventually(app.Stdout.String()).Should(ContainSubstring("-----> Python Buildpack version"))
 			Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 
 			Eventually(app.Stdout.String()).Should(ContainSubstring("Could not install python: no match found for 99.99.99"))
