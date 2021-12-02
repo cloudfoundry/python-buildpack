@@ -1,7 +1,7 @@
 package integration_test
 
 import (
-	"time"
+	"os/exec"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 
@@ -43,12 +43,15 @@ var _ = Describe("override yml", func() {
 	It("Forces python from override buildpack", func() {
 		Expect(app.Push()).ToNot(Succeed())
 
-		Eventually(app.Stdout.String(), 60*time.Second).Should(ContainSubstring("-----> OverrideYML Buildpack"))
-		Eventually(app.Stdout.String(), 60*time.Second).Should(ContainSubstring("-----> Python Buildpack version"))
-		Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
+		logs := exec.Command("cf", "logs", "--recent", app.Name)
+		out, err := logs.CombinedOutput()
+		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(app.Stdout.String()).Should(ContainSubstring("-----> Installing python"))
-		Eventually(app.Stdout.String()).Should(MatchRegexp("Copy .*/python.tgz"))
-		Eventually(app.Stdout.String()).Should(ContainSubstring("Could not install python: dependency sha256 mismatch: expected sha256 062d906c87839d03b243e2821e10653c89b4c92878bfe2bf995dec231e117bfc, actual sha256 b56b58ac21f9f42d032e1e4b8bf8b8823e69af5411caa15aee2b140bc756962f"))
+		Expect(out).To(ContainSubstring("-----> OverrideYML Buildpack"))
+		Expect(out).To(ContainSubstring("-----> Python Buildpack version "+buildpackVersion))
+
+		Expect(out).To(ContainSubstring("-----> Installing python"))
+		Expect(out).To(MatchRegexp("Copy .*/python.tgz"))
+		Expect(out).To(ContainSubstring("Could not install python: dependency sha256 mismatch: expected sha256 062d906c87839d03b243e2821e10653c89b4c92878bfe2bf995dec231e117bfc, actual sha256 b56b58ac21f9f42d032e1e4b8bf8b8823e69af5411caa15aee2b140bc756962f"))
 	})
 })
