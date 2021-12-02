@@ -4,6 +4,10 @@ default_versions:
 - name: python
   version: 3.8.x
 dependency_deprecation_dates:
+- version_line: 3.10.x
+  name: python
+  date: 2026-10-04
+  link: https://www.python.org/dev/peps/pep-0619/
 - version_line: 3.6.x
   name: python
   date: 2021-12-23
@@ -133,6 +137,14 @@ dependencies:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tgz
   source_sha256: 2cc7b67c1f3f66c571acc42479cdf691d8ed6b47bee12c9b68430413a17a44ea
+- name: python
+  version: 3.10.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.0_linux_x64_cflinuxfs3_6c9ca13f.tgz
+  sha256: 6c9ca13f858f77d36fe10ed09079abe9c05a5156d71b77e6d0d915301f03c414
+  cf_stacks:
+  - cflinuxfs3
+  source: https://www.python.org/ftp/python/3.10.0/Python-3.10.0.tgz
+  source_sha256: c4e0cbad57c90690cb813fb4663ef670b4d0f587d8171e2c42bd4c9245bd2758
 - name: setuptools
   version: 59.4.0
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_59.4.0_linux_noarch_any-stack_0b596e0b.tgz
