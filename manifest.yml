@@ -43,12 +43,12 @@ dependencies:
   source_sha256: e22c0bb032fde08f53de9ffbc5a128233041d9f33b5de022c0978a2149885f82
 - name: miniconda3
   version: 4.10.3
-  uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh
+  uri: https://repo.continuum.io/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh
   sha256: 1ea2f885b4dbc3098662845560bc64271eb17085387a70c2ba3f29fff6f8d52f
   cf_stacks:
   - cflinuxfs3
   source: https://github.com/conda/conda/archive/4.10.3.tar.gz
-  source_sha256: 9e83bb20a6b9adc0bd7abccaa4738a71dc04e19a42dc51ad543539c15b2c941a
+  source_sha256: 1ea2f885b4dbc3098662845560bc64271eb17085387a70c2ba3f29fff6f8d52f
 - name: pip
   version: 21.3.1
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_21.3.1_linux_noarch_any-stack_b50523d4.tgz
