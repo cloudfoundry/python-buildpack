@@ -139,8 +139,8 @@ dependencies:
   source_sha256: 2cc7b67c1f3f66c571acc42479cdf691d8ed6b47bee12c9b68430413a17a44ea
 - name: python
   version: 3.10.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.0_linux_x64_cflinuxfs3_6c9ca13f.tgz
-  sha256: 6c9ca13f858f77d36fe10ed09079abe9c05a5156d71b77e6d0d915301f03c414
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.0_linux_x64_cflinuxfs3_d2f9ec6a.tgz
+  sha256: d2f9ec6a15eab92e3c5a0264f1785f0b3030d15533294ef52ad49aa216d4193a
   cf_stacks:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.10.0/Python-3.10.0.tgz
