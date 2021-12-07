@@ -1,2 +1,2 @@
-markupsafe==0.21
+markupsafe
 -r other_requirements2.txt
