@@ -1,7 +1,7 @@
 module github.com/cloudfoundry/python-buildpack
 
 require (
-	github.com/Dynatrace/libbuildpack-dynatrace v1.4.1
+	github.com/Dynatrace/libbuildpack-dynatrace v1.4.2
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudfoundry/libbuildpack v0.0.0-20211201073524-877368d188fd
 	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484 // indirect
