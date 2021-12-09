@@ -1,3 +1,75 @@
+v1.7.48 Dec 09, 2021
+=====================
+
+* Bump github.com/onsi/gomega from 1.14.0 to 1.17.0
+  Bumps [github.com/onsi/gomega](https://github.com/onsi/gomega) from 1.14.0 to 1.17.0.
+  - [Release notes](https://github.com/onsi/gomega/releases)
+  - [Changelog](https://github.com/onsi/gomega/blob/master/CHANGELOG.md)
+  - [Commits](https://github.com/onsi/gomega/compare/v1.14.0...v1.17.0)
+  
+  ---
+  updated-dependencies:
+  - dependency-name: github.com/onsi/gomega
+    dependency-type: direct:production
+    update-type: version-update:semver-minor
+  ...
+
+* Bump github.com/Dynatrace/libbuildpack-dynatrace from 1.4.1 to 1.4.2
+  Bumps [github.com/Dynatrace/libbuildpack-dynatrace](https://github.com/Dynatrace/libbuildpack-dynatrace) from 1.4.1 to 1.4.2.
+  - [Release notes](https://github.com/Dynatrace/libbuildpack-dynatrace/releases)
+  - [Commits](https://github.com/Dynatrace/libbuildpack-dynatrace/compare/v1.4.1...v1.4.2)
+  
+  ---
+  updated-dependencies:
+  - dependency-name: github.com/Dynatrace/libbuildpack-dynatrace
+    dependency-type: direct:production
+    update-type: version-update:semver-patch
+  ...
+
+* Bump gopkg.in/ini.v1 from 1.62.0 to 1.66.2
+  Bumps [gopkg.in/ini.v1](https://github.com/go-ini/ini) from 1.62.0 to 1.66.2.
+  - [Release notes](https://github.com/go-ini/ini/releases)
+  - [Commits](https://github.com/go-ini/ini/compare/v1.62.0...v1.66.2)
+  
+  ---
+  updated-dependencies:
+  - dependency-name: gopkg.in/ini.v1
+    dependency-type: direct:production
+    update-type: version-update:semver-minor
+  ...
+
+* Update libbuildpack
+
+* Add python 3.10.1
+  for stack(s) cflinuxfs3
+
+* Add python 3.9.9, remove python 3.9.6
+  for stack(s) cflinuxfs3
+
+* Bump miniconda3, remove miniconda37/38
+
+* Add pipenv 2021.11.23, remove pipenv 2021.5.29
+  for stack(s) cflinuxfs3
+
+* Add pip 21.3.1, remove pip 21.3
+  for stack(s) cflinuxfs3
+
+* Update outdated fixtures
+
+* Update default python version to 3.10.x
+
+* Add setuptools 59.5.0, remove setuptools 58.2.0
+  for stack(s) cflinuxfs3
+
+* Refactor caching for miniconda
+  Old caching mechanism was very hacky and seemed to be the cause of miniconda test failures
+  (specifically tests which pushed twice, as the app would fail to start on the second push).
+  
+  New approach uses CF's cache and conda's ability to set a package cache via CONDA_PKGS_DIRS.
+
+* Updating github-config
+
+
 v1.7.47 Oct 20, 2021
 =====================
 
