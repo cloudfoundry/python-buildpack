@@ -145,6 +145,14 @@ dependencies:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.10.1/Python-3.10.1.tgz
   source_sha256: b76117670e7c5064344b9c138e141a377e686b9063f3a8a620ff674fa8ec90d3
+- name: python
+  version: 3.10.2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.2_linux_x64_cflinuxfs3_8fe07fad.tgz
+  sha256: 8fe07fad516307094a19fbbc96d3cf046afd43b90a5326e02fafa06f6c943da2
+  cf_stacks:
+  - cflinuxfs3
+  source: https://www.python.org/ftp/python/3.10.2/Python-3.10.2.tgz
+  source_sha256: 3c0ede893011319f9b0a56b44953a3d52c7abf9657c23fb4bc9ced93b86e9c97
 - name: setuptools
   version: 60.5.0
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_60.5.0_linux_noarch_any-stack_697ffd2c.tgz
