@@ -3,14 +3,14 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [packages]
-Flask = "==1.0.2"
-gunicorn = "*"
-itsdangerous = "==0.24"
-Jinja2 = "==2.7.2"
-Werkzeug = "==0.10.4"
+Flask = "==2.0.2"
+gunicorn = "==20.1.0"
+itsdangerous = "==2.0.1"
+Jinja2 = "==3.0.3"
+Werkzeug = "==2.0.2"
 
 [requires]
-python_version='3.6'
+python_version='3.9'
 
 [dev-packages]
 tox = "*"

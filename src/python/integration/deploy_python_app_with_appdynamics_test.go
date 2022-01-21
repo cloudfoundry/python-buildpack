@@ -97,16 +97,8 @@ var _ = Describe("appdynamics", func() {
 		By("Checking if the buildpack properly set the APPD environment variables in apps environments")
 		appEnv, err := app.GetBody("/appd")
 		Expect(err).To(BeNil())
-		expectedAppEnv := fmt.Sprintf(`{
-  "APPD_ACCOUNT_ACCESS_KEY": "test-key",
-  "APPD_ACCOUNT_NAME": "test-account",
-  "APPD_APP_NAME": "%s",
-  "APPD_CONTROLLER_HOST": "test-sb-host",
-  "APPD_CONTROLLER_PORT": "1234",
-  "APPD_NODE_NAME": "%s",
-  "APPD_SSL_ENABLED": "on",
-  "APPD_TIER_NAME": "%s"
-}`, app.Name, app.Name, app.Name)
+		expectedAppEnv := fmt.Sprintf(`{"APPD_ACCOUNT_ACCESS_KEY":"test-key","APPD_ACCOUNT_NAME":"test-account","APPD_APP_NAME":"%s","APPD_CONTROLLER_HOST":"test-sb-host","APPD_CONTROLLER_PORT":"1234","APPD_NODE_NAME":"%s","APPD_SSL_ENABLED":"on","APPD_TIER_NAME":"%s"}
+`, app.Name, app.Name, app.Name)
 		Expect(appEnv).To(Equal(expectedAppEnv))
 
 		By("unbinding the service")

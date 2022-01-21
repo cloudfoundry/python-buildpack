@@ -205,7 +205,7 @@ var _ = Describe("Supply", func() {
 			{
 				"_meta":{
 					"requires":{
-						"python_version":"3.6"
+						"python_version":"3.9"
 					}
 				}
 			}`
@@ -217,7 +217,7 @@ var _ = Describe("Supply", func() {
 			Expect(supplier.HandlePipfile()).To(Succeed())
 			runtimeContents, err := ioutil.ReadFile(filepath.Join(depDir, "runtime.txt"))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(runtimeContents)).To(ContainSubstring("python-3.6"))
+			Expect(string(runtimeContents)).To(ContainSubstring("python-3.9"))
 		})
 	})
 
@@ -527,24 +527,24 @@ var _ = Describe("Supply", func() {
 		Context("when requirements-declared.txt exists", func() {
 
 			requirementsDeclared :=
-				`Flask==0.10.1
-Jinja2==2.7.2
-MarkupSafe==0.21
-Werkzeug==0.10.4
-gunicorn==19.3.0
-itsdangerous==0.24
+				`Flask==2.0.2
+Jinja2==3.0.3
+MarkupSafe==2.0.1
+Werkzeug==2.0.2
+gunicorn==20.1.0
+itsdangerous==2.0.1
 pylibmc==1.4.2
 cffi==0.9.2
 `
 			requirements :=
-				`Flask==0.10.1
-Jinja2==2.7.2
-MarkupSafe==0.21
+				`Flask==2.0.2
+Jinja2==3.0.3
+MarkupSafe==2.0.1
 `
 			requirementsStale :=
-				`Werkzeug==0.10.4
-gunicorn==19.3.0
-itsdangerous==0.24
+				`Werkzeug==2.0.2
+gunicorn==20.1.0
+itsdangerous==2.0.1
 pylibmc==1.4.2
 cffi==0.9.2
 `
@@ -618,9 +618,9 @@ cffi==0.9.2
 --extra-index-url https://extra-index-url2
 --trusted-host extra-index-url1
 --trusted-host extra-index-url2
-Flask==0.10.1
-Jinja2==2.7.2
-MarkupSafe==0.21
+Flask==2.0.2
+Jinja2==3.0.3
+MarkupSafe==2.0.1
 `
 			BeforeEach(func() {
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
