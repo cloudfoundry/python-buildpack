@@ -48,7 +48,7 @@ var _ = Describe("override yml", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Expect(out).To(ContainSubstring("-----> OverrideYML Buildpack"))
-		Expect(out).To(ContainSubstring("-----> Python Buildpack version "+buildpackVersion))
+		Expect(out).To(ContainSubstring("-----> Python Buildpack version " + buildpackVersion))
 
 		Expect(out).To(ContainSubstring("-----> Installing python"))
 		Expect(out).To(MatchRegexp("Copy .*/python.tgz"))
