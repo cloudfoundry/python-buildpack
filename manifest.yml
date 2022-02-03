@@ -46,13 +46,13 @@ dependencies:
   source: https://github.com/conda/conda/archive/4.10.3.tar.gz
   source_sha256: 1ea2f885b4dbc3098662845560bc64271eb17085387a70c2ba3f29fff6f8d52f
 - name: pip
-  version: 22.0.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_22.0.2_linux_noarch_any-stack_fa35bb9e.tgz
-  sha256: fa35bb9e269a00afced5c4c984fc68908d2103c864063e747a3fa156adb7813a
+  version: 22.0.3
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_22.0.3_linux_noarch_any-stack_6b9d3203.tgz
+  sha256: 6b9d320334e1ca0f7a8e8496bcd6cd1d8842a57eb2ca7e5ea802badd965ce8ac
   cf_stacks:
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/d9/c1/146b24a7648fdf3f8b4dc6521ab0b26ac151ef903bac0b63a4e1450cb4d1/pip-22.0.2.tar.gz
-  source_sha256: 27b4b70c34ec35f77947f777070d8331adbb1e444842e98e7150c288dc0caea4
+  source: https://files.pythonhosted.org/packages/88/d9/761f0b1e0551a3559afe4d34bd9bf68fc8de3292363b3775dda39b62ce84/pip-22.0.3.tar.gz
+  source_sha256: f29d589df8c8ab99c060e68ad294c4a9ed896624f6368c5349d70aa581b333d0
 - name: pip-pop
   version: 0.1.5
   cf_stacks:
