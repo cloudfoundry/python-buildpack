@@ -1,12 +1,13 @@
 package main
 
 import (
+	_ "github.com/cloudfoundry/python-buildpack/src/python/hooks"
+	"github.com/cloudfoundry/python-buildpack/src/python/requirements"
+	"github.com/cloudfoundry/python-buildpack/src/python/supply"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	_ "github.com/cloudfoundry/python-buildpack/src/python/hooks"
-	"github.com/cloudfoundry/python-buildpack/src/python/supply"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
@@ -71,12 +72,13 @@ func main() {
 	}
 
 	s := supply.Supplier{
-		Logfile:   logfile,
-		Stager:    stager,
-		Manifest:  manifest,
-		Installer: installer,
-		Log:       logger,
-		Command:   &libbuildpack.Command{},
+		Logfile:      logfile,
+		Stager:       stager,
+		Manifest:     manifest,
+		Installer:    installer,
+		Log:          logger,
+		Command:      &libbuildpack.Command{},
+		Requirements: requirements.Reqs{},
 	}
 
 	err = supply.Run(&s)

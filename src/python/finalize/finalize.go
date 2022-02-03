@@ -34,6 +34,11 @@ type ManagePyFinder interface {
 	FindManagePy(dir string) (string, error)
 }
 
+type Reqs interface {
+	FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error)
+	FindStalePackages(oldRequirementsPath, newRequirementsPath string, excludedPackages ...string) ([]string, error)
+}
+
 type Finalizer struct {
 	Stager         Stager
 	Log            *libbuildpack.Logger
@@ -41,6 +46,7 @@ type Finalizer struct {
 	Manifest       Manifest
 	Command        Command
 	ManagePyFinder ManagePyFinder
+	Requirements   Reqs
 }
 
 func Run(f *Finalizer) error {
@@ -67,19 +73,22 @@ func (f *Finalizer) HandleCollectstatic() error {
 	if len(os.Getenv("DISABLE_COLLECTSTATIC")) > 0 {
 		return nil
 	}
-	if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stderr, "pip-grep", "-s", "requirements.txt", "django", "Django"); err != nil {
-		return nil
-	}
 
-	managePyPath, err := f.ManagePyFinder.FindManagePy(f.Stager.BuildDir())
+	exists, err := f.Requirements.FindAnyPackage(f.Stager.BuildDir(), "django", "Django")
 	if err != nil {
 		return err
 	}
 
-	f.Log.Info("Running python %s collectstatic --noinput --traceback", managePyPath)
-	output := new(bytes.Buffer)
-	if err = f.Command.Execute(f.Stager.BuildDir(), output, text.NewIndentWriter(os.Stderr, []byte("       ")), "python", managePyPath, "collectstatic", "--noinput", "--traceback"); err != nil {
-		f.Log.Error(fmt.Sprintf(` !     Error while running '$ python %s collectstatic --noinput'.
+	if exists {
+		managePyPath, err := f.ManagePyFinder.FindManagePy(f.Stager.BuildDir())
+		if err != nil {
+			return err
+		}
+
+		f.Log.Info("Running python %s collectstatic --noinput --traceback", managePyPath)
+		output := new(bytes.Buffer)
+		if err = f.Command.Execute(f.Stager.BuildDir(), output, text.NewIndentWriter(os.Stderr, []byte("       ")), "python", managePyPath, "collectstatic", "--noinput", "--traceback"); err != nil {
+			f.Log.Error(fmt.Sprintf(` !     Error while running '$ python %s collectstatic --noinput'.
        See traceback above for details.
 
        You may need to update application code to resolve this error.
@@ -88,10 +97,11 @@ func (f *Finalizer) HandleCollectstatic() error {
           $ cf set-env <app> DISABLE_COLLECTSTATIC 1
 
        https://devcenter.heroku.com/articles/django-assets`, managePyPath))
-		return err
-	}
+			return err
+		}
 
-	writeFilteredCollectstaticOutput(output)
+		writeFilteredCollectstaticOutput(output)
+	}
 
 	return nil
 }

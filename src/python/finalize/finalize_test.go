@@ -33,6 +33,7 @@ var _ = Describe("Finalize", func() {
 		mockManifest       *MockManifest
 		mockCommand        *MockCommand
 		mockManagePyFinder *MockManagePyFinder
+		mockRequirements   *MockReqs
 	)
 
 	BeforeEach(func() {
@@ -53,6 +54,7 @@ var _ = Describe("Finalize", func() {
 		mockManifest = NewMockManifest(mockCtrl)
 		mockCommand = NewMockCommand(mockCtrl)
 		mockManagePyFinder = NewMockManagePyFinder(mockCtrl)
+		mockRequirements = NewMockReqs(mockCtrl)
 
 		args := []string{buildDir, "", depsDir, depsIdx}
 		stager := libbuildpack.NewStager(args, logger, &libbuildpack.Manifest{})
@@ -63,6 +65,7 @@ var _ = Describe("Finalize", func() {
 			Log:            logger,
 			Command:        mockCommand,
 			ManagePyFinder: mockManagePyFinder,
+			Requirements:   mockRequirements,
 		}
 	})
 
@@ -93,7 +96,7 @@ var _ = Describe("Finalize", func() {
 			})
 			Context("app uses Django", func() {
 				BeforeEach(func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(nil)
+					mockRequirements.EXPECT().FindAnyPackage(buildDir, "django", "Django").Return(true, nil)
 					mockManagePyFinder.EXPECT().FindManagePy(buildDir).Return("/foo/bar/manage.py", nil)
 				})
 
@@ -118,7 +121,7 @@ var _ = Describe("Finalize", func() {
 
 			Context("app does not use Django", func() {
 				BeforeEach(func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "django", "Django").Return(fmt.Errorf("Not found"))
+					mockRequirements.EXPECT().FindAnyPackage(buildDir, "django", "Django").Return(false, nil)
 				})
 
 				It("does not run anything", func() {

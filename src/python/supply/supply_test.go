@@ -21,20 +21,21 @@ import (
 
 var _ = Describe("Supply", func() {
 	var (
-		err           error
-		buildDir      string
-		cacheDir      string
-		depsDir       string
-		depsIdx       string
-		depDir        string
-		supplier      *supply.Supplier
-		logger        *libbuildpack.Logger
-		buffer        *bytes.Buffer
-		mockCtrl      *gomock.Controller
-		mockManifest  *MockManifest
-		mockInstaller *MockInstaller
-		mockStager    *MockStager
-		mockCommand   *MockCommand
+		err              error
+		buildDir         string
+		cacheDir         string
+		depsDir          string
+		depsIdx          string
+		depDir           string
+		supplier         *supply.Supplier
+		logger           *libbuildpack.Logger
+		buffer           *bytes.Buffer
+		mockCtrl         *gomock.Controller
+		mockManifest     *MockManifest
+		mockInstaller    *MockInstaller
+		mockStager       *MockStager
+		mockCommand      *MockCommand
+		mockRequirements *MockReqs
 	)
 
 	BeforeEach(func() {
@@ -60,16 +61,18 @@ var _ = Describe("Supply", func() {
 		mockStager.EXPECT().DepDir().AnyTimes().Return(depDir)
 		mockStager.EXPECT().DepsIdx().AnyTimes().Return(depsIdx)
 		mockCommand = NewMockCommand(mockCtrl)
+		mockRequirements = NewMockReqs(mockCtrl)
 
 		buffer = new(bytes.Buffer)
 		logger = libbuildpack.NewLogger(ansicleaner.New(buffer))
 
 		supplier = &supply.Supplier{
-			Manifest:  mockManifest,
-			Installer: mockInstaller,
-			Stager:    mockStager,
-			Command:   mockCommand,
-			Log:       logger,
+			Manifest:     mockManifest,
+			Installer:    mockInstaller,
+			Stager:       mockStager,
+			Command:      mockCommand,
+			Log:          logger,
+			Requirements: mockRequirements,
 		}
 	})
 
@@ -221,15 +224,6 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
-	Describe("InstallPipPop", func() {
-		It("installs pip-pop", func() {
-			mockInstaller.EXPECT().InstallOnlyVersion("pip-pop", "/tmp/pip-pop")
-			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "pip-pop", "--exists-action=w", "--no-index", "--find-links=/tmp/pip-pop")
-			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
-			Expect(supplier.InstallPipPop()).To(Succeed())
-		})
-	})
-
 	// Add the expects for what the installFfi function uses
 	expectInstallFfi := func() string {
 		ffiDir := filepath.Join(depDir, "libffi")
@@ -323,7 +317,7 @@ var _ = Describe("Supply", func() {
 
 		Context("when the app uses pylibmc", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pylibmc").Return(nil)
+				mockRequirements.EXPECT().FindAnyPackage(buildDir, "pylibmc").Return(true, nil)
 			})
 			It("installs libmemcache", func() {
 				memcachedDir := filepath.Join(depDir, "libmemcache")
@@ -339,7 +333,7 @@ var _ = Describe("Supply", func() {
 		})
 		Context("when the app does not use pylibmc", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pylibmc").Return(fmt.Errorf("not found"))
+				mockRequirements.EXPECT().FindAnyPackage(buildDir, "pylibmc").Return(false, nil)
 			})
 
 			It("does not install libmemcache", func() {
@@ -421,7 +415,7 @@ var _ = Describe("Supply", func() {
 
 		Context("when the app uses ffi", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pymysql", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(nil)
+				mockRequirements.EXPECT().FindAnyPackage(buildDir, "pymysql", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(true, nil)
 			})
 
 			It("installs ffi", func() {
@@ -450,7 +444,7 @@ var _ = Describe("Supply", func() {
 		})
 		Context("when the app does not use libffi", func() {
 			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "pip-grep", "-s", "requirements.txt", "pymysql", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(fmt.Errorf("not found"))
+				mockRequirements.EXPECT().FindAnyPackage(buildDir, "pymysql", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka").Return(false, nil)
 			})
 
 			It("does not install libffi", func() {
@@ -534,33 +528,40 @@ Werkzeug==2.0.2
 gunicorn==20.1.0
 itsdangerous==2.0.1
 pylibmc==1.4.2
-cffi==0.9.2
+cffi
+wheel==1.0.0
+setuptools
 `
 			requirements :=
 				`Flask==2.0.2
 Jinja2==3.0.3
 MarkupSafe==2.0.1
 `
-			requirementsStale :=
-				`Werkzeug==2.0.2
+			requirementsStale := []string{"Werkzeug==2.0.2", "gunicorn==20.1.0", "itsdangerous==2.0.1", "pylibmc==1.4.2", "cffi"}
+			requirementsStaleString := `Werkzeug==2.0.2
 gunicorn==20.1.0
 itsdangerous==2.0.1
 pylibmc==1.4.2
-cffi==0.9.2
-`
+cffi`
+
 			BeforeEach(func() {
 				Expect(os.MkdirAll(filepath.Join(depDir, "python"), 0755)).To(Succeed())
 				Expect(ioutil.WriteFile(filepath.Join(depDir, "python", "requirements-declared.txt"), []byte(requirementsDeclared), 0644)).To(Succeed())
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte(requirements), 0644)).To(Succeed())
 			})
 
-			It("creates requirements-stale.txt and uninstalls unused dependencies", func() {
-				mockCommand.EXPECT().Output(buildDir, "pip-diff", "--stale", filepath.Join(depDir, "python", "requirements-declared.txt"), filepath.Join(buildDir, "requirements.txt"), "--exclude", "setuptools", "pip", "wheel").Return(requirementsStale, nil)
+			It("creates requirements-stale.txt and uninstalls unused dependencies that are not in the excluded list", func() {
+				mockRequirements.EXPECT().FindStalePackages(
+					filepath.Join(depDir, "python", "requirements-declared.txt"),
+					filepath.Join(buildDir, "requirements.txt"),
+					"setuptools", "pip", "wheel",
+				).Return(requirementsStale, nil)
+
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "uninstall", "-r", filepath.Join(depDir, "python", "requirements-stale.txt", "-y", "--exists-action=w"))
 				Expect(supplier.UninstallUnusedDependencies()).To(Succeed())
 				fileContents, err := ioutil.ReadFile(filepath.Join(depDir, "python", "requirements-stale.txt"))
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(fileContents)).To(Equal(requirementsStale))
+				Expect(string(fileContents)).To(Equal(requirementsStaleString))
 			})
 		})
 

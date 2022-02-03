@@ -1,12 +1,13 @@
 package main
 
 import (
-	"io"
-	"io/ioutil"
-	"os"
 	"github.com/cloudfoundry/python-buildpack/src/python/finalize"
 	_ "github.com/cloudfoundry/python-buildpack/src/python/hooks"
 	"github.com/cloudfoundry/python-buildpack/src/python/pyfinder"
+	"github.com/cloudfoundry/python-buildpack/src/python/requirements"
+	"io"
+	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
@@ -55,6 +56,7 @@ func main() {
 		Logfile:        logfile,
 		Command:        &libbuildpack.Command{},
 		ManagePyFinder: pyfinder.ManagePyFinder{},
+		Requirements:   requirements.Reqs{},
 	}
 
 	if err := finalize.Run(&f); err != nil {
