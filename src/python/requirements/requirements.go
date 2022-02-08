@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const requirementsParserRegex = `(?m)^[\w\-\w\[\]]+`
+
 type Reqs struct{}
 
 func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error) {
@@ -56,7 +58,8 @@ func containsPackage(packages []string, searchedPackage string) bool {
 }
 
 func packageIsExcluded(excludedPackages []string, packageFullName string) bool {
-	regex := regexp.MustCompile(`(?m)^[\w\-\w\[\]]+`)
+
+	regex := regexp.MustCompile(requirementsParserRegex)
 
 	packageWithoutVersion := regex.FindString(packageFullName)
 

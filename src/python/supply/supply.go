@@ -484,11 +484,12 @@ func (s *Supplier) HandlePylibmc() error {
 		return err
 	}
 
-	if exists {
-		return s.installLibmemcache()
+	if !exists {
+
+		return nil
 	}
 
-	return nil
+	return s.installLibmemcache()
 }
 
 func (s *Supplier) installLibmemcache() error {
@@ -552,11 +553,12 @@ func (s *Supplier) HandleFfi() error {
 		return err
 	}
 
-	if exists {
-		return s.installFfi()
+	if !exists {
+
+		return nil
 	}
 
-	return nil
+	return s.installFfi()
 }
 
 func (s *Supplier) UninstallUnusedDependencies() error {

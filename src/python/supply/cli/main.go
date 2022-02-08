@@ -1,14 +1,15 @@
 package main
 
 import (
-	_ "github.com/cloudfoundry/python-buildpack/src/python/hooks"
-	"github.com/cloudfoundry/python-buildpack/src/python/requirements"
-	"github.com/cloudfoundry/python-buildpack/src/python/supply"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
+
+	_ "github.com/cloudfoundry/python-buildpack/src/python/hooks"
+	"github.com/cloudfoundry/python-buildpack/src/python/requirements"
+	"github.com/cloudfoundry/python-buildpack/src/python/supply"
 
 	"github.com/cloudfoundry/libbuildpack"
 )
