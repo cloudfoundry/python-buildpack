@@ -28,46 +28,69 @@ var _ = Describe("Reqs", func() {
 
 	Describe("FindAnyPackage", func() {
 		Context("succeed", func() {
-			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`package0
+
+			Context("single requirements.txt file", func() {
+				BeforeEach(func() {
+					Expect(ioutil.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`package0
 package2>=2.0.0
 package3!=3.0.0
 package4~=4.0.0
 package6[test]==6.0.0
 `), 0644)).To(Succeed())
-			})
+				})
 
-			Context("package is not in requirements.txt file", func() {
-				It("returns false and nil error", func() {
-					exists, err := req.FindAnyPackage(tempDir, "package1")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(exists).To(BeFalse())
+				Context("package is not in requirements.txt file", func() {
+					It("returns false and nil error", func() {
+						exists, err := req.FindAnyPackage(tempDir, "package1")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(exists).To(BeFalse())
 
-					exists, err = req.FindAnyPackage(tempDir, "package5")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(exists).To(BeFalse())
+						exists, err = req.FindAnyPackage(tempDir, "package5")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(exists).To(BeFalse())
+					})
+				})
+
+				Context("package is in requirements.txt file", func() {
+					It("returns true and nil error", func() {
+						exists, err := req.FindAnyPackage(tempDir, "package2")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(exists).To(BeTrue())
+
+						exists, err = req.FindAnyPackage(tempDir, "package6[test]")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(exists).To(BeTrue())
+					})
 				})
 			})
 
-			Context("package is in requirements.txt file", func() {
-				It("returns true and nil error", func() {
-					exists, err := req.FindAnyPackage(tempDir, "package2")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(exists).To(BeTrue())
+			Context("multiple requirements.txt files", func() {
+				Context("packages are in a recursive requirements.txt file", func() {
+					BeforeEach(func() {
+						err := os.Mkdir(filepath.Join(tempDir, "other_folder"), 0755)
+						Expect(err).NotTo(HaveOccurred())
 
-					exists, err = req.FindAnyPackage(tempDir, "package6[test]")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(exists).To(BeTrue())
-				})
-			})
-		})
+						Expect(ioutil.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`package0
+package3!=3.0.0
+package4~=4.0.0
+-r requirements1.txt`), 0644)).To(Succeed())
 
-		Context("failure", func() {
-			Context("error opening requirements.txt file", func() {
-				It("returns the error", func() {
-					_, err := req.FindAnyPackage("invalid-directory", "package0")
-					Expect(err).To(HaveOccurred())
+						Expect(ioutil.WriteFile(filepath.Join(tempDir, "requirements1.txt"), []byte(`package6[test] == 6.0.0
+-r other_folder/requirements2.txt`), 0644)).To(Succeed())
+						Expect(ioutil.WriteFile(filepath.Join(tempDir, "other_folder", "requirements2.txt"), []byte(`package2>=2.0.0`), 0644)).To(Succeed())
+					})
+
+					It("returns true and nil error", func() {
+						exists, err := req.FindAnyPackage(tempDir, "package2")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(exists).To(BeTrue())
+
+						exists, err = req.FindAnyPackage(tempDir, "package6[test]")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(exists).To(BeTrue())
+					})
 				})
+
 			})
 		})
 	})

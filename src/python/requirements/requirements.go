@@ -78,17 +78,29 @@ func parseRequirements(requirementsPath string) ([]string, error) {
 		return nil, err
 	}
 
-	return strings.Split(string(content), "\n"), nil
-	//// TODO: Add support for nested requirements.txt files
+	requirements := strings.Split(string(content), "\n")
+
+	for _, requirement := range requirements {
+		if strings.HasPrefix(requirement, "-r ") {
+			requirement = strings.TrimPrefix(requirement, "-r ")
+			nestedReqs, err := parseRequirements(strings.ReplaceAll(requirementsPath, filepath.Base(requirementsPath), requirement))
+			if err != nil {
+				return nil, err
+			}
+
+			requirements = append(requirements, nestedReqs...)
+		}
+	}
+
+	return requirements, nil
 }
 
 func parseRequirementsWithoutVersion(requirementsPath string) ([]string, error) {
-	content, err := ioutil.ReadFile(requirementsPath)
+	parsedRequirements, err := parseRequirements(requirementsPath)
 	if err != nil {
 		return nil, err
 	}
 
-	//// TODO: Add support for nested requirements.txt files
 	regex := regexp.MustCompile(`(?m)^[\w\-\w\[\]]+`)
-	return regex.FindAllString(string(content), -1), nil
+	return regex.FindAllString(strings.Join(parsedRequirements, "\n"), -1), nil
 }
