@@ -226,3 +226,66 @@ func (mr *MockManagePyFinderMockRecorder) FindManagePy(dir interface{}) *gomock.
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindManagePy", reflect.TypeOf((*MockManagePyFinder)(nil).FindManagePy), dir)
 }
+
+// MockReqs is a mock of Reqs interface.
+type MockReqs struct {
+	ctrl     *gomock.Controller
+	recorder *MockReqsMockRecorder
+}
+
+// MockReqsMockRecorder is the mock recorder for MockReqs.
+type MockReqsMockRecorder struct {
+	mock *MockReqs
+}
+
+// NewMockReqs creates a new mock instance.
+func NewMockReqs(ctrl *gomock.Controller) *MockReqs {
+	mock := &MockReqs{ctrl: ctrl}
+	mock.recorder = &MockReqsMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockReqs) EXPECT() *MockReqsMockRecorder {
+	return m.recorder
+}
+
+// FindAnyPackage mocks base method.
+func (m *MockReqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{buildDir}
+	for _, a := range searchedPackages {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FindAnyPackage", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindAnyPackage indicates an expected call of FindAnyPackage.
+func (mr *MockReqsMockRecorder) FindAnyPackage(buildDir interface{}, searchedPackages ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{buildDir}, searchedPackages...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAnyPackage", reflect.TypeOf((*MockReqs)(nil).FindAnyPackage), varargs...)
+}
+
+// FindStalePackages mocks base method.
+func (m *MockReqs) FindStalePackages(oldRequirementsPath, newRequirementsPath string, excludedPackages ...string) ([]string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{oldRequirementsPath, newRequirementsPath}
+	for _, a := range excludedPackages {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FindStalePackages", varargs...)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindStalePackages indicates an expected call of FindStalePackages.
+func (mr *MockReqsMockRecorder) FindStalePackages(oldRequirementsPath, newRequirementsPath interface{}, excludedPackages ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{oldRequirementsPath, newRequirementsPath}, excludedPackages...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindStalePackages", reflect.TypeOf((*MockReqs)(nil).FindStalePackages), varargs...)
+}

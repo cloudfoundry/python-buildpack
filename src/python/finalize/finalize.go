@@ -10,8 +10,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cloudfoundry/libbuildpack"
 	"github.com/kr/text"
+
+	"github.com/cloudfoundry/libbuildpack"
 )
 
 type Manifest interface {
@@ -34,6 +35,11 @@ type ManagePyFinder interface {
 	FindManagePy(dir string) (string, error)
 }
 
+type Reqs interface {
+	FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error)
+	FindStalePackages(oldRequirementsPath, newRequirementsPath string, excludedPackages ...string) ([]string, error)
+}
+
 type Finalizer struct {
 	Stager         Stager
 	Log            *libbuildpack.Logger
@@ -41,6 +47,7 @@ type Finalizer struct {
 	Manifest       Manifest
 	Command        Command
 	ManagePyFinder ManagePyFinder
+	Requirements   Reqs
 }
 
 func Run(f *Finalizer) error {
@@ -67,7 +74,13 @@ func (f *Finalizer) HandleCollectstatic() error {
 	if len(os.Getenv("DISABLE_COLLECTSTATIC")) > 0 {
 		return nil
 	}
-	if err := f.Command.Execute(f.Stager.BuildDir(), os.Stdout, os.Stderr, "pip-grep", "-s", "requirements.txt", "django", "Django"); err != nil {
+
+	exists, err := f.Requirements.FindAnyPackage(f.Stager.BuildDir(), "django", "Django")
+	if err != nil {
+		return err
+	}
+
+	if !exists {
 		return nil
 	}
 

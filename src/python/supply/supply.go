@@ -50,6 +50,11 @@ type Command interface {
 	RunWithOutput(cmd *exec.Cmd) ([]byte, error)
 }
 
+type Reqs interface {
+	FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error)
+	FindStalePackages(oldRequirementsPath, newRequirementsPath string, excludedPackages ...string) ([]string, error)
+}
+
 type Supplier struct {
 	PythonVersion          string
 	Manifest               Manifest
@@ -60,6 +65,7 @@ type Supplier struct {
 	Logfile                *os.File
 	HasNltkData            bool
 	removeRequirementsText bool
+	Requirements           Reqs
 }
 
 func Run(s *Supplier) error {
@@ -99,11 +105,6 @@ func RunPython(s *Supplier) error {
 
 	if err := s.InstallPip(); err != nil {
 		s.Log.Error("Could not install pip: %v", err)
-		return err
-	}
-
-	if err := s.InstallPipPop(); err != nil {
-		s.Log.Error("Could not install pip pop: %v", err)
 		return err
 	}
 
@@ -365,22 +366,6 @@ func (s *Supplier) InstallPip() error {
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
 }
 
-func (s *Supplier) InstallPipPop() error {
-	tempPath := filepath.Join("/tmp", "pip-pop")
-	if err := s.Installer.InstallOnlyVersion("pip-pop", tempPath); err != nil {
-		return err
-	}
-
-	if err := s.runPipInstall("pip-pop", "--exists-action=w", "--no-index", fmt.Sprintf("--find-links=%s", tempPath)); err != nil {
-		return err
-	}
-
-	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin"); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *Supplier) InstallPipEnv() error {
 	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
 	if err != nil {
@@ -494,21 +479,31 @@ func pipfileToRequirements(lockFilePath string) (string, error) {
 }
 
 func (s *Supplier) HandlePylibmc() error {
-	memcachedDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
-
-	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "pylibmc"); err == nil {
-		s.Log.BeginStep("Noticed pylibmc. Bootstrapping libmemcached.")
-		if err := s.Installer.InstallOnlyVersion("libmemcache", memcachedDir); err != nil {
-			return err
-		}
-		os.Setenv("LIBMEMCACHED", memcachedDir)
-		s.Stager.WriteEnvFile("LIBMEMCACHED", memcachedDir)
-		s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib"), "lib")
-		s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib", "sasl2"), "lib")
-		s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib", "pkgconfig"), "pkgconfig")
-		s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "include"), "include")
+	exists, err := s.Requirements.FindAnyPackage(s.Stager.BuildDir(), "pylibmc")
+	if err != nil {
+		return err
 	}
 
+	if !exists {
+
+		return nil
+	}
+
+	return s.installLibmemcache()
+}
+
+func (s *Supplier) installLibmemcache() error {
+	memcachedDir := filepath.Join(s.Stager.DepDir(), "libmemcache")
+	s.Log.BeginStep("Noticed pylibmc. Bootstrapping libmemcached.")
+	if err := s.Installer.InstallOnlyVersion("libmemcache", memcachedDir); err != nil {
+		return err
+	}
+	os.Setenv("LIBMEMCACHED", memcachedDir)
+	s.Stager.WriteEnvFile("LIBMEMCACHED", memcachedDir)
+	s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib"), "lib")
+	s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib", "sasl2"), "lib")
+	s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "lib", "pkgconfig"), "pkgconfig")
+	s.Stager.LinkDirectoryInDepDir(filepath.Join(memcachedDir, "include"), "include")
 	return nil
 }
 
@@ -551,10 +546,19 @@ func (s *Supplier) installFfi() error {
 }
 
 func (s *Supplier) HandleFfi() error {
-	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "pip-grep", "-s", "requirements.txt", "pymysql", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]", "django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka"); err == nil {
-		return s.installFfi()
+	exists, err := s.Requirements.FindAnyPackage(s.Stager.BuildDir(),
+		"pymysql", "argon2-cffi", "bcrypt", "cffi", "cryptography", "django[argon2]", "Django[argon2]",
+		"django[bcrypt]", "Django[bcrypt]", "PyNaCl", "pyOpenSSL", "PyOpenSSL", "requests[security]", "misaka")
+	if err != nil {
+		return err
 	}
-	return nil
+
+	if !exists {
+
+		return nil
+	}
+
+	return s.installFfi()
 }
 
 func (s *Supplier) UninstallUnusedDependencies() error {
@@ -567,26 +571,22 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 		fileContents, _ := ioutil.ReadFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"))
 		s.Log.Info("requirements-declared: %s", string(fileContents))
 
-		staleContents, err := s.Command.Output(
-			s.Stager.BuildDir(),
-			"pip-diff",
-			"--stale",
+		staleContents, err := s.Requirements.FindStalePackages(
 			filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"),
 			filepath.Join(s.Stager.BuildDir(), "requirements.txt"),
-			"--exclude",
-			"setuptools",
-			"pip",
-			"wheel",
-		)
+			"setuptools", "pip", "wheel")
+
 		if err != nil {
 			return err
 		}
 
-		if staleContents == "" {
+		if len(staleContents) == 0 {
 			return nil
 		}
 
-		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt"), []byte(staleContents), 0644); err != nil {
+		staleContentString := strings.Join(staleContents[:], "\n")
+
+		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt"), []byte(staleContentString), 0644); err != nil {
 			return err
 		}
 

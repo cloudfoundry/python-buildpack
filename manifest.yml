@@ -53,14 +53,6 @@ dependencies:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/88/d9/761f0b1e0551a3559afe4d34bd9bf68fc8de3292363b3775dda39b62ce84/pip-22.0.3.tar.gz
   source_sha256: f29d589df8c8ab99c060e68ad294c4a9ed896624f6368c5349d70aa581b333d0
-- name: pip-pop
-  version: 0.1.5
-  cf_stacks:
-  - cflinuxfs3
-  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/pip-pop/pip-pop-0.1.5-b32efe86.tar.gz
-  sha256: b32efe865fc6d956e3345690215bc92a7038acf728db228243097b254403048f
-  source: https://github.com/cloudfoundry/pip-pop/archive/v0.1.5.tar.gz
-  source_sha256: 879221acbf123fb24e4a91b3d02e400031f89799bb70316fd97f36d2307a8230
 - name: pipenv
   version: 2022.1.8
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.1.8_linux_noarch_cflinuxfs3_119108d6.tgz
