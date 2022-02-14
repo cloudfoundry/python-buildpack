@@ -123,25 +123,5 @@ package1==2.0.0
 				Expect(stale).To(ConsistOf("package4", "package5!=4.0.0"))
 			})
 		})
-
-		Context("failure", func() {
-			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(tempDir, "valid-req.txt"), []byte(`package0`), 0644)).To(Succeed())
-			})
-
-			Context("error opening old requirements file", func() {
-				It("returns the error", func() {
-					_, err := req.FindStalePackages(filepath.Join(tempDir, "missing.txt"), filepath.Join(tempDir, "valid-req.txt"))
-					Expect(err).To(HaveOccurred())
-				})
-			})
-
-			Context("error opening new requirements file", func() {
-				It("returns the error", func() {
-					_, err := req.FindStalePackages(filepath.Join(tempDir, "valid-req.txt"), filepath.Join(tempDir, "missing.txt"))
-					Expect(err).To(HaveOccurred())
-				})
-			})
-		})
 	})
 })

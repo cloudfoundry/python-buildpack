@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/cloudfoundry/libbuildpack"
 )
 
 const requirementsParserRegex = `(?m)^[\w\-\w\[\]]+`
@@ -12,14 +14,24 @@ const requirementsParserRegex = `(?m)^[\w\-\w\[\]]+`
 type Reqs struct{}
 
 func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error) {
-	reqPackages, err := parseRequirementsWithoutVersion(filepath.Join(buildDir, "requirements.txt"))
+	requirementsPath := filepath.Join(buildDir, "requirements.txt")
+
+	requirementsFileExists, err := libbuildpack.FileExists(requirementsPath)
 	if err != nil {
 		return false, err
 	}
 
-	for _, searchedPackage := range searchedPackages {
-		if containsPackage(reqPackages, searchedPackage) {
-			return true, nil
+	if requirementsFileExists {
+
+		reqPackages, err := parseRequirementsWithoutVersion(requirementsPath)
+		if err != nil {
+			return false, err
+		}
+
+		for _, searchedPackage := range searchedPackages {
+			if containsPackage(reqPackages, searchedPackage) {
+				return true, nil
+			}
 		}
 	}
 
@@ -29,22 +41,34 @@ func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool,
 func (m Reqs) FindStalePackages(oldRequirementsPath, newRequirementsPath string, excludedPackages ...string) ([]string, error) {
 	var stalePackages []string
 
-	oldPkgs, err := parseRequirements(oldRequirementsPath)
+	oldRequirementsExists, err := libbuildpack.FileExists(oldRequirementsPath)
 	if err != nil {
 		return nil, err
 	}
 
-	newPkgs, err := parseRequirements(newRequirementsPath)
+	newRequirementsExists, err := libbuildpack.FileExists(newRequirementsPath)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, oldPkg := range oldPkgs {
-		if !containsPackage(newPkgs, oldPkg) && !packageIsExcluded(excludedPackages, oldPkg) {
-			stalePackages = append(stalePackages, oldPkg)
+	if oldRequirementsExists && newRequirementsExists {
+
+		oldPkgs, err := parseRequirements(oldRequirementsPath)
+		if err != nil {
+			return nil, err
+		}
+
+		newPkgs, err := parseRequirements(newRequirementsPath)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, oldPkg := range oldPkgs {
+			if !containsPackage(newPkgs, oldPkg) && !packageIsExcluded(excludedPackages, oldPkg) {
+				stalePackages = append(stalePackages, oldPkg)
+			}
 		}
 	}
-
 	return stalePackages, nil
 }
 
