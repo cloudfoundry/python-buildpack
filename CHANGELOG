@@ -1,3 +1,21 @@
+v1.7.50 Feb 14, 2022
+=====================
+
+* Deprecate Python 3.6.x and update all fixtures
+
+* Add python 3.10.2
+
+* Add python 3.9.10, remove python 3.9.7
+
+* Remove the usage of pip-pop library
+
+* Add setuptools 60.9.0, remove setuptools 60.2.0
+
+* Add pip 22.0.3, remove pip 21.3.1
+
+* Add pipenv 2022.1.8, remove pipenv 2021.11.23
+
+
 v1.7.49 Jan 05, 2022
 =====================
 
