@@ -71,7 +71,7 @@ func Run(c *Conda) error {
 }
 
 func (c *Conda) Version() string {
-	return "miniconda3"
+	return "miniconda3-py39"
 }
 
 func (c *Conda) Install(version string) error {

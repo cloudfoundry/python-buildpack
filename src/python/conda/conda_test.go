@@ -73,14 +73,14 @@ var _ = Describe("Conda", func() {
 				Expect(ioutil.WriteFile(filepath.Join(buildDir, "runtime.txt"), []byte("python-3.2.3"), 0644)).To(Succeed())
 			})
 
-			It("returns 'miniconda3'", func() {
-				Expect(subject.Version()).To(Equal("miniconda3"))
+			It("returns 'miniconda3-py39'", func() {
+				Expect(subject.Version()).To(Equal("miniconda3-py39"))
 			})
 		})
 
 		Context("runtime.txt does not exist", func() {
-			It("returns 'miniconda3'", func() {
-				Expect(subject.Version()).To(Equal("miniconda3"))
+			It("returns 'miniconda3-py39'", func() {
+				Expect(subject.Version()).To(Equal("miniconda3-py39"))
 			})
 		})
 	})
