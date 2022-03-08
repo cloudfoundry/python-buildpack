@@ -1,3 +1,15 @@
+v1.7.51 Mar 08, 2022
+=====================
+
+* Add pip 22.0.4, remove pip 22.0.3 for stack(s) cflinuxfs3
+
+* Add setuptools 60.9.3, remove setuptools 60.9.0 for stack(s) cflinuxfs3
+
+* Rename dependency name from miniconda3 to miniconda3-py39
+
+* Add miniconda3-py39 4.11.0, remove miniconda3-py39 4.10.3
+
+
 v1.7.50 Feb 14, 2022
 =====================
 
