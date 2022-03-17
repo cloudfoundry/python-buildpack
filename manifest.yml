@@ -62,14 +62,6 @@ dependencies:
   source: https://files.pythonhosted.org/packages/82/71/cd2c9501b2796784eea65213c7a787a2aec6393009a134a6f01c2b89b2a1/pipenv-2022.1.8.tar.gz
   source_sha256: f84d7119239b22ab2ac2b8fbc7d619d83cf41135206d72a17c4f151cda529fd0
 - name: python
-  version: 3.7.11
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.7.11_linux_x64_cflinuxfs3_b214c524.tgz
-  sha256: b214c524e0d5c32c41d1bbf3c766eb00b8c55e7da00ad9e309e158624c025573
-  cf_stacks:
-  - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.7.11/Python-3.7.11.tgz
-  source_sha256: b4fba32182e16485d0a6022ba83c9251e6a1c14676ec243a9a07d3722cd4661a
-- name: python
   version: 3.7.12
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.7.12_linux_x64_cflinuxfs3_b89d366c.tgz
   sha256: b89d366ceea58c4eec39bf20b7d3899fe72b9ef2b8debc6ac79d5810180ecba7
@@ -77,6 +69,14 @@ dependencies:
   - cflinuxfs3
   source: https://www.python.org/ftp/python/3.7.12/Python-3.7.12.tgz
   source_sha256: 33b4daaf831be19219659466d12645f87ecec6eb21d4d9f9711018a7b66cce46
+- name: python
+  version: 3.7.13
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.7.13_linux_x64_cflinuxfs3_b5116321.tgz
+  sha256: b51163210e76abfbaa0be2eb8640fe1832d601e7157616153737c5296ac419f2
+  cf_stacks:
+  - cflinuxfs3
+  source: https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tgz
+  source_sha256: e405417f50984bc5870c7e7a9f9aeb93e9d270f5ac67f667a0cd3a09439682b5
 - name: python
   version: 3.8.12
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.8.12_linux_x64_cflinuxfs3_63d8339a.tgz
