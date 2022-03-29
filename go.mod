@@ -3,7 +3,7 @@ module github.com/cloudfoundry/python-buildpack
 require (
 	github.com/Dynatrace/libbuildpack-dynatrace v1.4.2
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/cloudfoundry/libbuildpack v0.0.0-20211207004218-1ef25b7c793a
+	github.com/cloudfoundry/libbuildpack v0.0.0-20220104002832-0463886d7d21
 	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -12,7 +12,8 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.19.0
 	github.com/stretchr/testify v1.7.0 // indirect
-	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/sys v0.0.0-20220329152356-43be30ef3008 // indirect
 	gopkg.in/ini.v1 v1.66.4
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
