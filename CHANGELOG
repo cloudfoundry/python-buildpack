@@ -1,3 +1,15 @@
+v1.7.53 Apr 07, 2022
+=====================
+
+* Add setuptools 62.0.0, remove setuptools 60.10.0 for stack(s) cflinuxfs3
+
+* Add python 3.10.4, remove python 3.10.2 for stack(s) cflinuxfs3
+
+* Add python 3.9.12, remove python 3.9.10 for stack(s) cflinuxfs3
+
+* Add pipenv 2022.3.28, remove pipenv 2022.1.8 for stack(s) cflinuxfs3
+
+
 v1.7.52 Mar 18, 2022
 =====================
 
