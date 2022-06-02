@@ -72,20 +72,24 @@ func Run(f *Finalizer) error {
 
 func (f *Finalizer) HandleCollectstatic() error {
 	if len(os.Getenv("DISABLE_COLLECTSTATIC")) > 0 {
+        f.Log.Debug("DISABLE_COLLECTSTATIC > 0, skipping collectstatic")
 		return nil
 	}
 
 	exists, err := f.Requirements.FindAnyPackage(f.Stager.BuildDir(), "django", "Django")
 	if err != nil {
+        f.Log.Debug("Error during FindAnyPackage, skipping collectstatic")
 		return err
 	}
 
 	if !exists {
+        f.Log.Debug("Django not in requirements, skipping collectstatic")
 		return nil
 	}
 
 	managePyPath, err := f.ManagePyFinder.FindManagePy(f.Stager.BuildDir())
 	if err != nil {
+        f.Log.Debug("Error finding manage.py, skipping collectstatic")
 		return err
 	}
 
