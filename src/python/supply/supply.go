@@ -699,7 +699,7 @@ func (s *Supplier) RunPipVendored() error {
 		installArgs = append(installArgs, "--no-build-isolation")
 	}
 
-	// Remove lines from requirements.txt that begin with -i
+	// Remove lines from requirements.txt that begin with -i, --index-url and --extra-index-url
 	// because specifying index links here makes pip always want internet access,
 	// and pipenv generates requirements.txt with -i.
 	originalReqs, err := ioutil.ReadFile(requirementsPath)
@@ -707,7 +707,7 @@ func (s *Supplier) RunPipVendored() error {
 		return fmt.Errorf("could not read requirements.txt: %v", err)
 	}
 
-	re := regexp.MustCompile(`(?m)^\s*-i.*$`)
+	re := regexp.MustCompile(`(?m)^\s*(-i|--index-url|--extra-index-url)\s+(.*)$`)
 	modifiedReqs := re.ReplaceAll(originalReqs, []byte{})
 	err = ioutil.WriteFile(requirementsPath, modifiedReqs, 0644)
 	if err != nil {
