@@ -1,3 +1,17 @@
+v1.7.57 Aug 10, 2022
+=====================
+
+* Add python 3.10.6, remove python 3.10.4 for stack(s) cflinuxfs3
+
+* Add pip 22.2.2, remove pip 22.1.2 for stack(s) cflinuxfs3
+
+* Add pipenv 2022.8.5, remove pipenv 2022.7.4 for stack(s) cflinuxfs3
+
+* Add setuptools 63.4.2, remove setuptools 63.1.0 for stack(s) cflinuxfs3
+
+* Scrub multiple ways of describing index-url from requiremnts.txt when using vendored installs (#544). See https://github.com/pypa/pip/issues/11276 for the upstream problem.
+
+
 v1.7.56 Jul 12, 2022
 =====================
 
