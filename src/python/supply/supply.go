@@ -304,7 +304,12 @@ func (s *Supplier) InstallPython() error {
 	if err := os.Setenv("PATH", fmt.Sprintf("%s:%s", filepath.Join(s.Stager.DepDir(), "bin"), os.Getenv("PATH"))); err != nil {
 		return err
 	}
-	if err := os.Setenv("PYTHONPATH", filepath.Join(s.Stager.DepDir())); err != nil {
+	if err := os.Setenv("PYTHONPATH", s.Stager.DepDir()); err != nil {
+		return err
+	}
+
+	version := regexp.MustCompile(`\d+\.\d+`).FindString(dep.Version)
+	if err := os.Setenv("CFLAGS", fmt.Sprintf("-I%s", filepath.Join(s.Stager.DepDir(), "python", "include", fmt.Sprintf("python%s", version)))); err != nil {
 		return err
 	}
 

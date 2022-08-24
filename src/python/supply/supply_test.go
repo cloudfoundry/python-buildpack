@@ -112,7 +112,8 @@ var _ = Describe("Supply", func() {
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
 				Expect(supplier.InstallPython()).To(Succeed())
 				Expect(os.Getenv("PATH")).To(Equal(fmt.Sprintf("%s:%s", filepath.Join(depDir, "bin"), originalPath)))
-				Expect(os.Getenv("PYTHONPATH")).To(Equal(filepath.Join(depDir)))
+				Expect(os.Getenv("PYTHONPATH")).To(Equal(depDir))
+				Expect(os.Getenv("CFLAGS")).To(Equal(fmt.Sprintf("-I%s", filepath.Join(depDir, "python", "include", "python3.4"))))
 			})
 		})
 
@@ -122,13 +123,14 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("installs the default Python version", func() {
-				mockManifest.EXPECT().DefaultVersion("python").Return(libbuildpack.Dependency{Name: "python", Version: "some-default-version"}, nil)
-				mockInstaller.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "some-default-version"}, pythonInstallDir)
+				mockManifest.EXPECT().DefaultVersion("python").Return(libbuildpack.Dependency{Name: "python", Version: "some-default-version-3.2"}, nil)
+				mockInstaller.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "some-default-version-3.2"}, pythonInstallDir)
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
 				Expect(supplier.InstallPython()).To(Succeed())
 				Expect(os.Getenv("PATH")).To(Equal(fmt.Sprintf("%s:%s", filepath.Join(depDir, "bin"), originalPath)))
 				Expect(os.Getenv("PYTHONPATH")).To(Equal(filepath.Join(depDir)))
+				Expect(os.Getenv("CFLAGS")).To(Equal(fmt.Sprintf("-I%s", filepath.Join(depDir, "python", "include", "python3.2"))))
 			})
 		})
 	})
