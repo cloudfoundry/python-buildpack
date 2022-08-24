@@ -229,7 +229,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 		})
 
-		Context("with mercurial dependencies", func() {
+		PContext("with mercurial dependencies", func() {
 			BeforeEach(func() {
 				app = cutlass.New(Fixtures("mercurial"))
 				app.SetEnv("BP_DEBUG", "1")
@@ -266,7 +266,7 @@ var _ = Describe("CF Python Buildpack", func() {
 			})
 		})
 
-		Context("with mercurial dependencies", func() {
+		PContext("with mercurial dependencies", func() {
 			BeforeEach(func() {
 				app = cutlass.New(Fixtures("mercurial"))
 			})
