@@ -1,3 +1,19 @@
+v1.7.58 Aug 24, 2022
+=====================
+
+* Set CFLAGS when building
+  Fix for `Python.h: No such file or directory` error on native extensions.
+
+* Add setuptools 65.3.0, remove setuptools 63.4.2
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/183070646)
+  (https://www.pivotaltracker.com/story/show/182956247)
+
+* Add pipenv 2022.8.19, remove pipenv 2022.8.5
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/183033182)
+
+
 v1.7.57 Aug 10, 2022
 =====================
 
