@@ -128,11 +128,6 @@ func RunPython(s *Supplier) error {
 		return err
 	}
 
-	if err := s.HandleMercurial(); err != nil {
-		s.Log.Error("Could not handle pip mercurial dependencies: %v", err)
-		return err
-	}
-
 	if err := s.UninstallUnusedDependencies(); err != nil {
 		s.Log.Error("Error uninstalling unused dependencies: %v", err)
 		return err
@@ -193,25 +188,6 @@ func (s *Supplier) CopyRuntimeTxt() error {
 		if err = libbuildpack.CopyFile(filepath.Join(s.Stager.BuildDir(), "runtime.txt"), filepath.Join(s.Stager.DepDir(), "runtime.txt")); err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func (s *Supplier) HandleMercurial() error {
-	if err := s.Command.Execute(s.Stager.BuildDir(), ioutil.Discard, ioutil.Discard, "grep", "-Fiq", "hg+", "requirements.txt"); err != nil {
-		return nil
-	}
-
-	if s.Manifest.IsCached() {
-		s.Log.Warning("Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work.")
-	}
-
-	if err := s.runPipInstall("mercurial"); err != nil {
-		return err
-	}
-
-	if err := s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin"); err != nil {
-		return err
 	}
 	return nil
 }

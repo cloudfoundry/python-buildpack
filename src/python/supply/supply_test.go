@@ -456,47 +456,6 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
-	Describe("HandleMercurial", func() {
-		Context("has mercurial dependencies", func() {
-			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "grep", "-Fiq", "hg+", "requirements.txt")
-			})
-
-			Context("the buildpack is not cached", func() {
-				BeforeEach(func() {
-					mockManifest.EXPECT().IsCached().Return(false)
-				})
-				It("installs mercurial", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "mercurial")
-					mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
-					Expect(supplier.HandleMercurial()).To(Succeed())
-				})
-			})
-
-			Context("the buildpack is cached", func() {
-				BeforeEach(func() {
-					mockManifest.EXPECT().IsCached().Return(true)
-				})
-				It("installs mercurial and provides a warning", func() {
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "mercurial")
-					mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
-					Expect(supplier.HandleMercurial()).To(Succeed())
-					Expect(buffer.String()).To(ContainSubstring("Cloud Foundry does not support Pip Mercurial dependencies while in offline-mode. Vendor your dependencies if they do not work."))
-				})
-			})
-
-		})
-		Context("does not have mercurial dependencies", func() {
-			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "grep", "-Fiq", "hg+", "requirements.txt").Return(fmt.Errorf("Mercurial not found"))
-			})
-
-			It("succeeds without installing mercurial", func() {
-				Expect(supplier.HandleMercurial()).To(Succeed())
-			})
-		})
-	})
-
 	Describe("RewriteShebangs", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(filepath.Join(depDir, "bin"), 0755)).To(Succeed())
