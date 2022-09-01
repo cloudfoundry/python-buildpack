@@ -10,7 +10,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/kr/text v0.2.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.20.1
+	github.com/onsi/gomega v1.20.2
 	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	gopkg.in/ini.v1 v1.67.0
