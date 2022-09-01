@@ -54,13 +54,13 @@ dependencies:
   source: https://files.pythonhosted.org/packages/4b/30/e15b806597e67057e07a5acdc135216ccbf76a5f1681a324533b61066b0b/pip-22.2.2.tar.gz
   source_sha256: 3fd1929db052f056d7a998439176d3333fa1b3f6c1ad881de1885c0717608a4b
 - name: pipenv
-  version: 2022.8.30
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.8.30_linux_noarch_cflinuxfs3_7b1c53ed.tgz
-  sha256: 7b1c53ed8f38ef849346afe5dd8bcdbbdf7c9a398a3511d742ad4a7ea04ce8b7
+  version: 2022.8.31
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.8.31_linux_noarch_cflinuxfs3_7abaa6a0.tgz
+  sha256: 7abaa6a0aba7882410d73fa6a2b41c42089783001f5262b3077265ac013a3685
   cf_stacks:
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/18/6e/55b5e77915b56a495394786622fb8a580c876ceed97e773c7ce6386032d1/pipenv-2022.8.30.tar.gz
-  source_sha256: 41475adbc5ade17184643bcfdfa99632e7f61513a17ec71c4832031b8862cbab
+  source: https://files.pythonhosted.org/packages/34/4b/f825cd274506698b0ee8dd9a2c05f7fc01c873787dee634ab982a1a64863/pipenv-2022.8.31.tar.gz
+  source_sha256: 9f26e90e694aa6346f9b09149dc086ea69ea294846e0eccf8191c148c99bf38d
 - name: python
   version: 3.7.12
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.7.12_linux_x64_cflinuxfs3_b89d366c.tgz
