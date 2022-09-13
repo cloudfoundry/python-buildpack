@@ -1,3 +1,29 @@
+v1.7.59 Sep 13, 2022
+=====================
+
+* Add python 3.7.14, remove python 3.7.12
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/183201709)
+
+* Add python 3.8.14, remove python 3.8.12
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/183209169)
+
+* Add python 3.9.14, remove python 3.9.12
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/183209172)
+
+* Add python 3.10.7, remove python 3.10.5
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/183186088)
+
+* Add pipenv 2022.9.8, remove pipenv 2022.8.19
+  for stack(s) cflinuxfs3
+
+* supply: remove pre-installing mercurial
+  (https://github.com/cloudfoundry/python-buildpack/pull/576)
+
+
 v1.7.58 Aug 24, 2022
 =====================
 
