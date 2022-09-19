@@ -24,6 +24,7 @@ dependencies:
 - name: libffi
   version: 3.2.1
   cf_stacks:
+  - cflinuxfs4
   - cflinuxfs3
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64-5f5bf32c.tgz
   sha256: ff6f2f33aa3d3978a2c1764d6992ac8c384bc84a4c5d193deef891eef2555dc9
@@ -32,6 +33,7 @@ dependencies:
 - name: libmemcache
   version: 1.0.18
   cf_stacks:
+  - cflinuxfs4
   - cflinuxfs3
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64-6d33aa02.tgz
   sha256: '009a3476197030e30d0ce924cc044ee4851ef27324e132b29fd12d8cde071915'
@@ -52,6 +54,7 @@ dependencies:
   sha256: 51f4b7a02007a4648cdfda49eb497555c75ab2dfb466c7c3a3788b5ad58fa2ee
   cf_stacks:
   - cflinuxfs3
+  - cflinuxfs4
   source: https://files.pythonhosted.org/packages/4b/30/e15b806597e67057e07a5acdc135216ccbf76a5f1681a324533b61066b0b/pip-22.2.2.tar.gz
   source_sha256: 3fd1929db052f056d7a998439176d3333fa1b3f6c1ad881de1885c0717608a4b
 - name: pipenv
