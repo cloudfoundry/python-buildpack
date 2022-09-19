@@ -167,9 +167,10 @@ dependencies:
   source_sha256: 1b2e4e2df697c52d36731666979e648beeda5941d0f95740aafbf4163e5cc126
 - name: setuptools
   version: 65.3.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_65.3.0_linux_noarch_any-stack_6c4646a6.tgz
-  sha256: 6c4646a68fc618382f3de8352cbbf2cde79975b9287e97f57221690c2434f317
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_65.3.0_linux_noarch_any-stack_6dbcd476.tgz
+  sha256: 6dbcd476b51828e5d49f795fb6a700165571fe84b825a922e3fabda1dd251b12
   cf_stacks:
+  - cflinuxfs4
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/cc/83/7ea9d9b3a6ff3225aca2fce5e4df373bee7e0a74c539711a4fbfda53374f/setuptools-65.3.0.tar.gz
   source_sha256: 7732871f4f7fa58fb6bdcaeadb0161b2bd046c85905dbaa066bdcbcc81953b57
