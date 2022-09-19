@@ -42,6 +42,7 @@ dependencies:
   uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
   sha256: 78f39f9bae971ec1ae7969f0516017f2413f17796670f7040725dd83fcff5689
   cf_stacks:
+  - cflinuxfs4
   - cflinuxfs3
   source: https://github.com/conda/conda/archive/4.12.0.tar.gz
   source_sha256: 78f39f9bae971ec1ae7969f0516017f2413f17796670f7040725dd83fcff5689
