@@ -42,7 +42,13 @@ var _ = Describe("Python buildpack", func() {
 			)
 		})
 		By("supports mysql by raising a no connection error", func() {
-			Expect(app.GetBody("/mysql")).To(ContainSubstring("Can't connect to local MySQL server through socket"))
+			Expect(app.GetBody("/mysql")).To(
+				Or(
+					// cflinuxfs3 and cflinuxfs4 have different messages for the same error.
+					ContainSubstring("Can't connect to local MySQL server through socket"),
+					ContainSubstring("Can't connect to local server through socket"),
+				),
+			)
 		})
 		By("supports loading and running the hiredis lib", func() {
 			Expect(app.GetBody("/redis")).To(ContainSubstring("Hello"))
