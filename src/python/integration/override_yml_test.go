@@ -45,7 +45,7 @@ var _ = Describe("override yml", func() {
 
 		logs := exec.Command("cf", "logs", "--recent", app.Name)
 		out, err := logs.CombinedOutput()
-		Expect(err).ToNot(HaveOccurred())
+		Expect(err).ToNot(HaveOccurred(), string(out))
 
 		Expect(out).To(ContainSubstring("-----> OverrideYML Buildpack"))
 		Expect(out).To(ContainSubstring("-----> Python Buildpack version " + buildpackVersion))
