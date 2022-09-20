@@ -73,7 +73,8 @@ var _ = Describe("running supply buildpacks before the python buildpack", func()
 			}
 			PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
-
+			//  Binary Buildpack does not support cflinuxfs4 yet
+			SkipOnCflinuxfs4()
 			app.Buildpacks = []string{
 				"https://github.com/cloudfoundry/binary-buildpack#master",
 				"https://buildpacks.cloudfoundry.org/fixtures/supply-cache-new.zip",

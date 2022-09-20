@@ -191,3 +191,9 @@ func RunCf(args ...string) error {
 	command.Stderr = GinkgoWriter
 	return command.Run()
 }
+
+func SkipOnCflinuxfs4() {
+	if os.Getenv("CF_STACK") == "cflinuxfs4" {
+		Skip("Skipping test not relevant for stack cflinuxfs4")
+	}
+}
