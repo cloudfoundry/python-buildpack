@@ -33,7 +33,13 @@ var _ = Describe("Python buildpack", func() {
 			Expect(bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte("Hello, bcrypt"))).ToNot(HaveOccurred())
 		})
 		By("supports postgres by raising a no connection error", func() {
-			Expect(app.GetBody("/pg")).To(ContainSubstring("could not connect to server: No such file or directory"))
+			Expect(app.GetBody("/pg")).To(
+				Or(
+					// cflinuxfs3 and cflinuxfs4 have different messages for the same error.
+					ContainSubstring("could not connect to server: No such file or directory"),
+					ContainSubstring("failed: No such file or directory"),
+				),
+			)
 		})
 		By("supports mysql by raising a no connection error", func() {
 			Expect(app.GetBody("/mysql")).To(ContainSubstring("Can't connect to local MySQL server through socket"))
