@@ -1,3 +1,11 @@
+v1.8.0 Sep 22, 2022
+=====================
+
+* Add support for cflinuxfs4 stack
+
+* Add pipenv 2022.9.21, remove pipenv 2022.9.8 for stack(s) cflinuxfs3, cflinuxfs4
+
+
 v1.7.59 Sep 13, 2022
 =====================
 
