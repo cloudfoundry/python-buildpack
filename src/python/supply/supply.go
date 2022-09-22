@@ -642,6 +642,7 @@ func (s *Supplier) RunPipUnvendored() error {
 		"--exists-action=w",
 		"--src="+filepath.Join(s.Stager.DepDir(), "src"),
 		"--disable-pip-version-check",
+		"--no-warn-script-location",
 	); err != nil {
 		return fmt.Errorf("could not run pip: %v", err)
 	}
@@ -673,6 +674,7 @@ func (s *Supplier) RunPipVendored() error {
 		"--no-index",
 		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"),
 		"--disable-pip-version-check",
+		"--no-warn-script-location",
 	}
 
 	if s.hasBuildOptions() {
