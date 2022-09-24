@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -212,7 +211,7 @@ func (s *Supplier) HandlePipfile() error {
 
 		formattedVersion := s.formatVersion(pipfileJson.Meta.Requires.Version)
 
-		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "runtime.txt"), []byte(formattedVersion), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(s.Stager.DepDir(), "runtime.txt"), []byte(formattedVersion), 0644); err != nil {
 			return err
 		}
 	}
@@ -228,7 +227,7 @@ func (s *Supplier) InstallPython() error {
 	}
 
 	if runtimetxtExists {
-		userDefinedVersion, err := ioutil.ReadFile(filepath.Join(s.Stager.DepDir(), "runtime.txt"))
+		userDefinedVersion, err := os.ReadFile(filepath.Join(s.Stager.DepDir(), "runtime.txt"))
 		if err != nil {
 			return err
 		}
@@ -304,13 +303,13 @@ func (s *Supplier) RewriteShebangs() error {
 		} else if fileInfo.IsDir() {
 			continue
 		}
-		fileContents, err := ioutil.ReadFile(file)
+		fileContents, err := os.ReadFile(file)
 		if err != nil {
 			return err
 		}
 		shebangRegex := regexp.MustCompile(`^#!/.*/python.*`)
 		fileContents = shebangRegex.ReplaceAll(fileContents, []byte("#!/usr/bin/env python"))
-		if err := ioutil.WriteFile(file, fileContents, 0755); err != nil {
+		if err := os.WriteFile(file, fileContents, 0755); err != nil {
 			return err
 		}
 	}
@@ -432,7 +431,7 @@ func pipfileToRequirements(lockFilePath string) (string, error) {
 		}
 	}
 
-	lockContents, err := ioutil.ReadFile(lockFilePath)
+	lockContents, err := os.ReadFile(lockFilePath)
 	if err != nil {
 		return "", err
 	}
@@ -549,7 +548,7 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 	}
 
 	if requirementsDeclaredExists {
-		fileContents, _ := ioutil.ReadFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"))
+		fileContents, _ := os.ReadFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-declared.txt"))
 		s.Log.Info("requirements-declared: %s", string(fileContents))
 
 		staleContents, err := s.Requirements.FindStalePackages(
@@ -567,7 +566,7 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 
 		staleContentString := strings.Join(staleContents[:], "\n")
 
-		if err := ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt"), []byte(staleContentString), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(s.Stager.DepDir(), "python", "requirements-stale.txt"), []byte(staleContentString), 0644); err != nil {
 			return err
 		}
 
@@ -603,7 +602,7 @@ func (s *Supplier) RunPipUnvendored() error {
 	// and add them to the pydistutils file. We do this so that easy_install will use
 	// the same indexes as pip. This may not actually be necessary because it's possible that
 	// easy_install has been fixed upstream, but it has no ill side-effects.
-	reqs, err := ioutil.ReadFile(requirementsPath)
+	reqs, err := os.ReadFile(requirementsPath)
 	if err != nil {
 		return fmt.Errorf("could not read requirements.txt: %v", err)
 	}
@@ -685,14 +684,14 @@ func (s *Supplier) RunPipVendored() error {
 	// Remove lines from requirements.txt that begin with -i, --index-url and --extra-index-url
 	// because specifying index links here makes pip always want internet access,
 	// and pipenv generates requirements.txt with -i.
-	originalReqs, err := ioutil.ReadFile(requirementsPath)
+	originalReqs, err := os.ReadFile(requirementsPath)
 	if err != nil {
 		return fmt.Errorf("could not read requirements.txt: %v", err)
 	}
 
 	re := regexp.MustCompile(`(?m)^\s*(-i|--index-url|--extra-index-url)\s+(.*)$`)
 	modifiedReqs := re.ReplaceAll(originalReqs, []byte{})
-	err = ioutil.WriteFile(requirementsPath, modifiedReqs, 0644)
+	err = os.WriteFile(requirementsPath, modifiedReqs, 0644)
 	if err != nil {
 		return fmt.Errorf("could not overwrite requirements file: %v", err)
 	}
@@ -700,7 +699,7 @@ func (s *Supplier) RunPipVendored() error {
 	if err := s.runPipInstall(installArgs...); err != nil {
 		s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
 
-		if err := ioutil.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
+		if err := os.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
 			return fmt.Errorf("could not overwrite modified requirements file: %v", err)
 		}
 
@@ -747,7 +746,7 @@ export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-'--access-logfile -'}
 }
 
 func (s *Supplier) DownloadNLTKCorpora() error {
-	if err := s.Command.Execute("/", ioutil.Discard, ioutil.Discard, "python", "-m", "nltk.downloader", "-h"); err != nil {
+	if err := s.Command.Execute("/", io.Discard, io.Discard, "python", "-m", "nltk.downloader", "-h"); err != nil {
 		return nil
 	}
 
@@ -760,7 +759,7 @@ func (s *Supplier) DownloadNLTKCorpora() error {
 		return nil
 	}
 
-	bPackages, err := ioutil.ReadFile(filepath.Join(s.Stager.BuildDir(), "nltk.txt"))
+	bPackages, err := os.ReadFile(filepath.Join(s.Stager.BuildDir(), "nltk.txt"))
 	if err != nil {
 		return err
 	}
@@ -798,7 +797,7 @@ func writePyDistUtils(distUtils map[string][]string) error {
 		b.WriteString(fmt.Sprintf("%s = %s\n", k, strings.Join(v, "\n\t")))
 	}
 
-	if err := ioutil.WriteFile(pyDistUtilsPath, []byte(b.String()), os.ModePerm); err != nil {
+	if err := os.WriteFile(pyDistUtilsPath, []byte(b.String()), os.ModePerm); err != nil {
 		return err
 	}
 
@@ -847,7 +846,7 @@ func (s *Supplier) formatVersion(version string) string {
 
 func (s *Supplier) writeTempRequirementsTxt(content string) error {
 	s.removeRequirementsText = true
-	return ioutil.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(content), 0644)
+	return os.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(content), 0644)
 }
 
 func (s *Supplier) hasBuildOptions() bool {

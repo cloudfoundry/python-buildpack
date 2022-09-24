@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -72,24 +71,24 @@ func Run(f *Finalizer) error {
 
 func (f *Finalizer) HandleCollectstatic() error {
 	if len(os.Getenv("DISABLE_COLLECTSTATIC")) > 0 {
-        f.Log.Debug("DISABLE_COLLECTSTATIC > 0, skipping collectstatic")
+		f.Log.Debug("DISABLE_COLLECTSTATIC > 0, skipping collectstatic")
 		return nil
 	}
 
 	exists, err := f.Requirements.FindAnyPackage(f.Stager.BuildDir(), "django", "Django")
 	if err != nil {
-        f.Log.Debug("Error during FindAnyPackage, skipping collectstatic")
+		f.Log.Debug("Error during FindAnyPackage, skipping collectstatic")
 		return err
 	}
 
 	if !exists {
-        f.Log.Debug("Django not in requirements, skipping collectstatic")
+		f.Log.Debug("Django not in requirements, skipping collectstatic")
 		return nil
 	}
 
 	managePyPath, err := f.ManagePyFinder.FindManagePy(f.Stager.BuildDir())
 	if err != nil {
-        f.Log.Debug("Error finding manage.py, skipping collectstatic")
+		f.Log.Debug("Error finding manage.py, skipping collectstatic")
 		return err
 	}
 
@@ -135,14 +134,14 @@ func (f *Finalizer) ReplaceDepsDirWithLiteral() error {
 	for _, dir := range dirs {
 		if err := filepath.Walk(dir, func(path string, _ os.FileInfo, _ error) error {
 			if strings.HasSuffix(path, ".pth") {
-				fileContents, err := ioutil.ReadFile(path)
+				fileContents, err := os.ReadFile(path)
 				if err != nil {
 					return err
 				}
 
 				fileContents = []byte(strings.Replace(string(fileContents), f.Stager.DepDir(), "DOLLAR_DEPS_DIR/"+f.Stager.DepsIdx(), -1))
 
-				if err := ioutil.WriteFile(path, fileContents, 0644); err != nil {
+				if err := os.WriteFile(path, fileContents, 0644); err != nil {
 					return err
 				}
 			}

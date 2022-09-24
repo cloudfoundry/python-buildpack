@@ -5,14 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/cloudfoundry/libbuildpack"
 	"regexp"
+
+	"github.com/cloudfoundry/libbuildpack"
 )
 
 type Command interface {
@@ -73,7 +73,7 @@ func (h AppdynamicsHook) GenerateStartUpCommand(startCommand string) (string, er
 }
 
 func (h AppdynamicsHook) RewriteProcFile(procFilePath string) error {
-	startCommand, err := ioutil.ReadFile(procFilePath)
+	startCommand, err := os.ReadFile(procFilePath)
 	if err != nil {
 		return fmt.Errorf("Error reading file %s: %v", procFilePath, err)
 	}
@@ -82,7 +82,7 @@ func (h AppdynamicsHook) RewriteProcFile(procFilePath string) error {
 		return err
 	}
 
-	if err := ioutil.WriteFile(procFilePath, []byte(newCommand), 0666); err != nil {
+	if err := os.WriteFile(procFilePath, []byte(newCommand), 0666); err != nil {
 		return fmt.Errorf("Error writing file %s: %v", procFilePath, err)
 	}
 	return nil
@@ -113,7 +113,7 @@ func (h AppdynamicsHook) RewriteRequirementsFile(stager *libbuildpack.Stager) er
 	if _, err = f.WriteString(packageName); err != nil {
 		panic(err)
 	}
-	fileContents, _ := ioutil.ReadFile(f.Name())
+	fileContents, _ := os.ReadFile(f.Name())
 	h.Log.Info(string(fileContents))
 
 	return nil
@@ -128,7 +128,7 @@ func (h AppdynamicsHook) RewriteProcFileWithAppdynamics(stager *libbuildpack.Sta
 		if err := h.RewriteProcFile(file); err != nil {
 			return err
 		}
-		fileContents, _ := ioutil.ReadFile(file)
+		fileContents, _ := os.ReadFile(file)
 		h.Log.Info(string(fileContents))
 	} else {
 		h.Log.Info("Cannot find Procfile, skipping this step!")

@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,10 +56,10 @@ var _ = Describe("CF Python Buildpack", func() {
 			Expect(app.GetBody("/")).To(ContainSubstring("numpy: 1.21.2"))
 			Expect(app.GetBody("/")).ToNot(ContainSubstring("numpy: 1.20.2"))
 
-			input, err := ioutil.ReadFile(filepath.Join(fixtureDir, "environment.yml"))
+			input, err := os.ReadFile(filepath.Join(fixtureDir, "environment.yml"))
 			Expect(err).ToNot(HaveOccurred())
 			output := strings.Replace(string(input), "numpy=1.21.2", "numpy=1.20.2", 1)
-			Expect(ioutil.WriteFile(filepath.Join(fixtureDir, "environment.yml"), []byte(output), 0644)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(fixtureDir, "environment.yml"), []byte(output), 0644)).To(Succeed())
 
 			fmt.Fprintln(GinkgoWriter, "Pushing updated app...")
 			PushAppAndConfirm(app)

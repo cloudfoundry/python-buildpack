@@ -1,7 +1,7 @@
 package requirements
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -97,7 +97,7 @@ func packageIsExcluded(excludedPackages []string, packageFullName string) bool {
 }
 
 func parseRequirements(requirementsPath string) ([]string, error) {
-	content, err := ioutil.ReadFile(requirementsPath)
+	content, err := os.ReadFile(requirementsPath)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -77,7 +76,7 @@ func (c *Conda) Version() string {
 func (c *Conda) Install(version string) error {
 	c.Log.BeginStep("Supplying conda")
 	var installer string
-	if installerDir, err := ioutil.TempDir("", "miniconda"); err != nil {
+	if installerDir, err := os.MkdirTemp("", "miniconda"); err != nil {
 		return err
 	} else {
 		installer = filepath.Join(installerDir, "miniconda.sh")
@@ -92,7 +91,7 @@ func (c *Conda) Install(version string) error {
 	}
 
 	c.Log.BeginStep("Installing Miniconda")
-	if err := c.Command.Execute("/", indentWriter(os.Stdout), ioutil.Discard, installer, "-b", "-p", c.condaHome()); err != nil {
+	if err := c.Command.Execute("/", indentWriter(os.Stdout), io.Discard, installer, "-b", "-p", c.condaHome()); err != nil {
 		return fmt.Errorf("Error installing miniconda: %v", err)
 	}
 
@@ -151,7 +150,7 @@ func (c *Conda) Warning() error {
 	} else if !exists {
 		return nil
 	}
-	if contents, err := ioutil.ReadFile(filepath.Join(c.Stager.BuildDir(), "environment.yml")); err != nil {
+	if contents, err := os.ReadFile(filepath.Join(c.Stager.BuildDir(), "environment.yml")); err != nil {
 		return err
 	} else {
 		if bytes.Contains(contents, []byte("python=")) {

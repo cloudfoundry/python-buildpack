@@ -1,7 +1,6 @@
 package hooks
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -36,7 +35,7 @@ func runHook(scriptName string, compiler *libbuildpack.Stager) error {
 			return err
 		}
 
-		fileContents, err := ioutil.ReadFile(path)
+		fileContents, err := os.ReadFile(path)
 		if err != nil {
 			return err
 		}

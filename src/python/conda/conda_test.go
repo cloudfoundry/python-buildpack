@@ -2,8 +2,7 @@ package conda_test
 
 import (
 	"bytes"
-	io "io"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -11,7 +10,7 @@ import (
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"
-	gomock "github.com/golang/mock/gomock"
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -36,11 +35,11 @@ var _ = Describe("Conda", func() {
 	)
 
 	BeforeEach(func() {
-		buildDir, err = ioutil.TempDir("", "python-buildpack.build.")
+		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
 		Expect(err).To(BeNil())
-		cacheDir, err = ioutil.TempDir("", "python-buildpack.cache.")
+		cacheDir, err = os.MkdirTemp("", "python-buildpack.cache.")
 		Expect(err).To(BeNil())
-		depsDir, err = ioutil.TempDir("", "python-buildpack.deps.")
+		depsDir, err = os.MkdirTemp("", "python-buildpack.deps.")
 		Expect(err).To(BeNil())
 		depsIdx = "13"
 		depDir = filepath.Join(depsDir, depsIdx)
@@ -70,7 +69,7 @@ var _ = Describe("Conda", func() {
 	Describe("Version", func() {
 		Context("runtime.txt specifies python 3", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(buildDir, "runtime.txt"), []byte("python-3.2.3"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "runtime.txt"), []byte("python-3.2.3"), 0644)).To(Succeed())
 			})
 
 			It("returns 'miniconda3-py39'", func() {
@@ -88,7 +87,7 @@ var _ = Describe("Conda", func() {
 	Describe("Install", func() {
 		It("downloads and installs miniconda version", func() {
 			mockInstaller.EXPECT().InstallOnlyVersion("Miniconda7", gomock.Any()).Do(func(_, path string) {
-				Expect(ioutil.WriteFile(path, []byte{}, 0644)).To(Succeed())
+				Expect(os.WriteFile(path, []byte{}, 0644)).To(Succeed())
 			})
 			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any())
 
@@ -97,7 +96,7 @@ var _ = Describe("Conda", func() {
 
 		It("make downloaded file executable", func() {
 			mockInstaller.EXPECT().InstallOnlyVersion("Miniconda7", gomock.Any()).Do(func(_, path string) {
-				Expect(ioutil.WriteFile(path, []byte{}, 0644)).To(Succeed())
+				Expect(os.WriteFile(path, []byte{}, 0644)).To(Succeed())
 			})
 			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), gomock.Any(), "-b", "-p", filepath.Join(depDir, "conda")).Do(func(_ string, _, _ io.Writer, path string, _ ...string) {
 				fi, err := os.Lstat(path)
@@ -111,7 +110,7 @@ var _ = Describe("Conda", func() {
 		It("deletes installer", func() {
 			var installerPath string
 			mockInstaller.EXPECT().InstallOnlyVersion("Miniconda7", gomock.Any()).Do(func(_, path string) {
-				Expect(ioutil.WriteFile(path, []byte{}, 0644)).To(Succeed())
+				Expect(os.WriteFile(path, []byte{}, 0644)).To(Succeed())
 				installerPath = path
 			})
 			mockCommand.EXPECT().Execute("/", gomock.Any(), gomock.Any(), gomock.Any(), "-b", "-p", filepath.Join(depDir, "conda")).Do(func(_ string, _, _ io.Writer, path string, _ ...string) {
