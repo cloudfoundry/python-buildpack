@@ -1,7 +1,6 @@
 package requirements
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -17,7 +16,7 @@ var _ = Describe("Reqs", func() {
 	)
 
 	BeforeEach(func() {
-		tempDir, err = ioutil.TempDir("", "requirements")
+		tempDir, err = os.MkdirTemp("", "requirements")
 		Expect(err).NotTo(HaveOccurred())
 		req = Reqs{}
 	})
@@ -31,7 +30,7 @@ var _ = Describe("Reqs", func() {
 
 			Context("single requirements.txt file", func() {
 				BeforeEach(func() {
-					Expect(ioutil.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`package0
+					Expect(os.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`package0
 package2>=2.0.0
 package3!=3.0.0
 package4~=4.0.0
@@ -70,14 +69,14 @@ package6[test]==6.0.0
 						err := os.Mkdir(filepath.Join(tempDir, "other_folder"), 0755)
 						Expect(err).NotTo(HaveOccurred())
 
-						Expect(ioutil.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`package0
+						Expect(os.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`package0
 package3!=3.0.0
 package4~=4.0.0
 -r requirements1.txt`), 0644)).To(Succeed())
 
-						Expect(ioutil.WriteFile(filepath.Join(tempDir, "requirements1.txt"), []byte(`package6[test] == 6.0.0
+						Expect(os.WriteFile(filepath.Join(tempDir, "requirements1.txt"), []byte(`package6[test] == 6.0.0
 -r other_folder/requirements2.txt`), 0644)).To(Succeed())
-						Expect(ioutil.WriteFile(filepath.Join(tempDir, "other_folder", "requirements2.txt"), []byte(`package2>=2.0.0`), 0644)).To(Succeed())
+						Expect(os.WriteFile(filepath.Join(tempDir, "other_folder", "requirements2.txt"), []byte(`package2>=2.0.0`), 0644)).To(Succeed())
 					})
 
 					It("returns true and nil error", func() {
@@ -98,14 +97,14 @@ package4~=4.0.0
 	Describe("FindStalePackages", func() {
 		Context("succeed", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(tempDir, "req-old.txt"), []byte(`package0
+				Expect(os.WriteFile(filepath.Join(tempDir, "req-old.txt"), []byte(`package0
 package1==2.0.0
 package2
 package3==3.0.0
 package4
 package5!=4.0.0
 `), 0644)).To(Succeed())
-				Expect(ioutil.WriteFile(filepath.Join(tempDir, "req-new.txt"), []byte(`package0
+				Expect(os.WriteFile(filepath.Join(tempDir, "req-new.txt"), []byte(`package0
 package1==2.0.0
 `), 0644)).To(Succeed())
 			})

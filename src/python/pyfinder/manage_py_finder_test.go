@@ -1,9 +1,9 @@
 package pyfinder_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
+
 	. "github.com/cloudfoundry/python-buildpack/src/python/pyfinder"
 
 	. "github.com/onsi/ginkgo"
@@ -18,7 +18,7 @@ var _ = Describe("ManagePyFinder", func() {
 	)
 
 	BeforeEach(func() {
-		tempDir, err = ioutil.TempDir("", "pyfinder")
+		tempDir, err = os.MkdirTemp("", "pyfinder")
 		Expect(err).NotTo(HaveOccurred())
 		finder = ManagePyFinder{}
 	})
@@ -43,7 +43,7 @@ var _ = Describe("ManagePyFinder", func() {
 		Context("manage.py exists 4 directories down", func() {
 			BeforeEach(func() {
 				Expect(os.MkdirAll(filepath.Join(tempDir, "a", "b", "toodeep"), 0755)).To(Succeed())
-				Expect(ioutil.WriteFile(filepath.Join(tempDir, "a", "b", "toodeep", "manage.py"), []byte("hello"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(tempDir, "a", "b", "toodeep", "manage.py"), []byte("hello"), 0644)).To(Succeed())
 			})
 
 			It("returns an error", func() {
@@ -55,7 +55,7 @@ var _ = Describe("ManagePyFinder", func() {
 
 		Context("when a manage.py exists 3 directories down", func() {
 			BeforeEach(func() {
-				Expect(ioutil.WriteFile(filepath.Join(tempDir, "a", "b", "manage.py"), []byte("hello"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(tempDir, "a", "b", "manage.py"), []byte("hello"), 0644)).To(Succeed())
 			})
 
 			It("finds the manage.py 3 directories deep", func() {
@@ -69,7 +69,7 @@ var _ = Describe("ManagePyFinder", func() {
 				BeforeEach(func() {
 					files = []string{filepath.Join(tempDir, "a", "b", "manage.py"), filepath.Join(tempDir, "a", "c", "manage.py")}
 					Expect(os.MkdirAll(filepath.Join(tempDir, "a", "c"), 0755)).To(Succeed())
-					Expect(ioutil.WriteFile(filepath.Join(tempDir, "a", "c", "manage.py"), []byte("hello"), 0644)).To(Succeed())
+					Expect(os.WriteFile(filepath.Join(tempDir, "a", "c", "manage.py"), []byte("hello"), 0644)).To(Succeed())
 				})
 				It("returns either", func() {
 					path, err := finder.FindManagePy(tempDir)
@@ -80,7 +80,7 @@ var _ = Describe("ManagePyFinder", func() {
 
 			Context("and another exists 2 directories down", func() {
 				BeforeEach(func() {
-					Expect(ioutil.WriteFile(filepath.Join(tempDir, "a", "manage.py"), []byte("hello"), 0644)).To(Succeed())
+					Expect(os.WriteFile(filepath.Join(tempDir, "a", "manage.py"), []byte("hello"), 0644)).To(Succeed())
 				})
 				It("finds the manage.py 2 directories deep", func() {
 					path, err := finder.FindManagePy(tempDir)
@@ -90,7 +90,7 @@ var _ = Describe("ManagePyFinder", func() {
 
 				Context("and another exists 1 directory down", func() {
 					BeforeEach(func() {
-						Expect(ioutil.WriteFile(filepath.Join(tempDir, "manage.py"), []byte("hello"), 0644)).To(Succeed())
+						Expect(os.WriteFile(filepath.Join(tempDir, "manage.py"), []byte("hello"), 0644)).To(Succeed())
 					})
 					It("finds the manage.py 1 directories deep", func() {
 						path, err := finder.FindManagePy(tempDir)

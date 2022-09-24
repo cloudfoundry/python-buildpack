@@ -2,7 +2,6 @@ package brats_test
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -68,7 +67,7 @@ func CopyBrats(version string) *cutlass.App {
 	}
 
 	data := "python-" + version
-	Expect(ioutil.WriteFile(filepath.Join(dir, "runtime.txt"), []byte(data), 0644)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(dir, "runtime.txt"), []byte(data), 0644)).To(Succeed())
 
 	return cutlass.New(dir)
 }
