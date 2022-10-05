@@ -105,7 +105,7 @@ function specs::run() {
   fi
 
   local buildpack_file
-  buildpack_file="$(buildpack::package "1.2.3" "${cached}" "${stack}")"
+  buildpack_file="$(buildpack::package "1.2.3" "${cached}")"
 
   CF_STACK="${stack}" \
   BUILDPACK_FILE="${BUILDPACK_FILE:-"${buildpack_file}"}" \
@@ -127,14 +127,13 @@ function buildpack::package() {
   local version cached
   version="${1}"
   cached="${2}"
-  stack="${3}"
 
   local name cached_flag
-  name="buildpack-${stack}-v${version}-uncached.zip"
+  name="buildpack-v${version}-uncached.zip"
   cached_flag=""
   if [[ "${cached}" == "true" ]]; then
     cached_flag="--cached"
-    name="buildpack-${stack}-v${version}-cached.zip"
+    name="buildpack-v${version}-cached.zip"
   fi
 
   local output
@@ -143,7 +142,6 @@ function buildpack::package() {
   bash "${ROOTDIR}/scripts/package.sh" \
     --version "${version}" \
     --output "${output}" \
-    --stack "${stack}" \
     "${cached_flag}" > /dev/null
 
   printf "%s" "${output}"
