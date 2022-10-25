@@ -11,12 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry/libbuildpack/cutlass"
+	"testing"
 
+	"github.com/cloudfoundry/libbuildpack/cutlass"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"testing"
+	"github.com/onsi/gomega/format"
 )
 
 var bpDir string
@@ -42,6 +42,7 @@ func init() {
 	flag.StringVar(&platform, "platform", "cf", "platform to run tests against")
 	flag.StringVar(&stack, "stack", "cflinuxfs3", "stack to use when pushing apps")
 	flag.Parse()
+	format.MaxLength = 0
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
