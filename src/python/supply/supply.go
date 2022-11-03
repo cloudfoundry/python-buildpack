@@ -832,6 +832,7 @@ func pipCommand() []string {
 
 func (s *Supplier) runPipInstall(args ...string) error {
 	installCmd := append(append(pipCommand(), "install"), args...)
+	s.Log.Info(strings.Join(installCmd, " "))
 	return s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), installCmd[0], installCmd[1:]...)
 }
 
