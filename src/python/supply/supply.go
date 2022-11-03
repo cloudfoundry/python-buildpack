@@ -591,6 +591,8 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 }
 
 func (s *Supplier) RunPipUnvendored() error {
+	s.Log.BeginStep("Running Pip Install (Unvendored)")
+
 	shouldContinue, requirementsPath, err := s.shouldRunPip()
 	if err != nil {
 		return err
@@ -650,6 +652,8 @@ func (s *Supplier) RunPipUnvendored() error {
 }
 
 func (s *Supplier) RunPipVendored() error {
+	s.Log.BeginStep("Running Pip Install (Vendored)")
+
 	shouldContinue, requirementsPath, err := s.shouldRunPip()
 	if err != nil {
 		return err
@@ -805,7 +809,6 @@ func writePyDistUtils(distUtils map[string][]string) error {
 }
 
 func (s *Supplier) shouldRunPip() (bool, string, error) {
-	s.Log.BeginStep("Running Pip Install")
 	if os.Getenv("PIP_CERT") == "" {
 		os.Setenv("PIP_CERT", "/etc/ssl/certs/ca-certificates.crt")
 	}
