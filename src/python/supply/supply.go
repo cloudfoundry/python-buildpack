@@ -320,7 +320,9 @@ func (s *Supplier) InstallPip() error {
 	pipVersion := os.Getenv(EnvPipVersion)
 	if pipVersion == "" {
 		s.Log.Info("Using python's pip module")
-		return nil
+
+		versionCmd := append(pipCommand(), "--version")
+		return s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), versionCmd[0], versionCmd[1:]...)
 	}
 	if pipVersion != "latest" {
 		return fmt.Errorf("invalid pip version: %s", pipVersion)
