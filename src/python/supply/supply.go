@@ -703,16 +703,8 @@ func (s *Supplier) RunPipVendored() error {
 	}
 
 	if err := s.runPipInstall(installArgs...); err != nil {
-		s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
-
-		if err := os.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
-			return fmt.Errorf("could not overwrite modified requirements file: %v", err)
-		}
-
-		if err := s.RunPipUnvendored(); err != nil {
-			s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
-			return err
-		}
+        s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
+        return err
 	}
 
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
