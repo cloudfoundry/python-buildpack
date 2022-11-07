@@ -7,7 +7,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/kr/text v0.2.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.23.0
+	github.com/onsi/gomega v1.24.0
 	golang.org/x/crypto v0.1.0
 	gopkg.in/ini.v1 v1.67.0
 )
