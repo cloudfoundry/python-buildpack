@@ -631,7 +631,6 @@ MarkupSafe==2.0.1
 				Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "--no-build-isolation", "-h").Return(nil)
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", "--no-warn-script-location", "--no-build-isolation").Return(fmt.Errorf("exit 28"))
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--disable-pip-version-check", "--no-warn-script-location").Return(fmt.Errorf("exit 28"))
 			})
 
 			const proTip = "Running pip install failed. You need to include all dependencies in the vendor directory."
