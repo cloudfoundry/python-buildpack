@@ -1,3 +1,39 @@
+v1.8.2 Nov 08, 2022
+====================
+
+* Add python 3.8.15, remove python 3.8.13
+  for stack(s) cflinuxfs3, cflinuxfs4
+  (https://www.pivotaltracker.com/story/show/183514400)
+
+* Add python 3.9.15, remove python 3.9.13
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/183514701)
+
+* Add python 3.10.8, remove python 3.10.6
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add python 3.7.15, remove python 3.7.13
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pip 22.3.1, remove pip 22.2.2
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add setuptools 65.5.1, remove setuptools 65.4.0
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pipenv 2022.11.5, remove pipenv 2022.9.24
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Distinguish Vendored and Unvendored installs in logs
+
+* Log used 'pip install' command before executing it
+  for debugging
+
+* Print pip's version when using python's pip module
+  To be able to debug problems when using pip it's handy to know
+  which version of pip is actually being used
+
+
 v1.8.1 Sep 26, 2022
 ====================
 
