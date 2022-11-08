@@ -704,7 +704,7 @@ func (s *Supplier) RunPipVendored() error {
 
 	if err := s.runPipInstall(installArgs...); err != nil {
         s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
-        return err
+        return fmt.Errorf("could not run pip: %v", err)
 	}
 
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
