@@ -142,7 +142,7 @@ var _ = Describe("Supply", func() {
 
 			It("skips install", func() {
 				mockInstaller.EXPECT().InstallOnlyVersion(gomock.Any(), gomock.Any()).Times(0)
-				mockCommand.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "--version")
 				mockStager.EXPECT().LinkDirectoryInDepDir(gomock.Any(), gomock.Any()).Times(0)
 
 				Expect(supplier.InstallPip()).To(Succeed())

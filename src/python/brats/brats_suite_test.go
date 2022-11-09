@@ -23,7 +23,7 @@ var _ = func() bool {
 
 func init() {
 	flag.StringVar(&cutlass.DefaultMemory, "memory", "128M", "default memory for pushed apps")
-	flag.StringVar(&cutlass.DefaultDisk, "disk", "256M", "default disk for pushed apps")
+	flag.StringVar(&cutlass.DefaultDisk, "disk", "512M", "default disk for pushed apps")
 	flag.Parse()
 }
 

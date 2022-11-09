@@ -320,7 +320,9 @@ func (s *Supplier) InstallPip() error {
 	pipVersion := os.Getenv(EnvPipVersion)
 	if pipVersion == "" {
 		s.Log.Info("Using python's pip module")
-		return nil
+
+		versionCmd := append(pipCommand(), "--version")
+		return s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), versionCmd[0], versionCmd[1:]...)
 	}
 	if pipVersion != "latest" {
 		return fmt.Errorf("invalid pip version: %s", pipVersion)
@@ -591,6 +593,8 @@ func (s *Supplier) UninstallUnusedDependencies() error {
 }
 
 func (s *Supplier) RunPipUnvendored() error {
+	s.Log.BeginStep("Running Pip Install (Unvendored)")
+
 	shouldContinue, requirementsPath, err := s.shouldRunPip()
 	if err != nil {
 		return err
@@ -650,6 +654,8 @@ func (s *Supplier) RunPipUnvendored() error {
 }
 
 func (s *Supplier) RunPipVendored() error {
+	s.Log.BeginStep("Running Pip Install (Vendored)")
+
 	shouldContinue, requirementsPath, err := s.shouldRunPip()
 	if err != nil {
 		return err
@@ -797,7 +803,6 @@ func writePyDistUtils(distUtils map[string][]string) error {
 }
 
 func (s *Supplier) shouldRunPip() (bool, string, error) {
-	s.Log.BeginStep("Running Pip Install")
 	if os.Getenv("PIP_CERT") == "" {
 		os.Setenv("PIP_CERT", "/etc/ssl/certs/ca-certificates.crt")
 	}
@@ -822,6 +827,7 @@ func pipCommand() []string {
 
 func (s *Supplier) runPipInstall(args ...string) error {
 	installCmd := append(append(pipCommand(), "install"), args...)
+	s.Log.Info(strings.Join(installCmd, " "))
 	return s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr), installCmd[0], installCmd[1:]...)
 }
 
