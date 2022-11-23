@@ -62,21 +62,21 @@ dependencies:
   source: https://files.pythonhosted.org/packages/a3/50/c4d2727b99052780aad92c7297465af5fe6eec2dbae490aa9763273ffdc1/pip-22.3.1.tar.gz
   source_sha256: 65fd48317359f3af8e593943e6ae1506b66325085ea64b706a998c6e83eeaf38
 - name: pipenv
-  version: 2022.11.11
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.11.11_linux_noarch_cflinuxfs3_ba751cd5.tgz
-  sha256: ba751cd5a0b872e90cb25dd4904f2c7741979eac9c7760053c0113f3e3853b95
+  version: 2022.11.23
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.11.23_linux_noarch_cflinuxfs3_6fadd575.tgz
+  sha256: 6fadd5759a02bdc8dcd39b4fc513a9a665cdd34416c3b7a45e0752386bdfbe8d
   cf_stacks:
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/3a/2f/66d16cfeb4d7b95b67fdf3bd02237c23058507750fa84a91ef8a6a4e31a8/pipenv-2022.11.11.tar.gz
-  source_sha256: e69f64477e83595f3b891e1e58b1b1355d4c593432e63b078dc1be9bd93c5066
+  source: https://files.pythonhosted.org/packages/39/f6/398752d4132649931196c63b9c568922b652ad75a7102908f06fbf87fee0/pipenv-2022.11.23.tar.gz
+  source_sha256: ada4553041f68c90bc74fec0b1135974891ed9573c20279a612423fde8cb1779
 - name: pipenv
-  version: 2022.11.11
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.11.11_linux_noarch_cflinuxfs4_a06ade54.tgz
-  sha256: a06ade54d1ef8497221627fc4f2795848d72762416a8ccb4507cb5434419b0a7
+  version: 2022.11.23
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.11.23_linux_noarch_cflinuxfs4_2e3c9886.tgz
+  sha256: 2e3c9886af1b1331c44842cc2b21327177cdca1b5f2305d4fd6ac9d77a4f5c12
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/3a/2f/66d16cfeb4d7b95b67fdf3bd02237c23058507750fa84a91ef8a6a4e31a8/pipenv-2022.11.11.tar.gz
-  source_sha256: e69f64477e83595f3b891e1e58b1b1355d4c593432e63b078dc1be9bd93c5066
+  source: https://files.pythonhosted.org/packages/39/f6/398752d4132649931196c63b9c568922b652ad75a7102908f06fbf87fee0/pipenv-2022.11.23.tar.gz
+  source_sha256: ada4553041f68c90bc74fec0b1135974891ed9573c20279a612423fde8cb1779
 - name: python
   version: 3.7.15
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.7.15_linux_x64_cflinuxfs3_7af76842.tgz
