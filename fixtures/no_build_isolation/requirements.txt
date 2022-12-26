@@ -7,4 +7,4 @@ itsdangerous==2.0.1
 pylibmc==1.4.2
 cffi==0.9.2
 boto3==1.20.21
-wheel==0.33.4
+wheel==0.38.1
