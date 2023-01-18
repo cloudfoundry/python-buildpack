@@ -31,7 +31,7 @@ var _ = Describe("deploying a flask web app", func() {
 
 		It("deploys a pipenv app", func() {
 			By("getting the python version from pipfile.lock")
-			Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.9."))
+			Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.10."))
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
 
 			By("generating a requirements.txt without updating the pipfile.lock packages")
