@@ -68,9 +68,11 @@ var _ = Describe("deploying a flask web app", func() {
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
-				It("should work by downloading the missing dependency", func() {
-					PushAppAndConfirm(app)
-					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
+				It("should fail because it requires all dependencies to be vendored", func() {
+					Expect(app.Push()).ToNot(Succeed())
+					Expect(app.Stdout.String()).ToNot(ContainSubstring("-----> Installing python"))
+					Expect(app.Stdout.String()).ToNot(ContainSubstring("Running Pip Install (Vendored)"))
+					Expect(app.Stdout.String()).ToNot(ContainSubstring("Running pip install failed. You need to include all dependencies in the vendor directory."))
 				})
 			})
 		})
