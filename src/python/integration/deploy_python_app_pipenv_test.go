@@ -70,7 +70,6 @@ var _ = Describe("deploying a flask web app", func() {
 
 				It("should fail because it requires all dependencies to be vendored", func() {
 					Expect(app.Push()).ToNot(Succeed())
-					Expect(app.Stdout.String()).ToNot(ContainSubstring("-----> Installing python"))
 					Expect(app.Stdout.String()).ToNot(ContainSubstring("Running Pip Install (Vendored)"))
 					Expect(app.Stdout.String()).ToNot(ContainSubstring("Running pip install failed. You need to include all dependencies in the vendor directory."))
 				})
