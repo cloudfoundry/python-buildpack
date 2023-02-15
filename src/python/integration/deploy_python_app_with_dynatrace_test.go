@@ -62,7 +62,6 @@ var _ = Describe("CF Python Buildpack", func() {
 		dynatraceBrokenAPIURI, err = dynatraceBrokenAPI.GetUrl("")
 		Expect(err).NotTo(HaveOccurred())
 
-		//app = cutlass.New(Fixtures("flask"))
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "flask"))
 		app.SetEnv("BP_DEBUG", "true")
 		PushAppAndConfirm(app)
