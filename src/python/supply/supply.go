@@ -284,8 +284,16 @@ func (s *Supplier) InstallPython() error {
 	}
 
 	version := regexp.MustCompile(`\d+\.\d+`).FindString(dep.Version)
-	if err := os.Setenv("CFLAGS", fmt.Sprintf("-I%s", filepath.Join(s.Stager.DepDir(), "python", "include", fmt.Sprintf("python%s", version)))); err != nil {
-		return err
+
+	//Remove once Python 3.7 is out of support (June 2023)
+	if version == "3.7" {
+		if err := os.Setenv("CFLAGS", fmt.Sprintf("-I%s", filepath.Join(s.Stager.DepDir(), "python", "include", fmt.Sprintf("python%sm", version)))); err != nil {
+			return err
+		}
+	} else {
+		if err := os.Setenv("CFLAGS", fmt.Sprintf("-I%s", filepath.Join(s.Stager.DepDir(), "python", "include", fmt.Sprintf("python%s", version)))); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -703,16 +711,8 @@ func (s *Supplier) RunPipVendored() error {
 	}
 
 	if err := s.runPipInstall(installArgs...); err != nil {
-		s.Log.Info("Running pip install without indexes failed. Not all dependencies were vendored. Trying again with indexes.")
-
-		if err := os.WriteFile(requirementsPath, originalReqs, 0644); err != nil {
-			return fmt.Errorf("could not overwrite modified requirements file: %v", err)
-		}
-
-		if err := s.RunPipUnvendored(); err != nil {
-			s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
-			return err
-		}
+		s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
+		return fmt.Errorf("could not run pip: %v", err)
 	}
 
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")

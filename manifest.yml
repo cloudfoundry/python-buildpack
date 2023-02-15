@@ -53,30 +53,30 @@ dependencies:
   source: https://github.com/conda/conda/archive/4.12.0.tar.gz
   source_sha256: 78f39f9bae971ec1ae7969f0516017f2413f17796670f7040725dd83fcff5689
 - name: pip
-  version: 22.3.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_22.3.1_linux_noarch_any-stack_68772d07.tgz
-  sha256: 68772d07b22e62844ca5a634daf7df3a2ab46ba5b9be03c37f6242129996ac75
+  version: '23.0'
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_23.0_linux_noarch_any-stack_502ae072.tgz
+  sha256: 502ae072230cef979d7f50a07448d20ccfd5d428ce085bfbd6fc577f00e28261
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/a3/50/c4d2727b99052780aad92c7297465af5fe6eec2dbae490aa9763273ffdc1/pip-22.3.1.tar.gz
-  source_sha256: 65fd48317359f3af8e593943e6ae1506b66325085ea64b706a998c6e83eeaf38
+  source: https://files.pythonhosted.org/packages/b5/16/5e24bf63cff51dcc169f43bd43b86b005c49941e09cc3482a5b370db239e/pip-23.0.tar.gz
+  source_sha256: aee438284e82c8def684b0bcc50b1f6ed5e941af97fa940e83e2e8ef1a59da9b
 - name: pipenv
-  version: 2022.11.30
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.11.30_linux_noarch_cflinuxfs3_344503fe.tgz
-  sha256: 344503fe2b2d0e9536d79efd5b41acd4ad9aaf619c0256bdaf368bb6704a2933
+  version: 2023.2.4
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2023.2.4_linux_noarch_cflinuxfs3_bedf3ba0.tgz
+  sha256: bedf3ba053622843b84f67542c219b34bcf62d225e9b5782058bad2e673cbcc9
   cf_stacks:
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/bf/91/cf31b9ee2133617a27084e892d540c96ee16c170d93387dc4f95bc6cd086/pipenv-2022.11.30.tar.gz
-  source_sha256: 7fd8aa14d0e63fa3f82b4d35ded0dc070df1b18731434173ced50fc4298163da
+  source: https://files.pythonhosted.org/packages/7e/19/98c841512d64c54d4ad47409a18e8ca763847c24aed0b6a1158ad3bf8cfb/pipenv-2023.2.4.tar.gz
+  source_sha256: 18a3eba519e36d59f0d5a7f9c42bd268521e4b9b7b3d1bd6adcf131569323275
 - name: pipenv
-  version: 2022.11.30
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2022.11.30_linux_noarch_cflinuxfs4_6e2d47ab.tgz
-  sha256: 6e2d47ab9fe3a13f9e7d3088367fba06cfab5cb1c52071633637cd5e44f93c3d
+  version: 2023.2.4
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2023.2.4_linux_noarch_cflinuxfs4_d27fe5ad.tgz
+  sha256: d27fe5adc2828fed04578fd92234a5414515caf486a89ba9b14adba52d2f871b
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/bf/91/cf31b9ee2133617a27084e892d540c96ee16c170d93387dc4f95bc6cd086/pipenv-2022.11.30.tar.gz
-  source_sha256: 7fd8aa14d0e63fa3f82b4d35ded0dc070df1b18731434173ced50fc4298163da
+  source: https://files.pythonhosted.org/packages/7e/19/98c841512d64c54d4ad47409a18e8ca763847c24aed0b6a1158ad3bf8cfb/pipenv-2023.2.4.tar.gz
+  source_sha256: 18a3eba519e36d59f0d5a7f9c42bd268521e4b9b7b3d1bd6adcf131569323275
 - name: python
   version: 3.7.16
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.7.16_linux_x64_cflinuxfs3_df1e893a.tgz
@@ -158,14 +158,14 @@ dependencies:
   source: https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz
   source_sha256: baed518e26b337d4d8105679caf68c5c32630d702614fc174e98cb95c46bdfa4
 - name: setuptools
-  version: 65.6.3
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_65.6.3_linux_noarch_any-stack_77f95639.tgz
-  sha256: 77f956394d07f0dc171f3a43d08ab281489274be5b2d0d373aedd1654063931f
+  version: 67.1.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_67.1.0_linux_noarch_any-stack_a6adb486.tgz
+  sha256: a6adb48670c2c6efe9332642bb444e3ced3bb3955b93f28378a387f785d0fcfb
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/b6/21/cb9a8d0b2c8597c83fce8e9c02884bce3d4951e41e807fc35791c6b23d9a/setuptools-65.6.3.tar.gz
-  source_sha256: a7620757bf984b58deaf32fc8a4577a9bbc0850cf92c20e1ce41c38c19e5fb75
+  source: https://files.pythonhosted.org/packages/bf/7c/3a0bb8db53f6b6dec4cb162d307cc5d37162dee65458b2be42817de30fda/setuptools-67.1.0.tar.gz
+  source_sha256: e261cdf010c11a41cb5cb5f1bf3338a7433832029f559a6a7614bd42a967c300
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md

@@ -31,7 +31,7 @@ var _ = Describe("deploying a flask web app", func() {
 
 		It("deploys a pipenv app", func() {
 			By("getting the python version from pipfile.lock")
-			Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.9."))
+			Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.10."))
 			Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
 
 			By("generating a requirements.txt without updating the pipfile.lock packages")
@@ -68,9 +68,10 @@ var _ = Describe("deploying a flask web app", func() {
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
-				It("should work by downloading the missing dependency", func() {
-					PushAppAndConfirm(app)
-					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World with pipenv!"))
+				It("should fail because it requires all dependencies to be vendored", func() {
+					Expect(app.Push()).ToNot(Succeed())
+					Expect(app.Stdout.String()).To(ContainSubstring("Running Pip Install (Vendored)"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Running pip install failed. You need to include all dependencies in the vendor directory."))
 				})
 			})
 		})

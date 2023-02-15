@@ -1,7 +1,7 @@
 package integration_test
 
 import (
-	"os/exec"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -37,14 +37,9 @@ var _ = Describe("CF Python Buildpack", func() {
 		It("displays a nice error messages and gracefully fails", func() {
 			Expect(app.Push()).ToNot(Succeed())
 
-			logs := exec.Command("cf", "logs", "--recent", app.Name)
-			out, err := logs.CombinedOutput()
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(out).To(ContainSubstring("-----> Python Buildpack version " + buildpackVersion))
-
-			Expect(out).To(ContainSubstring("Could not install python: no match found for 99.99.99"))
-			Expect(out).ToNot(ContainSubstring("-----> Installing python"))
+			Expect(app.Stdout.String()).To(ContainSubstring("-----> Python Buildpack version " + buildpackVersion))
+			Expect(app.Stdout.String()).To(ContainSubstring("Could not install python: no match found for 99.99.99"))
+			Expect(app.Stdout.String()).ToNot(ContainSubstring("-----> Installing python"))
 		})
 	})
 
@@ -124,7 +119,7 @@ var _ = Describe("CF Python Buildpack", func() {
 				It("deploys", func() {
 					PushAppAndConfirm(app)
 					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
-					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.9"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.10"))
 					Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 				})
 			})
@@ -138,21 +133,28 @@ var _ = Describe("CF Python Buildpack", func() {
 				It("deploys", func() {
 					PushAppAndConfirm(app)
 					Expect(app.GetBody("/")).To(ContainSubstring("Hello, World!"))
-					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.9"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.10"))
 					Expect(app.Stdout.String()).To(ContainSubstring("Dir checksum unchanged"))
 				})
 			})
 
 			Context("including django with specified python version", func() {
 				BeforeEach(func() {
-					app = cutlass.New(Fixtures("django_python_3"))
+					dir, err := cutlass.CopyFixture(Fixtures("django"))
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(os.WriteFile(filepath.Join(dir, "runtime.txt"), []byte("python-3.9.x"), 0644)).To(Succeed())
+
+					Expect(err).ToNot(HaveOccurred())
+
+					app = cutlass.New(dir)
 					app.SetEnv("BP_DEBUG", "1")
 				})
 
 				It("deploys", func() {
 					PushAppAndConfirm(app)
 					Expect(app.GetBody("/")).To(ContainSubstring("The install worked successfully!"))
-					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.9"))
+					Expect(app.Stdout.String()).To(ContainSubstring("Installing python 3.9."))
 					Expect(app.Stdout.String()).To(ContainSubstring("collectstatic --noinput"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Error while running"))
 					Expect(app.Stdout.String()).NotTo(ContainSubstring("Copying "))
@@ -201,7 +203,7 @@ var _ = Describe("CF Python Buildpack", func() {
 
 			Context("including django but not specified Python version", func() {
 				BeforeEach(func() {
-					app = cutlass.New(Fixtures("django_web_app"))
+					app = cutlass.New(Fixtures("django"))
 				})
 
 				It("deploys", func() {
