@@ -1,7 +1,7 @@
 module github.com/cloudfoundry/python-buildpack
 
 require (
-	github.com/Dynatrace/libbuildpack-dynatrace v1.5.0
+	github.com/Dynatrace/libbuildpack-dynatrace v1.5.2
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudfoundry/libbuildpack v0.0.0-20230209225346-0e58f7be61d4
 	github.com/golang/mock v1.6.0
