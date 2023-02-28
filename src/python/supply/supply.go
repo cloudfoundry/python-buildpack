@@ -284,8 +284,16 @@ func (s *Supplier) InstallPython() error {
 	}
 
 	version := regexp.MustCompile(`\d+\.\d+`).FindString(dep.Version)
-	if err := os.Setenv("CFLAGS", fmt.Sprintf("-I%s", filepath.Join(s.Stager.DepDir(), "python", "include", fmt.Sprintf("python%s", version)))); err != nil {
-		return err
+
+	//Remove once Python 3.7 is out of support (June 2023)
+	if version == "3.7" {
+		if err := os.Setenv("CFLAGS", fmt.Sprintf("-I%s", filepath.Join(s.Stager.DepDir(), "python", "include", fmt.Sprintf("python%sm", version)))); err != nil {
+			return err
+		}
+	} else {
+		if err := os.Setenv("CFLAGS", fmt.Sprintf("-I%s", filepath.Join(s.Stager.DepDir(), "python", "include", fmt.Sprintf("python%s", version)))); err != nil {
+			return err
+		}
 	}
 
 	return nil
