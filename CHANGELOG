@@ -1,3 +1,25 @@
+v1.8.7 Feb 17, 2023
+====================
+
+ * Bump github.com/Dynatrace/libbuildpack-dynatrace to v1.5.2 (#701)
+
+
+v1.8.6 Feb 15, 2023
+====================
+
+* Add special case for CFLAGS dir when using Python 3.7 (#703)
+
+* Update libbuildpack
+
+* Add pipenv 2023.2.4, remove pipenv 2022.12.19 (#694)
+  for stack(s) cflinuxfs3, cflinuxfs4
+  (https://www.pivotaltracker.com/story/show/184394842)
+
+* Add setuptools 67.1.0, remove setuptools 67.0.0 (#691)
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/184372013)
+
+
 v1.8.5 Feb 06, 2023
 ====================
 

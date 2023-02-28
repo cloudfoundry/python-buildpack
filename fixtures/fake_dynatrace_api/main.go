@@ -79,6 +79,12 @@ func main() {
 			json.NewEncoder(w).Encode(payload)
 
 		case "/v1/deployment/installer/agent/processmoduleconfig":
+			if os.Getenv("API_CONNECTION_FAIL") == "true" {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(err.Error()))
+				return
+			}
+
 			fakeConfig, err := os.ReadFile("fake_config.json")
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
