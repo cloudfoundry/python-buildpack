@@ -1,3 +1,25 @@
+v1.8.8 Mar 01, 2023
+====================
+
+* Add pip 23.0.1, remove pip 23.0 (#714)
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/184508492)
+
+* Add pipenv 2023.2.18, remove pipenv 2023.2.4 (#719)
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/184512962)
+
+* Add setuptools 67.4.0, remove setuptools 67.1.0 (#721)
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/184533088)
+
+* Add python 3.10.10, remove python 3.10.9 (#699)
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add python 3.11.2, remove python 3.11.1 (#698)
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+
 v1.8.7 Feb 17, 2023
 ====================
 
