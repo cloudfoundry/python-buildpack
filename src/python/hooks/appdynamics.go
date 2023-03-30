@@ -15,6 +15,10 @@ import (
 	"github.com/cloudfoundry/libbuildpack"
 )
 
+const (
+	appDynamicsServiceNameRegex = "app(-)?dynamics"
+)
+
 type Command interface {
 	Execute(string, io.Writer, io.Writer, string, ...string) error
 }
@@ -27,6 +31,7 @@ type AppdynamicsHook struct {
 
 type Plan struct {
 	Credentials Credential `json:"credentials"`
+	Name        string     `json:"name"`
 }
 
 type Credential struct {
@@ -160,18 +165,7 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		return nil
 	}
 
-	var appdServiceName string
-	for serviceName := range services {
-		if match, err := regexp.MatchString("app(-)?dynamics", serviceName); err != nil {
-			return nil
-		} else if match {
-			appdServiceName = serviceName
-			h.Log.Warning("[DEPRECATION WARNING]:")
-			h.Log.Warning("Please use AppDynamics extension buildpack for Python Application instrumentation")
-			h.Log.Warning("for more details: https://docs.pivotal.io/partners/appdynamics/multibuildpack.html")
-			break
-		}
-	}
+	appdServiceName, appdynamicsPlan, err := getAppDynamicsServiceName(services, h.Log)
 
 	if appdServiceName == "" {
 		return nil
@@ -179,8 +173,6 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 
 	h.Log.BeginStep("Setting up Appdynamics")
 
-	val := services[appdServiceName]
-	appdynamicsPlan := val[0].Credentials
 	vcapApplication := os.Getenv("VCAP_APPLICATION")
 	application := VcapApplication{}
 
@@ -191,7 +183,9 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 
 	sslFlag := "off"
 
-	if appdynamicsPlan.SslEnabled {
+	credentials := appdynamicsPlan.Credentials
+
+	if credentials.SslEnabled {
 		sslFlag = "on"
 	}
 
@@ -199,10 +193,10 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		"APPD_APP_NAME":           h.getEnv("APPD_APP_NAME", application.ApplicationName),
 		"APPD_TIER_NAME":          h.getEnv("APPD_TIER_NAME", application.ApplicationName),
 		"APPD_NODE_NAME":          h.getEnv("APPD_NODE_NAME", application.ApplicationName),
-		"APPD_CONTROLLER_HOST":    appdynamicsPlan.ControllerHost,
-		"APPD_CONTROLLER_PORT":    appdynamicsPlan.ControllerPort,
-		"APPD_ACCOUNT_ACCESS_KEY": appdynamicsPlan.AccountAccessKey,
-		"APPD_ACCOUNT_NAME":       appdynamicsPlan.AccountName,
+		"APPD_CONTROLLER_HOST":    credentials.ControllerHost,
+		"APPD_CONTROLLER_PORT":    credentials.ControllerPort,
+		"APPD_ACCOUNT_ACCESS_KEY": credentials.AccountAccessKey,
+		"APPD_ACCOUNT_NAME":       credentials.AccountName,
 		"APPD_SSL_ENABLED":        sslFlag,
 	}
 
@@ -222,6 +216,49 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 	}
 
 	return nil
+}
+
+func getAppDynamicsServiceName(services map[string][]Plan, log *libbuildpack.Logger) (string, Plan, error) {
+	// Check if there is a service with name appdynamics or app-dynamics
+	for serviceName, servicePlans := range services {
+		if isAppDynamicsServiceName(serviceName) {
+			appdServiceName := serviceName
+			logDeprecationWarning(log)
+			return appdServiceName, servicePlans[0], nil
+		}
+	}
+
+	// If this line is reached, no service with name appdynamics or app-dynamics was found. Check for user-provided services
+	userProvidedServices, keyExists := services["user-provided"]
+	if !keyExists {
+		return "", Plan{}, nil
+	}
+
+	for _, plan := range userProvidedServices {
+		if isAppDynamicsServiceName(plan.Name) {
+			appdServiceName := plan.Name
+			logDeprecationWarning(log)
+			return appdServiceName, plan, nil
+		}
+	}
+
+	// If this line is reached, no service with name appdynamics or app-dynamics was found in either the services and user-provided services. Return empty string, empty plan and nil error
+	return "", Plan{}, nil
+}
+
+func isAppDynamicsServiceName(serviceName string) bool {
+	match, err := regexp.MatchString(appDynamicsServiceNameRegex, serviceName)
+	if err != nil {
+		return false
+	}
+
+	return match
+}
+
+func logDeprecationWarning(log *libbuildpack.Logger) {
+	log.Warning("[DEPRECATION WARNING]:")
+	log.Warning("Please use AppDynamics extension buildpack for Python Application instrumentation")
+	log.Warning("for more details: https://docs.pivotal.io/partners/appdynamics/multibuildpack.html")
 }
 
 func init() {
