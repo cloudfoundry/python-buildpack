@@ -1,0 +1,8 @@
+Flask==2.2.2
+Jinja2==3.1.2
+MarkupSafe==2.1.2
+Werkzeug==2.2.2
+itsdangerous==2.1.2
+pylibmc==1.6.3
+cffi==1.15.1
+appdynamics==23.2.0.5678
