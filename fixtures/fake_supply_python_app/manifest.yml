@@ -1,5 +1,0 @@
----
-  applications:
-    - name: fake_supply_python_app
-      disk_quota: 1536M
-

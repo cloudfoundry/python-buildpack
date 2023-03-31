@@ -1,12 +1,12 @@
+import platform
+import sys
+
 import MySQLdb
 import bcrypt
-import psycopg2
-import sys
 import hiredis
-import platform
-
-
+import psycopg2
 from flask import Flask
+
 app = Flask(__name__)
 
 port = int(sys.argv[1])
@@ -16,13 +16,16 @@ port = int(sys.argv[1])
 def hello():
     return "Hello World!"
 
+
 @app.route("/version")
 def version():
     return platform.python_version()
 
+
 @app.route("/unicode")
 def unicode():
     return "max unicode: %d" % sys.maxunicode
+
 
 @app.route("/bcrypt")
 def test_bcrypt():
@@ -48,7 +51,7 @@ def test_pg():
 @app.route("/redis")
 def test_redis():
     reader = hiredis.Reader()
-    reader.feed("$5\r\nHello\r\n") 
+    reader.feed("$5\r\nHello\r\n")
     return reader.gets()
 
 

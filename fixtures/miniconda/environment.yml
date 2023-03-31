@@ -1,0 +1,4 @@
+name: pydata_test
+dependencies:
+  - flask
+  - gunicorn=20.1.0

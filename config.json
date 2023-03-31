@@ -1,16 +1,13 @@
 {
   "stack": "cflinuxfs3",
   "oses": [
-    "linux",
-    "windows"
+    "linux"
   ],
   "integration": {
-    "harness": "ginkgo",
+    "harness": "switchblade",
     "matrix": [
       { "cached": false, "parallel": true },
-      { "cached": false, "parallel": false },
-      { "cached": true,  "parallel": true },
-      { "cached": true,  "parallel": false }
+      { "cached": true, "parallel": true }
     ]
   }
 }

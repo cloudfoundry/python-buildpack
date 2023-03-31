@@ -1,5 +1,0 @@
-flask
-gunicorn
-itsdangerous
-jinja2
--r sub_folder/other_requirement1.txt
