@@ -1,9 +1,0 @@
-Flask
-Jinja2
-MarkupSafe
-Werkzeug
-gunicorn
-itsdangerous
-pylibmc
-cffi
--e git+https://github.com/eregs/regulations-core.git@2.0.0#egg=regcore

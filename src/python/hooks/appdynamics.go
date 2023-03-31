@@ -31,7 +31,7 @@ type AppdynamicsHook struct {
 
 type Plan struct {
 	Credentials Credential `json:"credentials"`
-	Name        string     `json:"name"`
+	Name        string     `json:"name,omitempty"`
 }
 
 type Credential struct {
@@ -44,7 +44,11 @@ type Credential struct {
 
 type VcapApplication struct {
 	ApplicationName string `json:"application_name"`
-	ApplicationId   string `json:"application_id"`
+	Name            string `json:"name"`
+	ProcessType     string `json:"process_type"`
+	Limits          struct {
+		Mem int `json:"mem"`
+	} `json:"limits"`
 }
 
 func (h AppdynamicsHook) getEnv(key, fallback string) string {
@@ -161,7 +165,7 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 
 	err := json.Unmarshal([]byte(vcapServices), &services)
 	if err != nil {
-		h.Log.Debug("Could not unmarshall VCAP_SERVICES JSON exiting")
+		h.Log.Debug("Could not unmarshall VCAP_SERVICES JSON exiting: %v", err)
 		return nil
 	}
 
@@ -178,7 +182,8 @@ func (h AppdynamicsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 
 	err = json.Unmarshal([]byte(vcapApplication), &application)
 	if err != nil {
-		h.Log.Debug("Could not unmarshall VCAP_APPLICATION JSON")
+		h.Log.Debug("Could not unmarshall VCAP_APPLICATION JSON %v", err)
+		h.Log.Debug("VCAP_APPLICATION: %s", vcapApplication)
 	}
 
 	sslFlag := "off"

@@ -1,5 +1,0 @@
----
-applications:
-- name: python-buildpack-test
-  memory: 128MB
-  buildpacks: [python_buildpack]

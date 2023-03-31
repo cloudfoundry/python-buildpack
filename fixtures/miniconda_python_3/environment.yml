@@ -1,5 +1,0 @@
-name: pydata_test
-dependencies:
-- python=3.8
-- flask=2.0.2
-- numpy=1.21.2
