@@ -1,3 +1,17 @@
+v1.8.9 Apr 11, 2023
+====================
+
+* Add python 3.10.11, remove python 3.10.10 for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add python 3.11.3, remove python 3.11.2 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add setuptools 67.6.1, remove setuptools 67.4.0 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pipenv 2023.3.20, remove pipenv 2023.2.18 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Fix problem with AppDynamics hook (now it supports user-provided services)
+
+
 v1.8.8 Mar 01, 2023
 ====================
 
