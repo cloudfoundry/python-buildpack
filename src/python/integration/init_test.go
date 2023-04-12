@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"flag"
+	"github.com/onsi/gomega/types"
 	"os"
 	"path/filepath"
 	"testing"
@@ -119,4 +120,18 @@ func TestIntegration(t *testing.T) {
 	Expect(platform.Delete.Execute(proxyName)).To(Succeed())
 	Expect(platform.Delete.Execute(dynatraceName)).To(Succeed())
 	Expect(os.Remove(os.Getenv("BUILDPACK_FILE"))).To(Succeed())
+}
+
+func CreateRequirementsTxtFile(Expect func(actual interface{}, extra ...interface{}) types.Assertion, path string, fileName string, modules ...string) {
+	file, err := os.Create(filepath.Join(path, fileName))
+	Expect(err).NotTo(HaveOccurred())
+
+	for _, module := range modules {
+		_, err = file.WriteString(module + "\n")
+		Expect(err).NotTo(HaveOccurred())
+	}
+
+	err = file.Close()
+
+	Expect(err).NotTo(HaveOccurred())
 }
