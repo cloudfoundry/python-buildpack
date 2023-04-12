@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"github.com/onsi/gomega/types"
 	"os"
 	"path/filepath"
 	"testing"
@@ -54,7 +53,7 @@ func testPip(platform switchblade.Platform, fixtures string) func(*testing.T, sp
 						Expect(os.RemoveAll(source)).To(Succeed())
 					})
 
-					it("installs the regulations-core package", func() {
+					it("handles recursive requirements successfully", func() {
 						deployment, logs, err := platform.Deploy.
 							Execute(name, source)
 						Expect(err).NotTo(HaveOccurred())
@@ -209,18 +208,4 @@ func testPip(platform switchblade.Platform, fixtures string) func(*testing.T, sp
 			})
 		})
 	}
-}
-
-func CreateRequirementsTxtFile(Expect func(actual interface{}, extra ...interface{}) types.Assertion, path string, fileName string, modules ...string) {
-	file, err := os.Create(filepath.Join(path, fileName))
-	Expect(err).NotTo(HaveOccurred())
-
-	for _, module := range modules {
-		_, err = file.WriteString(module + "\n")
-		Expect(err).NotTo(HaveOccurred())
-	}
-
-	err = file.Close()
-
-	Expect(err).NotTo(HaveOccurred())
 }
