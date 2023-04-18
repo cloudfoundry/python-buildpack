@@ -54,8 +54,8 @@ dependencies:
   source_sha256: 78f39f9bae971ec1ae7969f0516017f2413f17796670f7040725dd83fcff5689
 - name: pip
   version: '23.1'
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_23.1_linux_noarch_any-stack_6b16c735.tgz
-  sha256: 6b16c7351b40a60271cf8dc396b962afbe1734496074f46039a6774b05eb11c1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_23.1_linux_noarch_any-stack_fb3b514a.tgz
+  sha256: fb3b514ace7fdbdfb001f7f8b740bd45b644d43ab1f594e1bb870f07e92b2c5e
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
