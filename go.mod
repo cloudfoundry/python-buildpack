@@ -4,7 +4,7 @@ require (
 	github.com/Dynatrace/libbuildpack-dynatrace v1.5.2
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudfoundry/libbuildpack v0.0.0-20230404152448-8da916cb09fe
-	github.com/cloudfoundry/switchblade v0.3.0
+	github.com/cloudfoundry/switchblade v0.4.0
 	github.com/golang/mock v1.6.0
 	github.com/kr/text v0.2.0
 	github.com/onsi/ginkgo v1.16.5
@@ -17,10 +17,10 @@ require (
 require (
 	code.cloudfoundry.org/lager v2.0.0+incompatible // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
-	github.com/Microsoft/go-winio v0.6.0 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
+	github.com/Microsoft/go-winio v0.6.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v23.0.3+incompatible // indirect
+	github.com/docker/docker v23.0.4+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819 // indirect
@@ -31,9 +31,9 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
+	github.com/opencontainers/image-spec v1.1.0-rc2.0.20221005185240-3a7f492d3f1b // indirect
 	github.com/paketo-buildpacks/packit v1.3.1 // indirect
-	github.com/paketo-buildpacks/packit/v2 v2.9.0 // indirect
+	github.com/paketo-buildpacks/packit/v2 v2.9.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569 // indirect
 	github.com/tidwall/gjson v1.14.4 // indirect
