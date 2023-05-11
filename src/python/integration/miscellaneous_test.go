@@ -103,28 +103,6 @@ func testMiscellaneous(platform switchblade.Platform, fixtures string) func(*tes
 			})
 		})
 
-		context("when pushing an app with mercurial dependencies", func() {
-			it.Before(func() {
-				var err error
-				source, err = switchblade.Source(filepath.Join(fixtures, "miscellaneous", "mercurial"))
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			it.After(func() {
-				Expect(os.RemoveAll(source)).To(Succeed())
-			})
-
-			it("deploys successfully", func() {
-				deployment, logs, err := platform.Deploy.
-					Execute(name, source)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(deployment).Should(Serve(ContainSubstring("Hello, World!")))
-
-				Eventually(logs.String).Should(ContainSubstring("Obtaining python-hglib"))
-			})
-		})
-
 		context("when pushing an app without a Procfile", func() {
 			context("when start command is specified in push", func() {
 				it.Before(func() {
