@@ -1,3 +1,17 @@
+v1.8.10 May 11, 2023
+=====================
+
+* Remove mercurial tests (not supported anymore)
+
+* Add pipenv 2023.4.29, remove pipenv 2023.3.20 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pip 23.1.2, remove pip 23.0.1 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add setuptools 67.7.2, remove setuptools 67.6.1 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Refactor test framework to use Switchblade
+
+
 v1.8.9 Apr 11, 2023
 ====================
 
