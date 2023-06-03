@@ -107,6 +107,7 @@ func TestIntegration(t *testing.T) {
 	suite("Pipenv", testPipenv(platform, fixtures))
 	suite("Override", testOverride(platform, fixtures))
 	suite("Multibuildpack", testMultibuildpack(platform, fixtures))
+	suite("Sealights", testSealights(platform, fixtures))
 
 	if settings.Cached {
 		suite("Offline", testOffline(platform, fixtures))
