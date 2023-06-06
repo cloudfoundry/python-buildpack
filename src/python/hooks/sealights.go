@@ -21,6 +21,7 @@ type SealightsCredentials struct {
 	BsIdFile  string `json:"bsidFile",omitempty`
 	Proxy     string `json:"proxy",omitempty`
 	LabId     string `json:"labid",omitempty`
+	Version   string `json:"version",omitempty`
 }
 type SealightsConfig struct {
 	Token     string
@@ -29,6 +30,7 @@ type SealightsConfig struct {
 	BsIdFile  string
 	Proxy     string
 	LabId     string
+	Version   string
 }
 
 func NewSealightsConfig() *SealightsConfig {
@@ -104,13 +106,12 @@ func (sh SealightsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		return nil
 	}
 	sh.Log.BeginStep("Setting up Sealights hook")
-
-	if err := sh.RewriteRequirementsFile(stager); err != nil {
+	sealightsConfig := NewSealightsConfig().parseSealightsPlan(sealightsPlan)
+	if err := sh.RewriteRequirementsFile(stager, sealightsConfig.Version); err != nil {
 		sh.Log.Error("Could not write requirements file with Sealights package: %v", err)
 		return err
 	}
 
-	sealightsConfig := NewSealightsConfig().parseSealightsPlan(sealightsPlan)
 	if err := sh.RewriteProcFileWithSealgiths(stager, sealightsConfig.GetStartFlags()); err != nil {
 		sh.Log.Error("Failed to rewrite Procfile with Sealights: %s", err.Error())
 		return fmt.Errorf("Failed to rewrite Procfile with Sealights: %s", err.Error())
@@ -179,17 +180,21 @@ func (sh SealightsHook) GenerateStartUpCommand(startCommand string, cfgFlags str
 	}
 	return fmt.Sprintf("web: sl-python run%s -- %s", cfgFlags, webCommands[1]), nil
 }
-func (sh SealightsHook) RewriteRequirementsFile(stager *libbuildpack.Stager) error {
+func (sh SealightsHook) RewriteRequirementsFile(stager *libbuildpack.Stager, version string) error {
+	sealightsPackage := "sealights-python-agent"
+	if version != "" {
+		sealightsPackage = fmt.Sprintf("sealights-python-agent==%s", version)
+	}
 	reqFile := filepath.Join(stager.BuildDir(), "requirements.txt")
 	writeFlag := os.O_APPEND | os.O_WRONLY
-	packageName := "\n" + "sealights-python-agent"
+	packageName := "\n" + sealightsPackage
 
 	if exists, err := libbuildpack.FileExists(reqFile); err != nil {
 		return err
 	} else if !exists {
 		sh.Log.Info("Requirements file not found creating one with sealights packages")
 		writeFlag = os.O_CREATE | os.O_WRONLY
-		packageName = "sealights-python-agent"
+		packageName = sealightsPackage
 	}
 	f, err := os.OpenFile(reqFile, writeFlag, 0666)
 	if err != nil {

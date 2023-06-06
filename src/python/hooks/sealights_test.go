@@ -145,7 +145,7 @@ var _ = Describe("Sealights", func() {
 	Context("RewriteRequirementsFile when requirements.txt is not packaged", func() {
 		It("creates requirements.txt", func() {
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).ToNot(BeTrue())
-			err := sealights.RewriteRequirementsFile(stager)
+			err := sealights.RewriteRequirementsFile(stager, "")
 			Expect(err).To(BeNil())
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
 			packagesList, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
@@ -170,10 +170,17 @@ var _ = Describe("Sealights", func() {
 
 		It("rewrites requirements.txt", func() {
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
-			err := sealights.RewriteRequirementsFile(stager)
+			err := sealights.RewriteRequirementsFile(stager, "")
 			Expect(err).To(BeNil())
 			packages, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 			Expect(string(packages)).To(Equal("Flask\nsealights-python-agent"))
+		})
+		It("rewrites requirements.txt with sealights agent version", func() {
+			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
+			err := sealights.RewriteRequirementsFile(stager, "1.1.1")
+			Expect(err).To(BeNil())
+			packages, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+			Expect(string(packages)).To(Equal("Flask\nsealights-python-agent==1.1.1"))
 		})
 	})
 	Context("BeforeCompile when VCAP_SERVICES is not present", func() {
