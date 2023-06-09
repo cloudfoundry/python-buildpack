@@ -131,7 +131,7 @@ var _ = Describe("Sealights", func() {
 
 		It("Errors when Procfile doesn't exist", func() {
 			err := sealights.RewriteProcFile("/doesnt/exist", slConfig.GetStartFlags())
-			Expect(err).To(MatchError("Error reading file /doesnt/exist: open /doesnt/exist: The system cannot find the path specified."))
+			Expect(err).To(MatchError("Error reading file /doesnt/exist: open /doesnt/exist: no such file or directory"))
 		})
 
 		It("Errors with Procfile with wrong format", func() {
