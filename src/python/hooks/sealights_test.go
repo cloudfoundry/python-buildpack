@@ -168,14 +168,14 @@ var _ = Describe("Sealights", func() {
 			Expect(os.Remove(filepath.Join(buildDir, "requirements.txt"))).To(Succeed())
 		})
 
-		It("rewrites requirements.txt", func() {
+		It("Rewrites requirements.txt", func() {
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
 			err := sealights.RewriteRequirementsFile(stager, "")
 			Expect(err).To(BeNil())
 			packages, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 			Expect(string(packages)).To(Equal("Flask\nsealights-python-agent"))
 		})
-		It("rewrites requirements.txt with sealights agent version", func() {
+		It("Rewrites requirements.txt with sealights agent version", func() {
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
 			err := sealights.RewriteRequirementsFile(stager, "1.1.1")
 			Expect(err).To(BeNil())
