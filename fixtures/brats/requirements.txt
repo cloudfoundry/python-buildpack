@@ -6,4 +6,4 @@ itsdangerous
 bcrypt
 hiredis
 psycopg2
-mysqlclient
+mysqlclient==2.1.1
