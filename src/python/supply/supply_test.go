@@ -93,9 +93,9 @@ var _ = Describe("Supply", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 			pythonInstallDir = filepath.Join(depDir, "python")
-			Expect(os.WriteFile(filepath.Join(depDir, "runtime.txt"), []byte("\n\n\npython-3.4.2\n\n\n"), 0644)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(depDir, "runtime.txt"), []byte("\n\n\npython-3.9.2\n\n\n"), 0644)).To(Succeed())
 
-			versions = []string{"3.4.2", "3.7.13"}
+			versions = []string{"3.9.2", "3.10.1"}
 			originalPath = os.Getenv("PATH")
 		})
 
@@ -106,31 +106,13 @@ var _ = Describe("Supply", func() {
 		Context("runtime.txt sets Python version 3", func() {
 			It("installs Python version 3", func() {
 				mockManifest.EXPECT().AllDependencyVersions("python").Return(versions)
-				mockInstaller.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "3.4.2"}, pythonInstallDir)
+				mockInstaller.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "3.9.2"}, pythonInstallDir)
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
 				Expect(supplier.InstallPython()).To(Succeed())
 				Expect(os.Getenv("PATH")).To(Equal(fmt.Sprintf("%s:%s", filepath.Join(depDir, "bin"), originalPath)))
 				Expect(os.Getenv("PYTHONPATH")).To(Equal(depDir))
-				Expect(os.Getenv("CFLAGS")).To(Equal(fmt.Sprintf("-I%s", filepath.Join(depDir, "python", "include", "python3.4"))))
-			})
-		})
-
-		//Remove once Python 3.7 is out of support (June 2023)
-		Context("runtime.txt sets Python version 3.7", func() {
-			BeforeEach(func() {
-				Expect(os.RemoveAll(filepath.Join(depDir, "runtime.txt"))).To(Succeed())
-				Expect(os.WriteFile(filepath.Join(depDir, "runtime.txt"), []byte("\n\n\npython-3.7.13\n\n\n"), 0644)).To(Succeed())
-			})
-			It("installs Python version 3.7", func() {
-				mockManifest.EXPECT().AllDependencyVersions("python").Return(versions)
-				mockInstaller.EXPECT().InstallDependency(libbuildpack.Dependency{Name: "python", Version: "3.7.13"}, pythonInstallDir)
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "bin"), "bin")
-				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(pythonInstallDir, "lib"), "lib")
-				Expect(supplier.InstallPython()).To(Succeed())
-				Expect(os.Getenv("PATH")).To(Equal(fmt.Sprintf("%s:%s", filepath.Join(depDir, "bin"), originalPath)))
-				Expect(os.Getenv("PYTHONPATH")).To(Equal(depDir))
-				Expect(os.Getenv("CFLAGS")).To(Equal(fmt.Sprintf("-I%s", filepath.Join(depDir, "python", "include", "python3.7m"))))
+				Expect(os.Getenv("CFLAGS")).To(Equal(fmt.Sprintf("-I%s", filepath.Join(depDir, "python", "include", "python3.9"))))
 			})
 		})
 
