@@ -1,3 +1,13 @@
+v1.8.12 Jul 12, 2023
+=====================
+
+* Deprecate Python 3.7.x (EOL)
+
+* Add pipenv 2023.7.11, remove pipenv 2023.6.2 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add setuptools 68.0.0, remove setuptool for stack(s) cflinuxfs4, cflinuxfs3
+
+
 v1.8.11 Jun 08, 2023
 =====================
 
