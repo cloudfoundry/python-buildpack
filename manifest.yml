@@ -40,39 +40,39 @@ dependencies:
   source: https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
   source_sha256: e22c0bb032fde08f53de9ffbc5a128233041d9f33b5de022c0978a2149885f82
 - name: miniconda3-py39
-  version: 4.12.0
-  uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-  sha256: 78f39f9bae971ec1ae7969f0516017f2413f17796670f7040725dd83fcff5689
+  version: 23.5.2
+  uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh
+  sha256: 9829d95f639bd0053b2ed06d1204e60644617bf37dd5cc57523732e0e8d64516
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://github.com/conda/conda/archive/4.12.0.tar.gz
-  source_sha256: 78f39f9bae971ec1ae7969f0516017f2413f17796670f7040725dd83fcff5689
+  source: https://github.com/conda/conda/archive/23.5.2.tar.gz
+  source_sha256: 9829d95f639bd0053b2ed06d1204e60644617bf37dd5cc57523732e0e8d64516
 - name: pip
-  version: 23.1.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_23.1.2_linux_noarch_any-stack_9adab362.tgz
-  sha256: 9adab362fbdd3ef0f37067e18029735c6eb6f8c9c48b2f1ebcc6137aff6d2709
+  version: 23.2.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_23.2.1_linux_noarch_any-stack_28efa32f.tgz
+  sha256: 28efa32f6bb726d7d4e2485bdbd69af29d78e2d4c994cd3756874fb0c6f5ed46
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/fa/ee/74ff76da0ab649eec7581233daeb43d8aa35383d8f75317b2ab3b80c922f/pip-23.1.2.tar.gz
-  source_sha256: 0e7c86f486935893c708287b30bd050a36ac827ec7fe5e43fe7cb198dd835fba
+  source: https://files.pythonhosted.org/packages/ba/19/e63fb4e0d20e48bd2167bb7e857abc0e21679e24805ba921a224df8977c0/pip-23.2.1.tar.gz
+  source_sha256: fb0bd5435b3200c602b5bf61d2d43c2f13c02e29c1707567ae7fbc514eb9faf2
 - name: pipenv
-  version: 2023.7.11
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2023.7.11_linux_noarch_cflinuxfs3_d9d7e8cd.tgz
-  sha256: d9d7e8cda5edcee9e361ebcc5a8c2d2f921955e2de215b08b1841a27b482b38a
+  version: 2023.7.23
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2023.7.23_linux_noarch_cflinuxfs3_bd28ec47.tgz
+  sha256: bd28ec47ca49fd8e8968560e2e1da3fecf8d713bcf418d8f673def3dc08225b5
   cf_stacks:
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/96/fc/5323ede9132b2b60daca1a6e5bcb85a4ec42b647b5a63481581f8e93865a/pipenv-2023.7.11.tar.gz
-  source_sha256: 4089056c0e859307cd6b86223002657b55953f78d9af1b848f8953cdb94cfa12
+  source: https://files.pythonhosted.org/packages/6f/7f/389e0d3839c53a7ab5e99fe0dcd0dbd8c4ea269acf95861fb7cb2ca2ef1a/pipenv-2023.7.23.tar.gz
+  source_sha256: 77b1ba91d3cbfa85acb05fb447f5c8ab452dc377e0aea0f3ded8b2c36b669a45
 - name: pipenv
-  version: 2023.7.11
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2023.7.11_linux_noarch_cflinuxfs4_628bc751.tgz
-  sha256: 628bc751f18107a3965fb6a73516237c656e956e6d0abeb3085d537c7d79b0f4
+  version: 2023.7.23
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2023.7.23_linux_noarch_cflinuxfs4_c83f9ef6.tgz
+  sha256: c83f9ef6c6f3bf1dab3db454efef38e65427a0ce2423e83e4f772d0086a92f55
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/96/fc/5323ede9132b2b60daca1a6e5bcb85a4ec42b647b5a63481581f8e93865a/pipenv-2023.7.11.tar.gz
-  source_sha256: 4089056c0e859307cd6b86223002657b55953f78d9af1b848f8953cdb94cfa12
+  source: https://files.pythonhosted.org/packages/6f/7f/389e0d3839c53a7ab5e99fe0dcd0dbd8c4ea269acf95861fb7cb2ca2ef1a/pipenv-2023.7.23.tar.gz
+  source_sha256: 77b1ba91d3cbfa85acb05fb447f5c8ab452dc377e0aea0f3ded8b2c36b669a45
 - name: python
   version: 3.8.17
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.8.17_linux_x64_cflinuxfs3_9a6aa6b5.tgz
@@ -138,14 +138,14 @@ dependencies:
   source: https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz
   source_sha256: 85c37a265e5c9dd9f75b35f954e31fbfc10383162417285e30ad25cc073a0d63
 - name: setuptools
-  version: 68.0.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_68.0.0_linux_noarch_any-stack_d9114d5d.tgz
-  sha256: d9114d5d9162a6c7e282a00fbc33c2db23a08b05e611d0d228c6a765bce79800
+  version: 68.1.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_68.1.0_linux_noarch_any-stack_b2473e0a.tgz
+  sha256: b2473e0af1a39df4a2a1a6043b28ab4607c723258b63af151135358a1ad6159b
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/dc/98/5f896af066c128669229ff1aa81553ac14cfb3e5e74b6b44594132b8540e/setuptools-68.0.0.tar.gz
-  source_sha256: baf1fdb41c6da4cd2eae722e135500da913332ab3f2f5c7d33af9b492acb5235
+  source: https://files.pythonhosted.org/packages/83/b0/18310b45f6eec3757c0554dbc1e03f2f7685c8a87831aea6adc1276faacc/setuptools-68.1.0.tar.gz
+  source_sha256: d59c97e7b774979a5ccb96388efc9eb65518004537e85d52e81eaee89ab6dd91
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
