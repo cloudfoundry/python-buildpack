@@ -36,7 +36,6 @@ func testSealights(platform switchblade.Platform, fixtures string) func(*testing
 				WithBuildpacks("python_buildpack").
 				WithServices(map[string]switchblade.Service{
 					"sealights": {
-						"token":     "",
 						"tokenFile": "sltoken.txt",
 					},
 				}).
