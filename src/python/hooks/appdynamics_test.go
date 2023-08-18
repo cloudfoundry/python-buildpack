@@ -16,20 +16,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func createFile(dir, filename, command string, perm os.FileMode) error {
-	procFile := filepath.Join(dir, filename)
-	f, err := os.OpenFile(procFile, os.O_CREATE|os.O_WRONLY, perm)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	if _, err = f.WriteString(command); err != nil {
-		return err
-	}
-	return nil
-}
+const buildOrder = "9"
 
 var _ = Describe("Appdynamics", func() {
 	var (
@@ -43,15 +30,15 @@ var _ = Describe("Appdynamics", func() {
 
 	BeforeEach(func() {
 		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 
 		depsDir, err = os.MkdirTemp("", "python-buildpack.deps.")
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 
 		buffer = new(bytes.Buffer)
 		logger := libbuildpack.NewLogger(ansicleaner.New(buffer))
 
-		args := []string{buildDir, "", depsDir, "9"}
+		args := []string{buildDir, "", depsDir, buildOrder}
 		stager = libbuildpack.NewStager(args, logger, &libbuildpack.Manifest{})
 
 		command := &libbuildpack.Command{}
@@ -72,7 +59,7 @@ var _ = Describe("Appdynamics", func() {
 			startCommand := "web: python flask.py"
 			ModifiedCommand, err := appdynamics.GenerateStartUpCommand(startCommand)
 			Expect(ModifiedCommand).To(Equal("web: pyagent run --  python flask.py"))
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("Returns an error when provided the wrong format", func() {
@@ -97,13 +84,13 @@ var _ = Describe("Appdynamics", func() {
 		})
 
 		It("rewrites the procfile with pyagent", func() {
-			err = createFile(tempProcDir, "Procfile", "web: python app.py", 0666)
-			Expect(err).To(BeNil())
+			Expect(os.WriteFile(filepath.Join(tempProcDir, "Procfile"), []byte("web: python app.py"), 0666)).To(Succeed())
+			Expect(err).NotTo(HaveOccurred())
 
 			err = appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "Procfile"))
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			startCommand, err := os.ReadFile(filepath.Join(tempProcDir, "Procfile"))
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(startCommand)).To(Equal("web: pyagent run --  python app.py"))
 		})
 
@@ -113,8 +100,8 @@ var _ = Describe("Appdynamics", func() {
 		})
 
 		It("Errors with Procfile with wrong format", func() {
-			err = createFile(tempProcDir, "WrongFormatProcFile", "python app.py", 0666)
-			Expect(err).To(BeNil())
+			Expect(os.WriteFile(filepath.Join(tempProcDir, "WrongFormatProcFile"), []byte("python app.py"), 0666)).To(Succeed())
+			Expect(err).NotTo(HaveOccurred())
 
 			err = appdynamics.RewriteProcFile(filepath.Join(tempProcDir, "WrongFormatProcFile"))
 			Expect(err).To(MatchError("improper format found in Procfile"))
@@ -125,10 +112,10 @@ var _ = Describe("Appdynamics", func() {
 		It("creates requirements.txt", func() {
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).ToNot(BeTrue())
 			err := appdynamics.RewriteRequirementsFile(stager)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
 			packagesList, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(packagesList)).To(Equal("appdynamics"))
 		})
 	})
@@ -138,10 +125,10 @@ var _ = Describe("Appdynamics", func() {
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).ToNot(BeTrue())
 			procFile := filepath.Join(buildDir, "requirements.txt")
 			f, err := os.OpenFile(procFile, os.O_CREATE|os.O_WRONLY, 0644)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			defer f.Close()
 			_, err = f.WriteString("Flask")
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 		})
 		AfterEach(func() {
 			Expect(os.Remove(filepath.Join(buildDir, "requirements.txt"))).To(Succeed())
@@ -150,7 +137,7 @@ var _ = Describe("Appdynamics", func() {
 		It("rewrites requirements.txt", func() {
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
 			err := appdynamics.RewriteRequirementsFile(stager)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			packages, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 			Expect(string(packages)).To(Equal("Flask\nappdynamics"))
 		})
@@ -185,7 +172,7 @@ export APPD_KEY_2=APPD_VAL_2`
 export APPD_KEY_1=APPD_VAL_1
 export APPD_KEY_2=APPD_VAL_2`
 			script, err := os.ReadFile(appdynamicsShellScript)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(script)).To(Equal(expectedScript))
 		})
 	})
@@ -193,8 +180,8 @@ export APPD_KEY_2=APPD_VAL_2`
 	Context("BeforeCompile when VCAP_SERVICES is not present", func() {
 		BeforeEach(func() {
 			Expect(os.Getenv("VCAP_SERVICES")).To(Equal(""))
-			err = createFile(buildDir, "Procfile", "web: python app.py", 0644)
-			Expect(err).To(BeNil())
+			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		AfterEach(func() {
@@ -203,11 +190,11 @@ export APPD_KEY_2=APPD_VAL_2`
 
 		It("VCAP_SERVICES is not present", func() {
 			err := appdynamics.BeforeCompile(stager)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(libbuildpack.FileExists(filepath.Join(stager.DepDir(), "profile.d", "appdynamics.sh"))).To(BeFalse())
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeFalse())
 			procCommand, err := os.ReadFile(filepath.Join(buildDir, "Procfile"))
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(procCommand)).To(Equal("web: python app.py"))
 		})
 	})
@@ -216,8 +203,8 @@ export APPD_KEY_2=APPD_VAL_2`
 		BeforeEach(func() {
 			Expect(os.Getenv("VCAP_SERVICES")).To(Equal(""))
 			os.Setenv("VCAP_SERVICES", `{"service": [{"credentials": {"login": "name"}, "name": "443"}]}`)
-			err = createFile(buildDir, "Procfile", "web: python app.py", 0644)
-			Expect(err).To(BeNil())
+			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		AfterEach(func() {
@@ -227,11 +214,11 @@ export APPD_KEY_2=APPD_VAL_2`
 
 		It("VCAP_SERVICES has no appdynamics", func() {
 			err := appdynamics.BeforeCompile(stager)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(libbuildpack.FileExists(filepath.Join(stager.DepDir(), "profile.d", "appdynamics.sh"))).To(BeFalse())
 			Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeFalse())
 			procCommand, err := os.ReadFile(filepath.Join(buildDir, "Procfile"))
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(procCommand)).To(Equal("web: python app.py"))
 		})
 	})
@@ -246,8 +233,8 @@ export APPD_KEY_2=APPD_VAL_2`
 				os.Setenv("APPD_TIER_NAME", "tier")
 				os.Setenv("APPD_NODE_NAME", "node")
 
-				err = createFile(buildDir, "Procfile", "web: python app.py", 0644)
-				Expect(err).To(BeNil())
+				Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			AfterEach(func() {
@@ -256,7 +243,7 @@ export APPD_KEY_2=APPD_VAL_2`
 
 			It(fmt.Sprintf("VCAP_SERVICES has %s", serviceName), func() {
 				err := appdynamics.BeforeCompile(stager)
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(libbuildpack.FileExists(filepath.Join(stager.DepDir(), "profile.d", "appdynamics.sh"))).To(BeTrue())
 				appdynamicsInfo, err := os.ReadFile(filepath.Join(stager.DepDir(), "profile.d", "appdynamics.sh"))
@@ -271,15 +258,15 @@ export APPD_NODE_NAME=node
 export APPD_SSL_ENABLED=off
 export APPD_TIER_NAME=tier`
 				Expect(string(appdynamicsInfo)).To(Equal(expectedInfo))
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(libbuildpack.FileExists(filepath.Join(buildDir, "requirements.txt"))).To(BeTrue())
 				packages, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 				Expect(string(packages)).To(Equal("appdynamics"))
 
 				procCommand, err := os.ReadFile(filepath.Join(buildDir, "Procfile"))
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 				Expect(string(procCommand)).To(Equal("web: pyagent run --  python app.py"))
 			})
 		})

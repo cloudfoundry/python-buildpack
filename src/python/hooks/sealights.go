@@ -99,7 +99,7 @@ func (sh SealightsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		return nil
 	}
 
-	sealgithsServiceName, sealightsPlan := getSealightsServiceName(services, sh.Log)
+	sealgithsServiceName, sealightsPlan := getSealightsServiceName(services)
 
 	if sealgithsServiceName == "" {
 		sh.Log.Debug("No Sealights service found, exiting")
@@ -112,7 +112,7 @@ func (sh SealightsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		return err
 	}
 
-	if err := sh.RewriteProcFileWithSealgiths(stager, sealightsConfig.GetStartFlags()); err != nil {
+	if err := sh.RewriteProcFileWithSealights(stager, sealightsConfig.GetStartFlags()); err != nil {
 		sh.Log.Error("Failed to rewrite Procfile with Sealights: %s", err.Error())
 		return fmt.Errorf("Failed to rewrite Procfile with Sealights: %s", err.Error())
 	}
@@ -120,23 +120,30 @@ func (sh SealightsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 	sh.Log.Info("Successfully set up Sealights hook")
 	return nil
 }
-func (sh SealightsHook) RewriteProcFileWithSealgiths(stager *libbuildpack.Stager, cfgFlags string) error {
+func (sh SealightsHook) RewriteProcFileWithSealights(stager *libbuildpack.Stager, cfgFlags string) error {
 	sh.Log.BeginStep("Rewriting ProcFile to start with Sealights")
 
 	file := filepath.Join(stager.BuildDir(), "Procfile")
 
-	if exists, _ := libbuildpack.FileExists(file); exists {
+	exists, err := libbuildpack.FileExists(file)
+	if err != nil {
+		return err
+	}
+	if exists {
 		if err := sh.RewriteProcFile(file, cfgFlags); err != nil {
 			return err
 		}
-		fileContents, _ := os.ReadFile(file)
+		fileContents, err := os.ReadFile(file)
+		if err != nil {
+			return fmt.Errorf("Error reading file %s: %v", file, err)
+		}
 		sh.Log.Info(string(fileContents))
 	} else {
 		sh.Log.Info("Cannot find Procfile, skipping this step!")
 	}
 	return nil
 }
-func getSealightsServiceName(services map[string][]SealightsPlan, log *libbuildpack.Logger) (string, SealightsPlan) {
+func getSealightsServiceName(services map[string][]SealightsPlan) (string, SealightsPlan) {
 	for serviceName, servicePlans := range services {
 		if strings.Contains(serviceName, "sealights") {
 			return serviceName, servicePlans[0]
