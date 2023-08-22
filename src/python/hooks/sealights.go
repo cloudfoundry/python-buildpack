@@ -99,9 +99,9 @@ func (sh SealightsHook) BeforeCompile(stager *libbuildpack.Stager) error {
 		return nil
 	}
 
-	sealgithsServiceName, sealightsPlan := getSealightsServiceName(services)
+	sealightsServiceName, sealightsPlan := getSealightsServiceName(services)
 
-	if sealgithsServiceName == "" {
+	if sealightsServiceName == "" {
 		sh.Log.Debug("No Sealights service found, exiting")
 		return nil
 	}
