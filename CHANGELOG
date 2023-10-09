@@ -1,3 +1,15 @@
+v1.8.15 Oct 09, 2023
+=====================
+
+* Add python 3.11.6, remove python 3.11.5 for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add python 3.12.0 for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add pipenv 2023.10.3, remove pipenv 2023.9.1 for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add setuptools 68.2.2, remove setuptools 68.2.0 for stack(s) cflinuxfs4, cflinuxfs3
+
+
 v1.8.14 Sep 07, 2023
 =====================
 
