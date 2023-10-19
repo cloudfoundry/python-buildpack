@@ -44,14 +44,14 @@ dependencies:
   source: https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
   source_sha256: e22c0bb032fde08f53de9ffbc5a128233041d9f33b5de022c0978a2149885f82
 - name: miniconda3-py39
-  version: 23.5.2
-  uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh
-  sha256: 9829d95f639bd0053b2ed06d1204e60644617bf37dd5cc57523732e0e8d64516
+  version: 23.9.0
+  uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_23.9.0-0-Linux-x86_64.sh
+  sha256: 9200a10c762186391c35709382ed7cfa6578a051c9c76ea58f998df62c5afab0
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://github.com/conda/conda/archive/23.5.2.tar.gz
-  source_sha256: 9829d95f639bd0053b2ed06d1204e60644617bf37dd5cc57523732e0e8d64516
+  source: https://github.com/conda/conda/archive/23.9.0.tar.gz
+  source_sha256: 9200a10c762186391c35709382ed7cfa6578a051c9c76ea58f998df62c5afab0
 - name: pip
   version: '23.3'
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_23.3_linux_noarch_any-stack_1a95b321.tgz
