@@ -1,3 +1,14 @@
+v1.8.16 Nov 22, 2023
+=====================
+
+* Add setuptools 69.0.0, remove setuptools 68.2.2 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pipenv 2023.11.15, remove pipenv 2023.10.3 for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add miniconda3-py39 23.10.0, remove miniconda3-py39 23.5.2 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pip 23.3.1, remove pip 23.2.1 for stack(s) cflinuxfs4, cflinuxfs3
+
 v1.8.15 Oct 09, 2023
 =====================
 
