@@ -1,3 +1,17 @@
+v1.8.17 Dec 26, 2023
+=====================
+
+* Add python 3.12.1, remove python 3.12.0 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add python 3.11.7, remove python 3.11.6 for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add miniconda3-py39 23.11.0, remove miniconda3-py39 23.10.0 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pip 23.3.2, remove pip 23.3.1 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add setuptools 69.0.2, remove setuptools 69.0.0 for stack(s) cflinuxfs4, cflinuxfs3
+
+
 v1.8.16 Nov 22, 2023
 =====================
 
