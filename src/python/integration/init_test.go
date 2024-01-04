@@ -70,10 +70,10 @@ func TestIntegration(t *testing.T) {
 
 	proxyDeploymentProcess := platform.Deploy.WithBuildpacks("go_buildpack")
 
-	// TODO: remove this once go-buildpack runs on cflinuxfs4
-	// This is done to have the proxy app written in go up and running
-	if settings.Stack == "cflinuxfs4" {
-		proxyDeploymentProcess = proxyDeploymentProcess.WithStack("cflinuxfs3")
+	// This is done to have the dynatrace broker app running on default
+	// cf-deployment envs. They do not come with cflinuxfs3 buildpacks.
+	if os.Getenv("CF_STACK") == "cflinuxfs3" {
+		proxyDeploymentProcess = platform.Deploy.WithBuildpacks("https://github.com/cloudfoundry/go-buildpack")
 	}
 
 	proxyDeployment, _, err := proxyDeploymentProcess.
