@@ -2,7 +2,10 @@ package integration_test
 
 import (
 	"flag"
+	"fmt"
 	"github.com/onsi/gomega/types"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -53,6 +56,9 @@ func TestIntegration(t *testing.T) {
 	platform, err := switchblade.NewPlatform(settings.Platform, settings.GitHubToken, settings.Stack)
 	Expect(err).NotTo(HaveOccurred())
 
+	goBuildpackFile, err := downloadBuildpack("go")
+	Expect(err).NotTo(HaveOccurred())
+
 	err = platform.Initialize(
 		switchblade.Buildpack{
 			Name: "python_buildpack",
@@ -62,6 +68,11 @@ func TestIntegration(t *testing.T) {
 			Name: "override_buildpack",
 			URI:  filepath.Join(fixtures, "util", "override_buildpack"),
 		},
+		// Go buildpack is needed for the proxy and the dynatrace apps
+		switchblade.Buildpack{
+			Name: "go_buildpack",
+			URI:  goBuildpackFile,
+		},
 	)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -69,12 +80,6 @@ func TestIntegration(t *testing.T) {
 	Expect(err).NotTo(HaveOccurred())
 
 	proxyDeploymentProcess := platform.Deploy.WithBuildpacks("go_buildpack")
-
-	// TODO: remove this once go-buildpack runs on cflinuxfs4
-	// This is done to have the proxy app written in go up and running
-	if settings.Stack == "cflinuxfs4" {
-		proxyDeploymentProcess = proxyDeploymentProcess.WithStack("cflinuxfs3")
-	}
 
 	proxyDeployment, _, err := proxyDeploymentProcess.
 		Execute(proxyName, filepath.Join(fixtures, "util", "proxy"))
@@ -84,12 +89,6 @@ func TestIntegration(t *testing.T) {
 	Expect(err).NotTo(HaveOccurred())
 
 	dynatraceDeploymentProcess := platform.Deploy.WithBuildpacks("go_buildpack")
-
-	// TODO: remove this once go-buildpack runs on cflinuxfs4
-	// This is done to have the dynatrace broker app app written in go up and running
-	if settings.Stack == "cflinuxfs4" {
-		dynatraceDeploymentProcess = dynatraceDeploymentProcess.WithStack("cflinuxfs3")
-	}
 
 	dynatraceDeployment, _, err := dynatraceDeploymentProcess.
 		Execute(dynatraceName, filepath.Join(fixtures, "util", "dynatrace"))
@@ -121,6 +120,26 @@ func TestIntegration(t *testing.T) {
 	Expect(platform.Delete.Execute(proxyName)).To(Succeed())
 	Expect(platform.Delete.Execute(dynatraceName)).To(Succeed())
 	Expect(os.Remove(os.Getenv("BUILDPACK_FILE"))).To(Succeed())
+	Expect(os.Remove(goBuildpackFile)).To(Succeed())
+}
+
+func downloadBuildpack(name string) (string, error) {
+	uri := fmt.Sprintf("https://github.com/cloudfoundry/%s-buildpack/archive/master.zip", name)
+
+	file, err := os.CreateTemp("", fmt.Sprintf("%s-buildpack-*.zip", name))
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	resp, err := http.Get(uri)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	_, err = io.Copy(file, resp.Body)
+	return file.Name(), err
 }
 
 func CreateRequirementsTxtFile(Expect func(actual interface{}, extra ...interface{}) types.Assertion, path string, fileName string, modules ...string) {
