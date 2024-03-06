@@ -1,3 +1,11 @@
+v1.8.21 Mar 06, 2024
+=====================
+
+* Add setuptools 69.1.1, remove setuptools 69.1.0 for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add miniconda3-py39 24.1.2, remove miniconda3-py39 23.11.0 for stack(s) cflinuxfs4, cflinuxfs3
+
+
 v1.8.20 Feb 21, 2024
 =====================
 
