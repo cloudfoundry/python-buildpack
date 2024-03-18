@@ -1,3 +1,9 @@
+v1.8.22 Mar 18, 2024
+=====================
+
+* Add setuptools 69.2.0, remove setuptools 69.1.1 for stack(s) cflinuxfs4, cflinuxfs3
+
+
 v1.8.21 Mar 06, 2024
 =====================
 
