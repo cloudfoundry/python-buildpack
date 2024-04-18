@@ -1,3 +1,31 @@
+v1.8.23 Apr 18, 2024
+=====================
+
+* Add setuptools 69.5.1, remove setuptools 69.2.0
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/187426113)
+
+* Add python 3.12.3, remove python 3.12.2 (#904)
+  for stack(s) cflinuxfs3, cflinuxfs4
+  (https://www.pivotaltracker.com/story/show/187398328)
+
+* Add python 3.11.9, remove python 3.11.8 (#903)
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/187354849)
+
+* Add python 3.10.14, remove python 3.10.13 (#901)
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/187273725)
+
+* Add python 3.9.19, remove python 3.9.18 (#900)
+  for stack(s) cflinuxfs3, cflinuxfs4
+  (https://www.pivotaltracker.com/story/show/187271197)
+
+* Add python 3.8.19, remove python 3.8.18 (#899)
+  for stack(s) cflinuxfs3, cflinuxfs4
+  (https://www.pivotaltracker.com/story/show/187270980)
+
+
 v1.8.22 Mar 18, 2024
 =====================
 
