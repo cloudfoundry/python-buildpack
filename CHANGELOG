@@ -1,3 +1,11 @@
+v1.8.24 Apr 30, 2024
+=====================
+
+* Add miniconda3-py39 24.3.0, remove miniconda3-py39 24.1.2
+  for stack(s) cflinuxfs4, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/187433355)
+
+
 v1.8.23 Apr 18, 2024
 =====================
 
