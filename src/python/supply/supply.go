@@ -21,6 +21,7 @@ import (
 )
 
 const EnvPipVersion = "BP_PIP_VERSION"
+const EnvEnableBuildIsoVendored = "BP_ENABLE_BUILD_ISOLATION_VENDORED"
 
 type Stager interface {
 	BuildDir() string
@@ -690,8 +691,10 @@ func (s *Supplier) RunPipVendored() error {
 		"--no-warn-script-location",
 	}
 
-	if s.hasBuildOptions() {
-		s.Log.Info("Using the pip --no-build-isolation flag since it is available")
+	enableBuildIso := os.Getenv(EnvEnableBuildIsoVendored)
+	// Add arg "--no-build-isolation" only if the env var is not set or not "true"/"True"
+	if enableBuildIso == "" || !strings.EqualFold(enableBuildIso, "true") {
+		s.Log.Info("Using pip --no-build-isolation flag")
 		installArgs = append(installArgs, "--no-build-isolation")
 	}
 
@@ -853,12 +856,6 @@ func (s *Supplier) formatVersion(version string) string {
 func (s *Supplier) writeTempRequirementsTxt(content string) error {
 	s.removeRequirementsText = true
 	return os.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(content), 0644)
-}
-
-func (s *Supplier) hasBuildOptions() bool {
-	helpCommand := append(pipCommand(), "install", "--no-build-isolation", "-h")
-	err := s.Command.Execute(s.Stager.BuildDir(), nil, nil, helpCommand[0], helpCommand[1:]...)
-	return nil == err
 }
 
 func indentWriter(writer io.Writer) io.Writer {

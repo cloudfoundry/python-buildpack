@@ -618,10 +618,30 @@ MarkupSafe==2.0.1
 				Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
 			})
 
-			It("installs the vendor directory", func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "--no-build-isolation", "-h").Return(nil)
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", "--no-warn-script-location", "--no-build-isolation")
-				Expect(supplier.RunPipVendored()).To(Succeed())
+			Context("BP_ENABLE_BUILD_ISOLATION_VENDORED not set", func() {
+				BeforeEach(func() {
+					Expect(os.Unsetenv("BP_ENABLE_BUILD_ISOLATION_VENDORED")).To(Succeed())
+				})
+
+				It("installs the vendor directory with --no-build-isolation flag", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", "--no-warn-script-location", "--no-build-isolation")
+					Expect(supplier.RunPipVendored()).To(Succeed())
+				})
+			})
+
+			Context("BP_ENABLE_BUILD_ISOLATION_VENDORED is set to 'true'", func() {
+				BeforeEach(func() {
+					Expect(os.Setenv("BP_ENABLE_BUILD_ISOLATION_VENDORED", "true")).To(Succeed())
+				})
+
+				AfterEach(func() {
+					Expect(os.Unsetenv("BP_ENABLE_BUILD_ISOLATION_VENDORED")).To(Succeed())
+				})
+
+				It("installs the vendor directory without --no-build-isolation flag", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", "--no-warn-script-location")
+					Expect(supplier.RunPipVendored()).To(Succeed())
+				})
 			})
 		})
 
@@ -629,7 +649,6 @@ MarkupSafe==2.0.1
 			BeforeEach(func() {
 				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte{}, 0644)).To(Succeed())
 				Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "--no-build-isolation", "-h").Return(nil)
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "-r", filepath.Join(buildDir, "requirements.txt"), "--ignore-installed", "--exists-action=w", fmt.Sprintf("--src=%s/src", depDir), "--no-index", fmt.Sprintf("--find-links=file://%s/vendor", buildDir), "--disable-pip-version-check", "--no-warn-script-location", "--no-build-isolation").Return(fmt.Errorf("exit 28"))
 			})
 
