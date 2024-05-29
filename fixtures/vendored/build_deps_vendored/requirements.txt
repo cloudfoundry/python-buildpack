@@ -1,0 +1,3 @@
+setuptools # build dependency
+wheel # build dependency
+oss2 # app dependency
