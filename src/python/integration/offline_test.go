@@ -60,6 +60,32 @@ func testOffline(platform switchblade.Platform, fixtures string) func(*testing.T
 				})
 			})
 
+			context.Focus("vendoring build deps of a PEP 517-fied sdist", func() {
+				it.Before(func() {
+					var err error
+					source, err = switchblade.Source(filepath.Join(fixtures, "vendored", "build_deps_vendored"))
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				it.After(func() {
+					Expect(os.RemoveAll(source)).To(Succeed())
+				})
+
+				it("deploys successfully without internet access", func() {
+					_, logs, err := platform.Deploy.
+						WithBuildpacks("python_buildpack").
+						WithEnv(map[string]string{"BP_ENABLE_BUILD_ISOLATION_VENDORED": "true"}).
+						WithoutInternetAccess().
+						Execute(name, source)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(logs.String()).To(SatisfyAll(
+						ContainSubstring("Running Pip Install (Vendored)"),
+						ContainSubstring("Created wheel for oss2"),
+						Not(ContainSubstring("--no-build-isolation")),
+					))
+				})
+			})
+
 			context("when vendor directory is incomplete", func() {
 				it.Before(func() {
 					var err error
