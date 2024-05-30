@@ -710,12 +710,53 @@ func (s *Supplier) RunPipVendored() error {
 		return fmt.Errorf("could not overwrite requirements file: %v", err)
 	}
 
+	vendorHasSdist, err := containsSdist(filepath.Join(s.Stager.BuildDir(), "vendor"))
+	if err != nil {
+		return fmt.Errorf("error checking for sdists in vendor dir: %v", err)
+	}
+	if vendorHasSdist {
+		s.Log.Info("source distribution found in vendor. Installing common build-time dependencies in staging")
+		err := s.InstallCommonBuildDependencies()
+		if err != nil {
+			return fmt.Errorf("error installing common build dependencies: %v", err)
+		}
+	}
+
 	if err := s.runPipInstall(installArgs...); err != nil {
 		s.Log.Info("Running pip install failed. You need to include all dependencies in the vendor directory.")
 		return fmt.Errorf("could not run pip: %v", err)
 	}
 
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
+}
+
+// sdist packages have 2 kinds of dependencies: build-time deps and
+// runtime-deps. Before PEP-517, there was no standard to specify a package's
+// build-time deps, but with PEP-517, a package defines its build-time deps in
+// its pyproject.toml. In an online install, pip reads it and downloads
+// build-time deps and builds the sdist. In a vendored (offline) install, this
+// is not possible because "pip download" is not smart enough to download
+// build-time deps during vendoring (pypa/pip issue#8302). Before pip 23.1,
+// when build-time deps were missing, pip fell back to using the legacy
+// 'setup.py install' method. pip 23.1 started enforcing PEP 517. Therefore,
+// for vendored apps with sdists, we install the 2 most common build-time
+// dependencies - wheel and setuptools. These are packaged by the dependency
+// pipeline within the "pip" dependency.
+func (s *Supplier) InstallCommonBuildDependencies() error {
+	var commonDeps = []string{"wheel", "setuptools"}
+	tempPath := filepath.Join("/tmp", "common_build_deps")
+	if err := s.Installer.InstallOnlyVersion("pip", tempPath); err != nil {
+		return err
+	}
+
+	for _, dep := range commonDeps {
+		s.Log.Info("Installing build-time dependency %s", dep)
+		args := []string{dep, "--no-index", "--upgrade-strategy=only-if-needed", fmt.Sprintf("--find-links=%s", tempPath)}
+		if err := s.runPipInstall(args...); err != nil {
+			return fmt.Errorf("could not install build-time dependency %s: %v", dep, err)
+		}
+	}
+	return nil
 }
 
 func (s *Supplier) CreateDefaultEnv() error {
@@ -863,4 +904,23 @@ func (s *Supplier) hasBuildOptions() bool {
 
 func indentWriter(writer io.Writer) io.Writer {
 	return text.NewIndentWriter(writer, []byte("       "))
+}
+
+// sdists are identified by .tar.gz, .tgz, or .zip extensions
+// in the vendor dir. docs.python.org/3.10/distutils/sourcedist.html
+func containsSdist(vendorDir string) (bool, error) {
+	files, err := os.ReadDir(vendorDir)
+	if err != nil {
+		return false, err
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			ext := strings.ToLower(filepath.Ext(file.Name()))
+			if strings.HasSuffix(strings.ToLower(file.Name()), ".tar.gz") || ext == ".tgz" || ext == ".zip" {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
