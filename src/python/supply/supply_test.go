@@ -648,6 +648,29 @@ MarkupSafe==2.0.1
 		})
 	})
 
+	Describe("InstallCommonBuildDependencies", func() {
+		Context("successful installation", func() {
+			It("runs command to install wheel and setuptools", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "setuptools", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
+
+				Expect(supplier.InstallCommonBuildDependencies()).To(Succeed())
+			})
+		})
+
+		Context("installation fails", func() {
+			BeforeEach(func() {
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps").Return(fmt.Errorf("some-pip-error"))
+			})
+
+			It("returns a useful error message", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion(gomock.Any(), gomock.Any()).Times(1)
+				Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not install build-time dependency wheel: some-pip-error"))
+			})
+		})
+	})
+
 	Describe("CreateDefaultEnv", func() {
 		It("writes an env file for PYTHONPATH", func() {
 			mockStager.EXPECT().WriteEnvFile("PYTHONPATH", depDir)
