@@ -1,8 +1,0 @@
---
-applications:
-  - memory: 1G
-    disk_quota: 2G
-    health-check-type: process
-    command: sleep infinity
-    env:
-      BP_ENABLE_BUILD_ISOLATION_VENDORED: true

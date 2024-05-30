@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -357,6 +358,37 @@ func (s *Supplier) InstallPip() error {
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
 }
 
+// from pip dependency
+func (s *Supplier) InstallPipBuildDeps() error {
+	tempPath := filepath.Join("/tmp", "builddeps")
+	if err := s.Installer.InstallOnlyVersion("pip", tempPath); err != nil {
+		return err
+	}
+
+	s.Log.Info("Installing build dependency wheel")
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
+		"python",
+		"-m", "pip",
+		"install", "wheel",
+		"--no-index",
+		fmt.Sprintf("--find-links=%s", tempPath),
+	); err != nil {
+		return err
+	}
+
+	s.Log.Info("Installing build dependency setuptools")
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
+		"python",
+		"-m", "pip",
+		"install", "setuptools",
+		"--no-index",
+		fmt.Sprintf("--find-links=%s", tempPath),
+	); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *Supplier) InstallPipEnv() error {
 	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
 	if err != nil {
@@ -680,13 +712,34 @@ func (s *Supplier) RunPipVendored() error {
 		return err
 	}
 
+	dirPath := filepath.Join(s.Stager.DepDir())
+
+	// Check if the directory exists
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		s.Log.BeginStep("Directory %s does not exist.\n", dirPath)
+		return err
+	}
+
+	// List the contents of the directory
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		s.Log.BeginStep("Error reading directory %s: %v\n", dirPath, err)
+		return err
+	}
+
+	s.Log.BeginStep("Contents of directory %s:\n", dirPath)
+	for _, file := range files {
+		s.Log.BeginStep(file.Name())
+	}
+
+	s.InstallPipBuildDeps()
 	installArgs := []string{
 		"-r", requirementsPath,
 		"--ignore-installed",
 		"--exists-action=w",
 		"--src=" + filepath.Join(s.Stager.DepDir(), "src"),
 		"--no-index",
-		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"),
+		"--find-links=file://" + filepath.Join(s.Stager.BuildDir(), "vendor"), // + " file://" + filepath.Join(dirPath),
 		"--disable-pip-version-check",
 		"--no-warn-script-location",
 	}

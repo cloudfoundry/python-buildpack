@@ -74,7 +74,9 @@ func testOffline(platform switchblade.Platform, fixtures string) func(*testing.T
 				it("deploys successfully without internet access", func() {
 					_, logs, err := platform.Deploy.
 						WithBuildpacks("python_buildpack").
-						WithEnv(map[string]string{"BP_ENABLE_BUILD_ISOLATION_VENDORED": "true"}).
+						WithEnv(map[string]string{"BP_PIP_VERSION": "latest"}).
+						// WithEnv(map[string]string{"PIP_FIND_LINKS": "file:///tmp/app/vendor file:///tmp/pip"}).
+						// WithEnv(map[string]string{"BP_ENABLE_BUILD_ISOLATION_VENDORED": "true"}).
 						WithoutInternetAccess().
 						Execute(name, source)
 					Expect(err).NotTo(HaveOccurred())
