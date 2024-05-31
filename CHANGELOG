@@ -1,3 +1,9 @@
+v1.8.26 May 31, 2024
+=====================
+
+* vendored apps with sdist: install common build-time dependencies in staging (#922)
+
+
 v1.8.25 May 23, 2024
 =====================
 
