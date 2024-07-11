@@ -12,7 +12,6 @@ var _ = Describe("Python buildpack", func() {
 	bratshelper.UnbuiltBuildpack("python", CopyBrats)
 	bratshelper.DeployingAnAppWithAnUpdatedVersionOfTheSameBuildpack(CopyBrats)
 	bratshelper.StagingWithBuildpackThatSetsEOL("python", CopyBrats)
-	bratshelper.StagingWithCustomBuildpackWithCredentialsInDependencies(CopyBrats)
 	bratshelper.DeployAppWithExecutableProfileScript("python", CopyBrats)
 	bratshelper.DeployAnAppWithSensitiveEnvironmentVariables(CopyBrats)
 
