@@ -17,9 +17,9 @@ jobs:
           go-version: stable
 
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run Unit Tests
         run: ./scripts/unit.sh
@@ -32,7 +32,7 @@ jobs:
     needs: unit
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set Matrix
         id: set-matrix
@@ -56,9 +56,9 @@ jobs:
           go-version: stable
 
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run Integration Tests
         env:
