@@ -1,5 +1,7 @@
 module github.com/cloudfoundry/python-buildpack
 
+go 1.22.5
+
 require (
 	github.com/Dynatrace/libbuildpack-dynatrace v1.5.2
 	github.com/blang/semver v3.5.1+incompatible
@@ -50,5 +52,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-go 1.19
