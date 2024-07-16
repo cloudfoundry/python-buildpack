@@ -1,3 +1,13 @@
+v1.8.28 Jul 16, 2024
+=====================
+
+* Add pipenv 2024.0.1, remove pipenv 2023.12.1
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add setuptools 70.2.0, remove setuptools 70.1.1
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+
 v1.8.27 Jun 27, 2024
 =====================
 
