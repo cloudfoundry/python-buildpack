@@ -12,7 +12,7 @@ jobs:
     steps:
 
       - name: Setup Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 
@@ -51,7 +51,7 @@ jobs:
     steps:
 
       - name: Setup Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 
