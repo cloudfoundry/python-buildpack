@@ -53,14 +53,14 @@ dependencies:
   source: https://github.com/conda/conda/archive/24.5.0.tar.gz
   source_sha256: 07a2435123fd8f41e6528baa5f272ce754fd8acaef08ce7081afb00227b8754a
 - name: pip
-  version: 24.1.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_24.1.2_linux_noarch_any-stack_d76b1063.tgz
-  sha256: d76b1063cf5d607db8ccea2c6ec83ad18dfbabcc154bee161be6d7313076ec7c
+  version: '24.2'
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_24.2_linux_noarch_any-stack_558731cf.tgz
+  sha256: 558731cff04546a14b1db77ea215b6ffa4e1442f5f2bc8481f676c0abfbe17c0
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/12/3d/d899257cace386bebb7bdf8a872d5fe3b935cc6381c3ddb76d3e5d99890d/pip-24.1.2.tar.gz
-  source_sha256: e5458a0b89f2755e0ee8c0c77613fe5273e05f337907874d64f13171a898a7ff
+  source: https://files.pythonhosted.org/packages/4d/87/fb90046e096a03aeab235e139436b3fe804cdd447ed2093b0d70eba3f7f8/pip-24.2.tar.gz
+  source_sha256: 5b5e490b5e9cb275c879595064adce9ebd31b854e3e803740b72f9ccf34a45b8
 - name: pipenv
   version: 2024.0.1
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.0.1_linux_noarch_cflinuxfs3_8bfa573f.tgz
