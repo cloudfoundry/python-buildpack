@@ -1,3 +1,28 @@
+v1.8.28 Aug 23, 2024
+=====================
+
+* Add python 3.12.5, remove python 3.12.4
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add miniconda3-py39 24.7.1, remove miniconda3-py39 24.5.0
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Update setuptools to 73.0.1
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Update pip to 24.2
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Bump to latest go in bootstrap script & go.mod
+
+* Use cflinuxfs4 as default for testing on switchblade
+
+* Add pipenv 2024.0.1, remove pipenv 2023.12.1
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Remove dependency credential test
+
+
 v1.8.27 Jun 27, 2024
 =====================
 
