@@ -1,0 +1,5 @@
+---
+applications:
+- name: conda-app
+  memory: 1GB
+
