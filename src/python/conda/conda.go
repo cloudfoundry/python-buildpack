@@ -70,29 +70,29 @@ func Run(c *Conda) error {
 }
 
 func (c *Conda) Version() string {
-	return "miniconda3-py39"
+	return "miniforge"
 }
 
 func (c *Conda) Install(version string) error {
 	c.Log.BeginStep("Supplying conda")
 	var installer string
-	if installerDir, err := os.MkdirTemp("", "miniconda"); err != nil {
+	if installerDir, err := os.MkdirTemp("", "miniforge"); err != nil {
 		return err
 	} else {
-		installer = filepath.Join(installerDir, "miniconda.sh")
+		installer = filepath.Join(installerDir, "miniforge.sh")
 		defer os.RemoveAll(installerDir)
 	}
 
 	if err := c.Installer.InstallOnlyVersion(version, installer); err != nil {
-		return fmt.Errorf("Error downloading miniconda: %v", err)
+		return fmt.Errorf("Error downloading miniforge: %v", err)
 	}
 	if err := os.Chmod(installer, 0755); err != nil {
 		return err
 	}
 
-	c.Log.BeginStep("Installing Miniconda")
+	c.Log.BeginStep("Installing Miniforge")
 	if err := c.Command.Execute("/", indentWriter(os.Stdout), io.Discard, installer, "-b", "-p", c.condaHome()); err != nil {
-		return fmt.Errorf("Error installing miniconda: %v", err)
+		return fmt.Errorf("Error installing miniforge: %v", err)
 	}
 
 	return nil
