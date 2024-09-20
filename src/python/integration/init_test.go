@@ -3,13 +3,14 @@ package integration_test
 import (
 	"flag"
 	"fmt"
-	"github.com/onsi/gomega/types"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/onsi/gomega/types"
 
 	"github.com/cloudfoundry/switchblade"
 	"github.com/onsi/gomega/format"
@@ -102,7 +103,7 @@ func TestIntegration(t *testing.T) {
 	suite("Versions", testVersions(platform, fixtures, root))
 	suite("Miscellaneous", testMiscellaneous(platform, fixtures))
 	suite("Django", testDjango(platform, fixtures))
-	suite("Miniconda", testMiniconda(platform, fixtures))
+	suite("Miniforge", testMiniforge(platform, fixtures))
 	suite("Pipenv", testPipenv(platform, fixtures))
 	suite("Override", testOverride(platform, fixtures))
 	suite("Multibuildpack", testMultibuildpack(platform, fixtures))

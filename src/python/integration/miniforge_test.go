@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func testMiniconda(platform switchblade.Platform, fixtures string) func(*testing.T, spec.G, spec.S) {
+func testMiniforge(platform switchblade.Platform, fixtures string) func(*testing.T, spec.G, spec.S) {
 	return func(t *testing.T, context spec.G, it spec.S) {
 		var (
 			Expect     = NewWithT(t).Expect
@@ -32,12 +32,12 @@ func testMiniconda(platform switchblade.Platform, fixtures string) func(*testing
 			Expect(platform.Delete.Execute(name)).To(Succeed())
 		})
 
-		context("when pushing an app that uses miniconda 3", func() {
+		context("when pushing an app that uses miniforge", func() {
 			var source string
 			context("when environment.yml stays the same", func() {
 				it.Before(func() {
 					var err error
-					source, err = switchblade.Source(filepath.Join(fixtures, "miniconda"))
+					source, err = switchblade.Source(filepath.Join(fixtures, "miniforge"))
 					Expect(err).NotTo(HaveOccurred())
 				})
 
@@ -53,7 +53,7 @@ func testMiniconda(platform switchblade.Platform, fixtures string) func(*testing
 					Eventually(deployment).Should(Serve(ContainSubstring("gunicorn: 20.1.0")))
 
 					Expect(logs.String()).To(SatisfyAll(
-						ContainSubstring("Installing Miniconda"),
+						ContainSubstring("Installing Miniforge"),
 						ContainSubstring("Installing conda environment from environment.yml"),
 					))
 				})
@@ -62,7 +62,7 @@ func testMiniconda(platform switchblade.Platform, fixtures string) func(*testing
 			context("when environment.yml changes", func() {
 				it.Before(func() {
 					var err error
-					source, err = switchblade.Source(filepath.Join(fixtures, "miniconda"))
+					source, err = switchblade.Source(filepath.Join(fixtures, "miniforge"))
 					Expect(err).NotTo(HaveOccurred())
 				})
 
@@ -81,7 +81,7 @@ func testMiniconda(platform switchblade.Platform, fixtures string) func(*testing
 					)))
 
 					Expect(logs.String()).To(SatisfyAll(
-						ContainSubstring("Installing Miniconda"),
+						ContainSubstring("Installing Miniforge"),
 						ContainSubstring("Installing conda environment from environment.yml"),
 					))
 
@@ -102,7 +102,7 @@ func testMiniconda(platform switchblade.Platform, fixtures string) func(*testing
 					)))
 
 					Expect(logs.String()).To(SatisfyAll(
-						ContainSubstring("Installing Miniconda"),
+						ContainSubstring("Installing Miniforge"),
 						ContainSubstring("Installing conda environment from environment.yml"),
 					))
 				})
