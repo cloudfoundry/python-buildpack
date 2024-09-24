@@ -1,4 +1,4 @@
-Flask
+Flask==2.3.2
 Jinja2
 MarkupSafe
 Werkzeug
