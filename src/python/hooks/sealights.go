@@ -41,6 +41,7 @@ func NewSealightsConfig() *SealightsConfig {
 		BsIdFile:  "",
 		Proxy:     "",
 		LabId:     "",
+		Version:   "",
 	}
 }
 
@@ -57,6 +58,7 @@ func (sc *SealightsConfig) parseSealightsPlan(plan SealightsPlan) *SealightsConf
 	sc.BsIdFile = sc.getEnv("SL_BUILD_SESSION_ID_FILE", plan.Credentials.BsIdFile)
 	sc.Proxy = sc.getEnv("SL_PROXY", plan.Credentials.Proxy)
 	sc.LabId = sc.getEnv("SL_LAB_ID", plan.Credentials.LabId)
+	sc.Version = sc.getEnv("SL_VERSION", plan.Credentials.Version)
 	return sc
 }
 
