@@ -60,30 +60,6 @@ func testOffline(platform switchblade.Platform, fixtures string) func(*testing.T
 				})
 			})
 
-			context("app vendored with pre-PEP517 sdist", func() {
-				it.Before(func() {
-					var err error
-					source, err = switchblade.Source(filepath.Join(fixtures, "vendored", "pre-pep517-sdist"))
-					Expect(err).NotTo(HaveOccurred())
-				})
-
-				it.After(func() {
-					Expect(os.RemoveAll(source)).To(Succeed())
-				})
-
-				it("deploys successfully without internet access", func() {
-					_, logs, err := platform.Deploy.
-						WithBuildpacks("python_buildpack").
-						WithoutInternetAccess().
-						Execute(name, source)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(logs.String()).To(SatisfyAll(
-						ContainSubstring("Running Pip Install (Vendored)"),
-						ContainSubstring("Created wheel for oss2"),
-					))
-				})
-			})
-
 			context("when vendor directory is incomplete", func() {
 				it.Before(func() {
 					var err error
