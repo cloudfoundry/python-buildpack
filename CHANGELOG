@@ -1,3 +1,42 @@
+v1.8.30 Nov 13, 2024
+=====================
+
+* Add python 3.13.0, remove python 3.8
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add pip 24.3.1, remove pip 24.2
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add setuptools 75.3.0, remove setuptools 75.1.0
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Update pipenv to 2024.4.0
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add python 3.12.7, remove python 3.12.6
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Updated setuptools to 75.1.0
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add python 3.10.15, remove python 3.10.14
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add python 3.9.20, remove python 3.9.19
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add python 3.8.20, remove python 3.8.19
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add python 3.12.6, remove python 3.12.5
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add python 3.11.10, remove python 3.11.9
+  for stack(s) cflinuxfs4, cflinuxfs3
+
+* Add support for the SL_VERSION env var in the Sealights configuration.
+
+
 v1.8.29 Sep 12, 2024
 =====================
 
