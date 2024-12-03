@@ -78,21 +78,21 @@ dependencies:
   source: https://files.pythonhosted.org/packages/f1/2a/453a44f0c99ebd56ea041bb5063edf30edab0f2739d977b346c406ca20f5/pipenv-2024.4.0.tar.gz
   source_sha256: 87b82407a9e2de3cf32a742c131708d7460d5985076c6a9b3c11d774d2929fb1
 - name: python
-  version: 3.9.20
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.20_linux_x64_cflinuxfs3_f22f6231.tgz
-  sha256: f22f6231bcbe72b1ef982b1a49b43f1e68b815fead48cd9dbca8df6237b576b8
+  version: 3.9.21
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.21_linux_x64_cflinuxfs3_e0d265aa.tgz
+  sha256: e0d265aac5ab7bceb0a8d79d56ad4e32977126c2de34fbbcbb94b6a0b47f4ae2
   cf_stacks:
   - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.9.20/Python-3.9.20.tgz
-  source_sha256: 1e71f006222666e0a39f5a47be8221415c22c4dd8f25334cc41aee260b3d379e
+  source: https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz
+  source_sha256: 667c3ba2ca98d39ead1162f6548c3475768582e2ff89e0821d25eb956ac09944
 - name: python
-  version: 3.9.20
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.20_linux_x64_cflinuxfs4_cb8ffc0e.tgz
-  sha256: cb8ffc0ea54f1116ed866d5b5c91fd5a22a7253313923a2ed0a91b714e5f7a2c
+  version: 3.9.21
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.21_linux_x64_cflinuxfs4_14d38a6d.tgz
+  sha256: 14d38a6dadb7dfef72bfa83c2e6939b05615cf398717dc1e3aceb25574b3ef85
   cf_stacks:
   - cflinuxfs4
-  source: https://www.python.org/ftp/python/3.9.20/Python-3.9.20.tgz
-  source_sha256: 1e71f006222666e0a39f5a47be8221415c22c4dd8f25334cc41aee260b3d379e
+  source: https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz
+  source_sha256: 667c3ba2ca98d39ead1162f6548c3475768582e2ff89e0821d25eb956ac09944
 - name: python
   version: 3.10.16
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.16_linux_x64_cflinuxfs3_3285a8ff.tgz
