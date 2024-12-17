@@ -43,6 +43,15 @@ dependencies:
   sha256: '009a3476197030e30d0ce924cc044ee4851ef27324e132b29fd12d8cde071915'
   source: https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
   source_sha256: e22c0bb032fde08f53de9ffbc5a128233041d9f33b5de022c0978a2149885f82
+- name: miniconda3-py39
+  version: 24.11.1
+  uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_24.11.1-0-Linux-x86_64.sh
+  sha256: 3ea8373098d72140e08aac9217822b047ec094eb457e7f73945af7c6f68bf6f5
+  cf_stacks:
+  - cflinuxfs4
+  - cflinuxfs3
+  source: https://github.com/conda/conda/archive/24.11.1.tar.gz
+  source_sha256: 3ea8373098d72140e08aac9217822b047ec094eb457e7f73945af7c6f68bf6f5
 - name: miniforge
   version: 24.7.1
   uri: https://github.com/conda-forge/miniforge/releases/download/24.7.1-0/Miniforge3-24.7.1-0-Linux-x86_64.sh
