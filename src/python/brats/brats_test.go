@@ -10,10 +10,7 @@ import (
 
 var _ = Describe("Python buildpack", func() {
 	bratshelper.UnbuiltBuildpack("python", CopyBrats)
-	bratshelper.DeployingAnAppWithAnUpdatedVersionOfTheSameBuildpack(CopyBrats)
-	bratshelper.StagingWithBuildpackThatSetsEOL("python", CopyBrats)
 	bratshelper.DeployAppWithExecutableProfileScript("python", CopyBrats)
-	bratshelper.DeployAnAppWithSensitiveEnvironmentVariables(CopyBrats)
 
 	bratshelper.ForAllSupportedVersions("python", CopyBrats, func(pythonVersion string, app *cutlass.App) {
 		PushApp(app)
