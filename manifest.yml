@@ -53,14 +53,14 @@ dependencies:
   source: https://github.com/conda-forge/miniforge/archive/refs/tags/24.7.1-0.tar.gz
   source_sha256: ca2f3cea67d6a1dbfd6acb9743891014768b12ad774755c57fbbcbfcd1fd8200
 - name: pip
-  version: '25.0'
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.0_linux_noarch_any-stack_24cbad64.tgz
-  sha256: 24cbad645b9ec62de964ce45213e575382b1317a618e3a01b8a89be34c8f14df
+  version: 25.0.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.0.1_linux_noarch_any-stack_ce64f840.tgz
+  sha256: ce64f840041ea5c6808381f3380f60f090d937db7ce928c846b78a138749c53d
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/47/3e/68beeeeb306ea20ffd30b3ed993f531d16cd884ec4f60c9b1e238f69f2af/pip-25.0.tar.gz
-  source_sha256: 8e0a97f7b4c47ae4a494560da84775e9e2f671d415d8d828e052efefb206b30b
+  source: https://files.pythonhosted.org/packages/70/53/b309b4a497b09655cb7e07088966881a57d082f48ac3cb54ea729fd2c6cf/pip-25.0.1.tar.gz
+  source_sha256: 88f96547ea48b940a3a385494e181e29fb8637898f88d88737c5049780f196ea
 - name: pipenv
   version: 2024.4.1
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs3_b3c74c78.tgz
