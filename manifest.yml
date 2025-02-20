@@ -63,16 +63,16 @@ dependencies:
   source_sha256: 8e0a97f7b4c47ae4a494560da84775e9e2f671d415d8d828e052efefb206b30b
 - name: pipenv
   version: 2024.4.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs3_7dee110c.tgz
-  sha256: 7dee110cf6432d512d9264342493368286444e17e9a26ac38a82e829ac844fce
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs3_b3c74c78.tgz
+  sha256: b3c74c78ef410ef910ca203f788cb5b0e095fa06b63e47ebc095b2785cc44c01
   cf_stacks:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/ca/5b/8ce5227713d692913c186d9a3164eee0236fbc3eaca87d7e2bd5dbb1da36/pipenv-2024.4.1.tar.gz
   source_sha256: e8ea6105c1cdda7d5c19df7bd6439a006751f3d4e017602c791e7b51314adf84
 - name: pipenv
   version: 2024.4.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs4_edff3827.tgz
-  sha256: edff38277ca3649157a795e7b4066fa2164b8a1a372944ce6f269edb31415ef9
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs4_82413449.tgz
+  sha256: 824134499a0935b55a8e9ef7801a56721b116c503f2a9f9decd7a8ff0551e0e8
   cf_stacks:
   - cflinuxfs4
   source: https://files.pythonhosted.org/packages/ca/5b/8ce5227713d692913c186d9a3164eee0236fbc3eaca87d7e2bd5dbb1da36/pipenv-2024.4.1.tar.gz
