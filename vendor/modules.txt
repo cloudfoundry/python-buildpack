@@ -30,8 +30,8 @@ github.com/cloudfoundry/libbuildpack/cutlass/docker
 github.com/cloudfoundry/libbuildpack/cutlass/glow
 github.com/cloudfoundry/libbuildpack/packager
 github.com/cloudfoundry/libbuildpack/snapshot
-# github.com/cloudfoundry/switchblade v0.6.0
-## explicit; go 1.19
+# github.com/cloudfoundry/switchblade v0.7.0
+## explicit; go 1.22.0
 github.com/cloudfoundry/switchblade
 github.com/cloudfoundry/switchblade/internal/cloudfoundry
 github.com/cloudfoundry/switchblade/internal/docker
