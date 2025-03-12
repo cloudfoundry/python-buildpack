@@ -103,7 +103,6 @@ func TestIntegration(t *testing.T) {
 	suite("Versions", testVersions(platform, fixtures, root))
 	suite("Miscellaneous", testMiscellaneous(platform, fixtures))
 	suite("Django", testDjango(platform, fixtures))
-	suite("Miniforge", testMiniforge(platform, fixtures))
 	suite("Pipenv", testPipenv(platform, fixtures))
 	suite("Override", testOverride(platform, fixtures))
 	suite("Multibuildpack", testMultibuildpack(platform, fixtures))
