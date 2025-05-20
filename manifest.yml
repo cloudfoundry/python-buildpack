@@ -158,14 +158,14 @@ dependencies:
   source: https://www.python.org/ftp/python/3.13.2/Python-3.13.2.tgz
   source_sha256: b8d79530e3b7c96a5cb2d40d431ddb512af4a563e863728d8713039aa50203f9
 - name: setuptools
-  version: 80.6.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.6.0_linux_noarch_any-stack_47686580.tgz
-  sha256: 476865801bbc2776447422fdd3b723c6fde018412a11e5ed3ea922a7d0e373c8
+  version: 80.8.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.8.0_linux_noarch_any-stack_84661a78.tgz
+  sha256: 84661a78d7867ebc4ff62f320b533579dd5933b0020297f3c4a81cb6df1522b0
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/bb/c6/4af6938e3c7321dab335c384d2ce4f604adc81099f124257de71599e301b/setuptools-80.6.0.tar.gz
-  source_sha256: 79cf4c44dfd0b5fb890be2dccc3fbd405253ce3baedd2700b54880a75219ea25
+  source: https://files.pythonhosted.org/packages/8d/d2/ec1acaaff45caed5c2dedb33b67055ba9d4e96b091094df90762e60135fe/setuptools-80.8.0.tar.gz
+  source_sha256: 49f7af965996f26d43c8ae34539c8d99c5042fbff34302ea151eaa9c207cd257
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
