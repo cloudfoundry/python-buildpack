@@ -54,6 +54,13 @@ dependencies:
   source_sha256: ca2f3cea67d6a1dbfd6acb9743891014768b12ad774755c57fbbcbfcd1fd8200
 - name: pip
   version: '25.2'
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.2_linux_noarch_any-stack_b15ae02f.tgz
+  sha256: b15ae02f5b72bf9911bc550c7d8cf8210c26eff7047ba9f19446855ae8cb6749
+  cf_stacks: []
+  source: https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
+  source_sha256: 578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2
+- name: pip
+  version: '25.2'
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.2_linux_noarch_any-stack_7dc1e988.tgz
   sha256: 7dc1e9882eb18f53150261c3a0cde7d5a39cdb18843c930ee01db8582f6b4f27
   cf_stacks:
