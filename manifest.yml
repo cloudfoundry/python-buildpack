@@ -61,6 +61,13 @@ dependencies:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
   source_sha256: 578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2
+- name: pip
+  version: '25.3'
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.3_linux_noarch_any-stack_d4b0c622.tgz
+  sha256: d4b0c62226e36bfc5f63b719e14f335182d0afa1bc8842dfba804bbb307d47e6
+  cf_stacks: []
+  source: https://files.pythonhosted.org/packages/fe/6e/74a3f0179a4a73a53d66ce57fdb4de0080a8baa1de0063de206d6167acc2/pip-25.3.tar.gz
+  source_sha256: 8d0538dbbd7babbd207f261ed969c65de439f6bc9e5dbd3b3b9a77f25d95f343
 - name: pipenv
   version: 2024.4.1
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs3_b3c74c78.tgz
