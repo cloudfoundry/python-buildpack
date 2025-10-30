@@ -43,6 +43,15 @@ dependencies:
   sha256: '009a3476197030e30d0ce924cc044ee4851ef27324e132b29fd12d8cde071915'
   source: https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
   source_sha256: e22c0bb032fde08f53de9ffbc5a128233041d9f33b5de022c0978a2149885f82
+- name: miniconda3-py39
+  version: 25.7.0
+  uri: https://repo.anaconda.com/miniconda/Miniconda3-py39_25.7.0-2-Linux-x86_64.sh
+  sha256: 790e8ea347cf49ba250fceacdc0b022237a9150717b9e4c17f2e70abc075c05d
+  cf_stacks:
+  - cflinuxfs4
+  - cflinuxfs3
+  source: https://github.com/conda/conda/archive/25.7.0.tar.gz
+  source_sha256: 790e8ea347cf49ba250fceacdc0b022237a9150717b9e4c17f2e70abc075c05d
 - name: miniforge
   version: 24.7.1
   uri: https://github.com/conda-forge/miniforge/releases/download/24.7.1-0/Miniforge3-24.7.1-0-Linux-x86_64.sh
@@ -78,21 +87,21 @@ dependencies:
   source: https://files.pythonhosted.org/packages/ca/5b/8ce5227713d692913c186d9a3164eee0236fbc3eaca87d7e2bd5dbb1da36/pipenv-2024.4.1.tar.gz
   source_sha256: e8ea6105c1cdda7d5c19df7bd6439a006751f3d4e017602c791e7b51314adf84
 - name: python
-  version: 3.9.23
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.23_linux_x64_cflinuxfs3_3bb0ba72.tgz
-  sha256: 3bb0ba729c67fbd7ec20a7cdc8d8546e1fb8cd240cf38e52930fcdc2095b8438
+  version: 3.9.24
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.24_linux_x64_cflinuxfs3_e7fcaa7e.tgz
+  sha256: e7fcaa7ebfab1610a902c86a886515b8db074039284bdf6deb54353d664a5e79
   cf_stacks:
   - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.9.23/Python-3.9.23.tgz
-  source_sha256: 9a69aad184dc1d06f6819930741da3a328d34875a41f8ba33875774dbfc51b51
+  source: https://www.python.org/ftp/python/3.9.24/Python-3.9.24.tgz
+  source_sha256: 9a32cfc683aecaadbd9ed891ac2af9451ff37f48a00a2d8e1f4ecd9c2a1ffdcb
 - name: python
-  version: 3.9.23
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.23_linux_x64_cflinuxfs4_f55096c5.tgz
-  sha256: f55096c5d0d7fc71acb050b5df6b4ded25b0aeb5edcd744403e31429e4559964
+  version: 3.9.24
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.24_linux_x64_cflinuxfs4_0c279a45.tgz
+  sha256: 0c279a45853038d2f6865b0e46c9e3d06b6d5ac6d5ac077dfe5711121cba3136
   cf_stacks:
   - cflinuxfs4
-  source: https://www.python.org/ftp/python/3.9.23/Python-3.9.23.tgz
-  source_sha256: 9a69aad184dc1d06f6819930741da3a328d34875a41f8ba33875774dbfc51b51
+  source: https://www.python.org/ftp/python/3.9.24/Python-3.9.24.tgz
+  source_sha256: 9a32cfc683aecaadbd9ed891ac2af9451ff37f48a00a2d8e1f4ecd9c2a1ffdcb
 - name: python
   version: 3.10.19
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.19_linux_x64_cflinuxfs3_d754b71d.tgz
@@ -110,21 +119,21 @@ dependencies:
   source: https://www.python.org/ftp/python/3.10.19/Python-3.10.19.tgz
   source_sha256: a078fb2d7a216071ebbe2e34b5f5355dd6b6e9b0cd1bacc4a41c63990c5a0eec
 - name: python
-  version: 3.11.12
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.11.12_linux_x64_cflinuxfs3_c9e6b498.tgz
-  sha256: c9e6b49875870e85dc4f811bfbab4fcc9382ca8f1fed6615c6e52752fdca963a
+  version: 3.11.14
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.11.14_linux_x64_cflinuxfs3_6d5446f5.tgz
+  sha256: 6d5446f502869094a9fcb701c41a6aa1c4823702e07aefb3c243e74468f5e17d
   cf_stacks:
   - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.11.12/Python-3.11.12.tgz
-  source_sha256: 379c9929a989a9d65a1f5d854e011f4872b142259f4fc0a8c4062d2815ed7fba
+  source: https://www.python.org/ftp/python/3.11.14/Python-3.11.14.tgz
+  source_sha256: 563d2a1b2a5ba5d5409b5ecd05a0e1bf9b028cf3e6a6f0c87a5dc8dc3f2d9182
 - name: python
-  version: 3.11.12
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.11.12_linux_x64_cflinuxfs4_51adfd88.tgz
-  sha256: 51adfd88ef729551c7ebc364f81787c8c805983dc33e3692250c53349fa38b5b
+  version: 3.11.14
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.11.14_linux_x64_cflinuxfs4_5d0a9d8b.tgz
+  sha256: 5d0a9d8bcea9ab75ffb927285f4ae79f3a47189a31d4eceac7842ec9131c8146
   cf_stacks:
   - cflinuxfs4
-  source: https://www.python.org/ftp/python/3.11.12/Python-3.11.12.tgz
-  source_sha256: 379c9929a989a9d65a1f5d854e011f4872b142259f4fc0a8c4062d2815ed7fba
+  source: https://www.python.org/ftp/python/3.11.14/Python-3.11.14.tgz
+  source_sha256: 563d2a1b2a5ba5d5409b5ecd05a0e1bf9b028cf3e6a6f0c87a5dc8dc3f2d9182
 - name: python
   version: 3.12.10
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.12.10_linux_x64_cflinuxfs3_c91697d7.tgz
@@ -158,14 +167,14 @@ dependencies:
   source: https://www.python.org/ftp/python/3.13.7/Python-3.13.7.tgz
   source_sha256: 6c9d80839cfa20024f34d9a6dd31ae2a9cd97ff5e980e969209746037a5153b2
 - name: setuptools
-  version: 80.8.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.8.0_linux_noarch_any-stack_84661a78.tgz
-  sha256: 84661a78d7867ebc4ff62f320b533579dd5933b0020297f3c4a81cb6df1522b0
+  version: 80.9.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.9.0_linux_noarch_any-stack_db9ec7d3.tgz
+  sha256: db9ec7d3c1b8e1494852b7228c3de7dd7449a1c4a53297ea9633a117eedf6787
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/8d/d2/ec1acaaff45caed5c2dedb33b67055ba9d4e96b091094df90762e60135fe/setuptools-80.8.0.tar.gz
-  source_sha256: 49f7af965996f26d43c8ae34539c8d99c5042fbff34302ea151eaa9c207cd257
+  source: https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz
+  source_sha256: f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
