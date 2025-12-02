@@ -20,6 +20,10 @@ dependency_deprecation_dates:
   name: python
   date: 2029-10-07
   link: https://peps.python.org/pep-0719/
+- version_line: 3.14.x
+  name: python
+  date: 2030-10-31
+  link: https://peps.python.org/pep-0745/
 - version_line: 3.9.x
   name: python
   date: 2025-10-05
@@ -180,6 +184,22 @@ dependencies:
   - cflinuxfs4
   source: https://www.python.org/ftp/python/3.13.9/Python-3.13.9.tgz
   source_sha256: c4c066af19c98fb7835d473bebd7e23be84f6e9874d47db9e39a68ee5d0ce35c
+- name: python
+  version: 3.14.1
+  uri: https://buildpack-dependencies.tanzu.vmware.com/cf/python/python_3.14.1_linux_x64_cflinuxfs3_003d4104.tgz
+  sha256: 003d4104979fa477be04fb32900f7d3dd492d85052c6d81394a709256b49462b
+  cf_stacks:
+  - cflinuxfs3
+  source: https://www.python.org/ftp/python/3.14.1/Python-3.14.1.tgz
+  source_sha256: 8343f001dede23812c7e9c6064f776bade2ef5813f46f0ae4b5a4c10c9069e9a
+- name: python
+  version: 3.14.1
+  uri: https://buildpack-dependencies.tanzu.vmware.com/cf/python/python_3.14.1_linux_x64_cflinuxfs4_c486ac2d.tgz
+  sha256: c486ac2d022083d0f5e583b2d8a824d06d4aeda7bd60efdd70c234bd407ef2a6
+  cf_stacks:
+  - cflinuxfs4
+  source: https://www.python.org/ftp/python/3.14.1/Python-3.14.1.tgz
+  source_sha256: 8343f001dede23812c7e9c6064f776bade2ef5813f46f0ae4b5a4c10c9069e9a
 - name: setuptools
   version: 80.9.0
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.9.0_linux_noarch_any-stack_db9ec7d3.tgz
