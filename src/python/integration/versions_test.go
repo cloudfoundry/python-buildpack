@@ -1,12 +1,13 @@
 package integration_test
 
 import (
-	"github.com/blang/semver"
-	"github.com/cloudfoundry/libbuildpack"
 	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
+
+	"github.com/blang/semver"
+	"github.com/cloudfoundry/libbuildpack"
 
 	"github.com/cloudfoundry/switchblade"
 	"github.com/sclevine/spec"
