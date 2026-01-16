@@ -9,15 +9,17 @@ import (
 )
 
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/cloudfoundry --interface InitializePhase --name CloudFoundryInitializePhase --output fakes/cloudfoundry_initialize_phase.go
+//go:generate faux --package github.com/cloudfoundry/switchblade/internal/cloudfoundry --interface DeinitializePhase --name CloudFoundryDeinitializePhase --output fakes/cloudfoundry_deinitialize_phase.go
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/cloudfoundry --interface SetupPhase --name CloudFoundrySetupPhase --output fakes/cloudfoundry_setup_phase.go
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/cloudfoundry --interface StagePhase --name CloudFoundryStagePhase --output fakes/cloudfoundry_stage_phase.go
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/cloudfoundry --interface TeardownPhase --name CloudFoundryTeardownPhase --output fakes/cloudfoundry_teardown_phase.go
 
-func NewCloudFoundry(initialize cloudfoundry.InitializePhase, setup cloudfoundry.SetupPhase, stage cloudfoundry.StagePhase, teardown cloudfoundry.TeardownPhase, workspace string) Platform {
+func NewCloudFoundry(initialize cloudfoundry.InitializePhase, deinitialize cloudfoundry.DeinitializePhase, setup cloudfoundry.SetupPhase, stage cloudfoundry.StagePhase, teardown cloudfoundry.TeardownPhase, workspace string, cli cloudfoundry.Executable) Platform {
 	return Platform{
-		initialize: cloudFoundryInitializeProcess{initialize: initialize},
-		Deploy:     cloudFoundryDeployProcess{setup: setup, stage: stage, workspace: workspace},
-		Delete:     cloudFoundryDeleteProcess{teardown: teardown, workspace: workspace},
+		initialize:   cloudFoundryInitializeProcess{initialize: initialize},
+		deinitialize: cloudFoundryDeinitializeProcess{deinitialize: deinitialize},
+		Deploy:       cloudFoundryDeployProcess{setup: setup, stage: stage, workspace: workspace, cli: cli},
+		Delete:       cloudFoundryDeleteProcess{teardown: teardown, workspace: workspace},
 	}
 }
 
@@ -37,10 +39,19 @@ func (p cloudFoundryInitializeProcess) Execute(buildpacks ...Buildpack) error {
 	return p.initialize.Run(bps)
 }
 
+type cloudFoundryDeinitializeProcess struct {
+	deinitialize cloudfoundry.DeinitializePhase
+}
+
+func (p cloudFoundryDeinitializeProcess) Execute() error {
+	return p.deinitialize.Run()
+}
+
 type cloudFoundryDeployProcess struct {
 	setup     cloudfoundry.SetupPhase
 	stage     cloudfoundry.StagePhase
 	workspace string
+	cli       cloudfoundry.Executable
 }
 
 func (p cloudFoundryDeployProcess) WithBuildpacks(buildpacks ...string) DeployProcess {
@@ -78,6 +89,11 @@ func (p cloudFoundryDeployProcess) WithStartCommand(command string) DeployProces
 	return p
 }
 
+func (p cloudFoundryDeployProcess) WithHealthCheckType(healthCheckType string) DeployProcess {
+	p.setup = p.setup.WithHealthCheckType(healthCheckType)
+	return p
+}
+
 func (p cloudFoundryDeployProcess) Execute(name, source string) (Deployment, fmt.Stringer, error) {
 	logs := bytes.NewBuffer(nil)
 	home := filepath.Join(p.workspace, name)
@@ -96,6 +112,9 @@ func (p cloudFoundryDeployProcess) Execute(name, source string) (Deployment, fmt
 		Name:        name,
 		ExternalURL: externalURL,
 		InternalURL: internalURL,
+		platform:    CloudFoundry,
+		workspace:   home,
+		cfCLI:       p.cli,
 	}, logs, nil
 }
 

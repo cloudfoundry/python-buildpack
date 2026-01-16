@@ -113,13 +113,13 @@ dependencies:
   source: https://www.python.org/ftp/python/3.9.24/Python-3.9.24.tgz
   source_sha256: 9a32cfc683aecaadbd9ed891ac2af9451ff37f48a00a2d8e1f4ecd9c2a1ffdcb
 - name: python
-  version: 3.9.24
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.24_linux_x64_cflinuxfs4_0c279a45.tgz
-  sha256: 0c279a45853038d2f6865b0e46c9e3d06b6d5ac6d5ac077dfe5711121cba3136
+  version: 3.9.25
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.25_linux_x64_cflinuxfs4_47183960.tgz
+  sha256: 47183960e453a25d6e30b763a6e868f812b58234ba747f2a380c241109b8856c
   cf_stacks:
   - cflinuxfs4
-  source: https://www.python.org/ftp/python/3.9.24/Python-3.9.24.tgz
-  source_sha256: 9a32cfc683aecaadbd9ed891ac2af9451ff37f48a00a2d8e1f4ecd9c2a1ffdcb
+  source: https://www.python.org/ftp/python/3.9.25/Python-3.9.25.tgz
+  source_sha256: a7438eabd3a48139f42d4e058096af8d880b0bb6e8fb8c78838892e4ce5583f2
 - name: python
   version: 3.10.19
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.19_linux_x64_cflinuxfs3_d754b71d.tgz
@@ -185,21 +185,21 @@ dependencies:
   source: https://www.python.org/ftp/python/3.13.9/Python-3.13.9.tgz
   source_sha256: c4c066af19c98fb7835d473bebd7e23be84f6e9874d47db9e39a68ee5d0ce35c
 - name: python
-  version: 3.14.1
-  uri: https://buildpack-dependencies.tanzu.vmware.com/cf/python/python_3.14.1_linux_x64_cflinuxfs3_003d4104.tgz
-  sha256: 003d4104979fa477be04fb32900f7d3dd492d85052c6d81394a709256b49462b
+  version: 3.14.2
+  uri: https://buildpack-dependencies.tanzu.vmware.com/cf/python/python_3.14.2_linux_x64_cflinuxfs3_82c1798d.tgz
+  sha256: 82c1798db9c1af3c4e6bd589cb1016b3c38981f809a63338f6708d6385c6e97b
   cf_stacks:
   - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.14.1/Python-3.14.1.tgz
-  source_sha256: 8343f001dede23812c7e9c6064f776bade2ef5813f46f0ae4b5a4c10c9069e9a
+  source: https://www.python.org/ftp/python/3.14.2/Python-3.14.2.tgz
+  source_sha256: c609e078adab90e2c6bacb6afafacd5eaf60cd94cf670f1e159565725fcd448d
 - name: python
-  version: 3.14.1
-  uri: https://buildpack-dependencies.tanzu.vmware.com/cf/python/python_3.14.1_linux_x64_cflinuxfs4_c486ac2d.tgz
-  sha256: c486ac2d022083d0f5e583b2d8a824d06d4aeda7bd60efdd70c234bd407ef2a6
+  version: 3.14.2
+  uri: https://buildpack-dependencies.tanzu.vmware.com/cf/python/python_3.14.2_linux_x64_cflinuxfs4_f32bebd1.tgz
+  sha256: f32bebd182dac46dc7a1a5782b4bc7e65dd67ba734d18eaf84b22487a4bede6e
   cf_stacks:
   - cflinuxfs4
-  source: https://www.python.org/ftp/python/3.14.1/Python-3.14.1.tgz
-  source_sha256: 8343f001dede23812c7e9c6064f776bade2ef5813f46f0ae4b5a4c10c9069e9a
+  source: https://www.python.org/ftp/python/3.14.2/Python-3.14.2.tgz
+  source_sha256: c609e078adab90e2c6bacb6afafacd5eaf60cd94cf670f1e159565725fcd448d
 - name: setuptools
   version: 80.9.0
   uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.9.0_linux_noarch_any-stack_db9ec7d3.tgz

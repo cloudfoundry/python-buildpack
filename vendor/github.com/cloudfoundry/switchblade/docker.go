@@ -9,16 +9,18 @@ import (
 )
 
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/docker --interface InitializePhase --name DockerInitializePhase --output fakes/docker_initialize_phase.go
+//go:generate faux --package github.com/cloudfoundry/switchblade/internal/docker --interface DeinitializePhase --name DockerDeinitializePhase --output fakes/docker_deinitialize_phase.go
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/docker --interface SetupPhase --name DockerSetupPhase --output fakes/docker_setup_phase.go
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/docker --interface StagePhase --name DockerStagePhase --output fakes/docker_stage_phase.go
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/docker --interface StartPhase --name DockerStartPhase --output fakes/docker_start_phase.go
 //go:generate faux --package github.com/cloudfoundry/switchblade/internal/docker --interface TeardownPhase --name DockerTeardownPhase --output fakes/docker_teardown_phase.go
 
-func NewDocker(initialize docker.InitializePhase, setup docker.SetupPhase, stage docker.StagePhase, start docker.StartPhase, teardown docker.TeardownPhase) Platform {
+func NewDocker(initialize docker.InitializePhase, deinitialize docker.DeinitializePhase, setup docker.SetupPhase, stage docker.StagePhase, start docker.StartPhase, teardown docker.TeardownPhase, client LogsClient) Platform {
 	return Platform{
-		initialize: dockerInitializeProcess{initialize: initialize},
-		Deploy:     dockerDeployProcess{setup: setup, stage: stage, start: start},
-		Delete:     dockerDeleteProcess{teardown: teardown},
+		initialize:   dockerInitializeProcess{initialize: initialize},
+		deinitialize: dockerDeinitializeProcess{deinitialize: deinitialize},
+		Deploy:       dockerDeployProcess{setup: setup, stage: stage, start: start, client: client},
+		Delete:       dockerDeleteProcess{teardown: teardown},
 	}
 }
 
@@ -35,15 +37,22 @@ func (p dockerInitializeProcess) Execute(buildpacks ...Buildpack) error {
 		})
 	}
 
-	p.initialize.Run(bps)
+	return p.initialize.Run(bps)
+}
 
-	return nil
+type dockerDeinitializeProcess struct {
+	deinitialize docker.DeinitializePhase
+}
+
+func (p dockerDeinitializeProcess) Execute() error {
+	return p.deinitialize.Run()
 }
 
 type dockerDeployProcess struct {
-	setup docker.SetupPhase
-	stage docker.StagePhase
-	start docker.StartPhase
+	setup  docker.SetupPhase
+	stage  docker.StagePhase
+	start  docker.StartPhase
+	client LogsClient
 }
 
 func (p dockerDeployProcess) WithBuildpacks(buildpacks ...string) DeployProcess {
@@ -84,6 +93,11 @@ func (p dockerDeployProcess) WithStartCommand(command string) DeployProcess {
 	return p
 }
 
+func (p dockerDeployProcess) WithHealthCheckType(healthCheckType string) DeployProcess {
+	// Docker platform doesn't use CF health check types, so this is a no-op
+	return p
+}
+
 func (p dockerDeployProcess) Execute(name, path string) (Deployment, fmt.Stringer, error) {
 	ctx := context.Background()
 	logs := bytes.NewBuffer(nil)
@@ -107,6 +121,8 @@ func (p dockerDeployProcess) Execute(name, path string) (Deployment, fmt.Stringe
 		Name:        name,
 		ExternalURL: externalURL,
 		InternalURL: internalURL,
+		platform:    Docker,
+		dockerCLI:   p.client,
 	}, logs, nil
 }
 
