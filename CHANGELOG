@@ -1,3 +1,29 @@
+v1.8.42 Jan 21, 2026
+=====================
+
+* Add pipenv 2026.0.3, remove pipenv 2025.0.4
+  for stack(s) cflinuxfs4
+
+* Add python 3.9.25, remove python 3.9.24
+  for stack(s) cflinuxfs4
+
+* Rebuild python 3.10.19
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+* Rebuild python 3.11.14
+  for stack(s) cflinuxfs3, cflinuxfs4
+
+* Add python 3.12.12, remove python 3.12.10
+  for stack(s) cflinuxfs4
+
+* Add python 3.13.11, remove python 3.13.9
+  for stack(s) cflinuxfs4
+
+
+=====================
+=====================
+
+
 v1.8.33 Feb 20, 2025
 =====================
 
