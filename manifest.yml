@@ -209,6 +209,14 @@ dependencies:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz
   source_sha256: f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c
+- name: setuptools
+  version: 80.10.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.10.1_linux_noarch_any-stack_e8745ea3.tgz
+  sha256: e8745ea31b2af10b2056552a65181b52f8fcc645f1ac13a4f6440525fcc896d1
+  cf_stacks:
+  - cflinuxfs4
+  source: https://files.pythonhosted.org/packages/86/ff/f75651350db3cf2ef767371307eb163f3cc1ac03e16fdf3ac347607f7edb/setuptools-80.10.1.tar.gz
+  source_sha256: bf2e513eb8144c3298a3bd28ab1a5edb739131ec5c22e045ff93cd7f5319703a
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
