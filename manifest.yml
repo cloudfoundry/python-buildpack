@@ -22,7 +22,7 @@ dependency_deprecation_dates:
   link: https://peps.python.org/pep-0719/
 - version_line: 3.14.x
   name: python
-  date: 2030-10-31
+  date: 2030-10-07
   link: https://peps.python.org/pep-0745/
 - version_line: 3.9.x
   name: python
@@ -186,8 +186,8 @@ dependencies:
   source_sha256: c609e078adab90e2c6bacb6afafacd5eaf60cd94cf670f1e159565725fcd448d
 - name: python
   version: 3.14.2
-  uri: https://buildpack-dependencies.tanzu.vmware.com/cf/python/python_3.14.2_linux_x64_cflinuxfs4_f32bebd1.tgz
-  sha256: f32bebd182dac46dc7a1a5782b4bc7e65dd67ba734d18eaf84b22487a4bede6e
+  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.14.2_linux_x64_cflinuxfs4_3e7d6d17.tgz
+  sha256: 3e7d6d17f8279c05483ad1fc98db11c9fb11289a3505f229ca82747cf72f38aa
   cf_stacks:
   - cflinuxfs4
   source: https://www.python.org/ftp/python/3.14.2/Python-3.14.2.tgz
