@@ -1,3 +1,9 @@
+v1.8.43 
+=====================
+
+* Remove Python version 3.12.10 due to vulnerability
+
+
 v1.8.42 Jan 21, 2026
 =====================
 
