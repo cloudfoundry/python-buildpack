@@ -73,6 +73,13 @@ dependencies:
   source: https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
   source_sha256: 578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2
 - name: pip
+  version: '25.3'
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.3_linux_noarch_any-stack_d4b0c622.tgz
+  sha256: d4b0c62226e36bfc5f63b719e14f335182d0afa1bc8842dfba804bbb307d47e6
+  cf_stacks: []
+  source: https://files.pythonhosted.org/packages/fe/6e/74a3f0179a4a73a53d66ce57fdb4de0080a8baa1de0063de206d6167acc2/pip-25.3.tar.gz
+  source_sha256: 8d0538dbbd7babbd207f261ed969c65de439f6bc9e5dbd3b3b9a77f25d95f343
+- name: pip
   version: '25.2'
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.2_linux_noarch_any-stack_7dc1e988.tgz
   sha256: 7dc1e9882eb18f53150261c3a0cde7d5a39cdb18843c930ee01db8582f6b4f27
@@ -81,13 +88,6 @@ dependencies:
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
   source_sha256: 578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2
-- name: pip
-  version: '25.3'
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.3_linux_noarch_any-stack_d4b0c622.tgz
-  sha256: d4b0c62226e36bfc5f63b719e14f335182d0afa1bc8842dfba804bbb307d47e6
-  cf_stacks: []
-  source: https://files.pythonhosted.org/packages/fe/6e/74a3f0179a4a73a53d66ce57fdb4de0080a8baa1de0063de206d6167acc2/pip-25.3.tar.gz
-  source_sha256: 8d0538dbbd7babbd207f261ed969c65de439f6bc9e5dbd3b3b9a77f25d95f343
 - name: pipenv
   version: 2024.4.1
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs3_b3c74c78.tgz
@@ -202,13 +202,14 @@ dependencies:
   source: https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz
   source_sha256: f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c
 - name: setuptools
-  version: 80.10.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.10.1_linux_noarch_any-stack_e8745ea3.tgz
-  sha256: e8745ea31b2af10b2056552a65181b52f8fcc645f1ac13a4f6440525fcc896d1
+  version: 82.0.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_82.0.0_linux_noarch_any-stack_284f639c.tgz
+  sha256: 284f639c6d85d6f159daa5eb35a28f0351f185ffebb50bd6deebf73d8d3ca444
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/86/ff/f75651350db3cf2ef767371307eb163f3cc1ac03e16fdf3ac347607f7edb/setuptools-80.10.1.tar.gz
-  source_sha256: bf2e513eb8144c3298a3bd28ab1a5edb739131ec5c22e045ff93cd7f5319703a
+  - cflinuxfs5
+  source: https://files.pythonhosted.org/packages/82/f3/748f4d6f65d1756b9ae577f329c951cda23fb900e4de9f70900ced962085/setuptools-82.0.0.tar.gz
+  source_sha256: 22e0a2d69474c6ae4feb01951cb69d515ed23728cf96d05513d36e42b62b37cb
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
