@@ -25,6 +25,7 @@ var _ = Describe("Hooks", func() {
 	BeforeEach(func() {
 		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, buildDir)
 
 		buffer = new(bytes.Buffer)
 		logger := libbuildpack.NewLogger(ansicleaner.New(buffer))
@@ -33,10 +34,6 @@ var _ = Describe("Hooks", func() {
 		stager = libbuildpack.NewStager(args, logger, &libbuildpack.Manifest{})
 
 		hook = &hooks.AppHook{}
-	})
-
-	AfterEach(func() {
-		Expect(os.RemoveAll(buildDir)).To(Succeed())
 	})
 
 	Describe("BeforeCompile", func() {

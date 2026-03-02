@@ -38,9 +38,13 @@ var _ = Describe("Finalize", func() {
 	BeforeEach(func() {
 		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, buildDir)
 
 		depsDir, err = os.MkdirTemp("", "python-buildpack.deps.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, depsDir)
+
+		DeferCleanup(os.Setenv, "DISABLE_COLLECTSTATIC", "")
 
 		depsIdx = "9"
 		Expect(os.MkdirAll(filepath.Join(depsDir, depsIdx), 0755)).To(Succeed())
@@ -66,18 +70,6 @@ var _ = Describe("Finalize", func() {
 			ManagePyFinder: mockManagePyFinder,
 			Requirements:   mockRequirements,
 		}
-	})
-
-	AfterEach(func() {
-		mockCtrl.Finish()
-
-		err = os.RemoveAll(buildDir)
-		Expect(err).To(BeNil())
-
-		err = os.RemoveAll(depsDir)
-		Expect(err).To(BeNil())
-
-		os.Setenv("DISABLE_COLLECTSTATIC", "")
 	})
 
 	Describe("HandleCollectStatic", func() {

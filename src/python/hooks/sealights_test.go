@@ -23,9 +23,11 @@ var _ = Describe("Sealights", func() {
 	BeforeEach(func() {
 		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
 		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(os.RemoveAll, buildDir)
 
 		depsDir, err = os.MkdirTemp("", "python-buildpack.deps.")
 		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(os.RemoveAll, depsDir)
 
 		buffer = new(bytes.Buffer)
 		logger := libbuildpack.NewLogger(ansicleaner.New(buffer))
@@ -35,11 +37,6 @@ var _ = Describe("Sealights", func() {
 		sealights = hooks.SealightsHook{
 			Log: logger,
 		}
-	})
-
-	AfterEach(func() {
-		Expect(os.RemoveAll(buildDir)).To(Succeed())
-		Expect(os.RemoveAll(depsDir)).To(Succeed())
 	})
 
 	Context("GenerateStartUpCommand", func() {
@@ -97,11 +94,8 @@ var _ = Describe("Sealights", func() {
 		BeforeEach(func() {
 			tempProcDir, err = os.MkdirTemp("", "Procfiles")
 			Expect(err).NotTo(HaveOccurred())
+			DeferCleanup(os.RemoveAll, tempProcDir)
 			slConfig = hooks.NewSealightsConfig()
-		})
-
-		AfterEach(func() {
-			Expect(os.RemoveAll(tempProcDir)).To(Succeed())
 		})
 
 		It("rewrites the procfile with sl-python", func() {
@@ -144,9 +138,7 @@ var _ = Describe("Sealights", func() {
 			requirementsFilepath := filepath.Join(buildDir, "requirements.txt")
 			Expect(libbuildpack.FileExists(requirementsFilepath)).ToNot(BeTrue())
 			Expect(os.WriteFile(requirementsFilepath, []byte("Flask"), 0644)).To(Succeed())
-		})
-		AfterEach(func() {
-			Expect(os.Remove(filepath.Join(buildDir, "requirements.txt"))).To(Succeed())
+			DeferCleanup(os.Remove, filepath.Join(buildDir, "requirements.txt"))
 		})
 
 		It("Rewrites requirements.txt", func() {
@@ -169,10 +161,7 @@ var _ = Describe("Sealights", func() {
 			Expect(os.Getenv("VCAP_SERVICES")).To(Equal(""))
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			Expect(os.Remove(filepath.Join(buildDir, "Procfile"))).To(Succeed())
+			DeferCleanup(os.Remove, filepath.Join(buildDir, "Procfile"))
 		})
 
 		It("BeforeCompile does not modify the existing Procfile", func() {
@@ -190,11 +179,8 @@ var _ = Describe("Sealights", func() {
 			os.Setenv("VCAP_SERVICES", `{"service": [{"credentials": {"login": "name"}, "name": "443"}]}`)
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			Expect(os.Remove(filepath.Join(buildDir, "Procfile"))).To(Succeed())
-			os.Unsetenv("VCAP_SERVICES")
+			DeferCleanup(os.Remove, filepath.Join(buildDir, "Procfile"))
+			DeferCleanup(os.Unsetenv, "VCAP_SERVICES")
 		})
 
 		It("BeforeCompile does not modify the existing Procfile", func() {
@@ -212,11 +198,8 @@ var _ = Describe("Sealights", func() {
 			os.Setenv("VCAP_SERVICES", `{"sealights":[{"credentials":{"token":"","tokenFile":"token.txt"}}]}`)
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			os.Unsetenv("VCAP_SERVICES")
-			os.Unsetenv("SL_TOKEN")
+			DeferCleanup(os.Unsetenv, "VCAP_SERVICES")
+			DeferCleanup(os.Unsetenv, "SL_TOKEN")
 		})
 		It("BeforeCompile modify the existing Procfile", func() {
 			err := sealights.BeforeCompile(stager)
@@ -252,10 +235,7 @@ var _ = Describe("Sealights", func() {
 			os.Setenv("VCAP_SERVICES", `{"some-sealights":[{"credentials":{"token":"","tokenFile":"token.txt"}}]}`)
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			os.Unsetenv("VCAP_SERVICES")
+			DeferCleanup(os.Unsetenv, "VCAP_SERVICES")
 		})
 		It("BeforeCompile modify the existing Procfile", func() {
 			err := sealights.BeforeCompile(stager)
@@ -276,10 +256,7 @@ var _ = Describe("Sealights", func() {
 			os.Setenv("VCAP_SERVICES", `{"user-provided":[{"binding_guid":"af3fea1b-8beb-4397-968e-6440d2906551","binding_name":null,"credentials":{"token":"","tokenFile":"sltoken.txt"},"instance_guid":"d5c36671-dc09-4cd9-8697-70adc0c0f6e9","instance_name":"sealights","label":"user-provided","name":"sealights","syslog_drain_url":null,"tags":[],"volume_mounts":[]}]}`)
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			os.Unsetenv("VCAP_SERVICES")
+			DeferCleanup(os.Unsetenv, "VCAP_SERVICES")
 		})
 		It("BeforeCompile modify the existing Procfile", func() {
 			err := sealights.BeforeCompile(stager)
@@ -300,10 +277,7 @@ var _ = Describe("Sealights", func() {
 			os.Setenv("VCAP_SERVICES", `{"sealights":[{"credentials":{"token":"","tokenFile":"token.txt"}}]}`)
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			os.Unsetenv("VCAP_SERVICES")
+			DeferCleanup(os.Unsetenv, "VCAP_SERVICES")
 		})
 		It("BeforeCompile is not modify the existing Procfile -  bad format", func() {
 			err := sealights.BeforeCompile(stager)

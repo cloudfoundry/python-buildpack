@@ -31,9 +31,11 @@ var _ = Describe("Appdynamics", func() {
 	BeforeEach(func() {
 		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
 		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(os.RemoveAll, buildDir)
 
 		depsDir, err = os.MkdirTemp("", "python-buildpack.deps.")
 		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(os.RemoveAll, depsDir)
 
 		buffer = new(bytes.Buffer)
 		logger := libbuildpack.NewLogger(ansicleaner.New(buffer))
@@ -47,11 +49,6 @@ var _ = Describe("Appdynamics", func() {
 			Log:     logger,
 			Command: command,
 		}
-	})
-
-	AfterEach(func() {
-		Expect(os.RemoveAll(buildDir)).To(Succeed())
-		Expect(os.RemoveAll(depsDir)).To(Succeed())
 	})
 
 	Context("GenerateStartUpCommand", func() {
@@ -77,10 +74,7 @@ var _ = Describe("Appdynamics", func() {
 		)
 		BeforeEach(func() {
 			tempProcDir, err = os.MkdirTemp("", "Procfiles")
-		})
-
-		AfterEach(func() {
-			Expect(os.RemoveAll(tempProcDir)).To(Succeed())
+			DeferCleanup(os.RemoveAll, tempProcDir)
 		})
 
 		It("rewrites the procfile with pyagent", func() {
@@ -129,9 +123,7 @@ var _ = Describe("Appdynamics", func() {
 			defer f.Close()
 			_, err = f.WriteString("Flask")
 			Expect(err).NotTo(HaveOccurred())
-		})
-		AfterEach(func() {
-			Expect(os.Remove(filepath.Join(buildDir, "requirements.txt"))).To(Succeed())
+			DeferCleanup(os.Remove, filepath.Join(buildDir, "requirements.txt"))
 		})
 
 		It("rewrites requirements.txt", func() {
@@ -182,10 +174,7 @@ export APPD_KEY_2=APPD_VAL_2`
 			Expect(os.Getenv("VCAP_SERVICES")).To(Equal(""))
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			Expect(os.Remove(filepath.Join(buildDir, "Procfile"))).To(Succeed())
+			DeferCleanup(os.Remove, filepath.Join(buildDir, "Procfile"))
 		})
 
 		It("VCAP_SERVICES is not present", func() {
@@ -205,11 +194,8 @@ export APPD_KEY_2=APPD_VAL_2`
 			os.Setenv("VCAP_SERVICES", `{"service": [{"credentials": {"login": "name"}, "name": "443"}]}`)
 			Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			Expect(os.Remove(filepath.Join(buildDir, "Procfile"))).To(Succeed())
-			os.Unsetenv("VCAP_SERVICES")
+			DeferCleanup(os.Remove, filepath.Join(buildDir, "Procfile"))
+			DeferCleanup(os.Unsetenv, "VCAP_SERVICES")
 		})
 
 		It("VCAP_SERVICES has no appdynamics", func() {
@@ -235,10 +221,7 @@ export APPD_KEY_2=APPD_VAL_2`
 
 				Expect(os.WriteFile(filepath.Join(buildDir, "Procfile"), []byte("web: python app.py"), 0644)).To(Succeed())
 				Expect(err).NotTo(HaveOccurred())
-			})
-
-			AfterEach(func() {
-				os.Unsetenv("VCAP_SERVICES")
+				DeferCleanup(os.Unsetenv, "VCAP_SERVICES")
 			})
 
 			It(fmt.Sprintf("VCAP_SERVICES has %s", serviceName), func() {

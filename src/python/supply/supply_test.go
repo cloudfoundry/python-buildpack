@@ -40,12 +40,14 @@ var _ = Describe("Supply", func() {
 	BeforeEach(func() {
 		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, buildDir)
 
 		cacheDir, err = os.MkdirTemp("", "python-buildpack.cache.")
 		Expect(err).To(BeNil())
 
 		depsDir, err = os.MkdirTemp("", "python-buildpack.deps.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, depsDir)
 
 		depsIdx = "13"
 
@@ -75,16 +77,6 @@ var _ = Describe("Supply", func() {
 		}
 	})
 
-	AfterEach(func() {
-		mockCtrl.Finish()
-
-		err = os.RemoveAll(depsDir)
-		Expect(err).To(BeNil())
-
-		err = os.RemoveAll(buildDir)
-		Expect(err).To(BeNil())
-	})
-
 	Describe("InstallPython", func() {
 		var pythonInstallDir string
 		var versions []string
@@ -97,10 +89,7 @@ var _ = Describe("Supply", func() {
 
 			versions = []string{"3.9.2", "3.10.1"}
 			originalPath = os.Getenv("PATH")
-		})
-
-		AfterEach(func() {
-			os.Setenv("PATH", originalPath)
+			DeferCleanup(os.Setenv, "PATH", originalPath)
 		})
 
 		Context("runtime.txt sets Python version 3", func() {
@@ -160,10 +149,7 @@ var _ = Describe("Supply", func() {
 		Describe("BP_PIP_VERSION set to 'latest'", func() {
 			BeforeEach(func() {
 				Expect(os.Setenv("BP_PIP_VERSION", "latest")).To(Succeed())
-			})
-
-			AfterEach(func() {
-				Expect(os.Unsetenv("BP_PIP_VERSION")).To(Succeed())
+				DeferCleanup(os.Unsetenv, "BP_PIP_VERSION")
 			})
 
 			It("installs latest from manifest", func() {
@@ -186,10 +172,7 @@ var _ = Describe("Supply", func() {
 		Describe("BP_PIP_VERSION is invalid", func() {
 			BeforeEach(func() {
 				Expect(os.Setenv("BP_PIP_VERSION", "something-else")).To(Succeed())
-			})
-
-			AfterEach(func() {
-				Expect(os.Unsetenv("BP_PIP_VERSION")).To(Succeed())
+				DeferCleanup(os.Unsetenv, "BP_PIP_VERSION")
 			})
 
 			It("returns an error without installing", func() {
@@ -312,9 +295,7 @@ var _ = Describe("Supply", func() {
 	})
 
 	Describe("HandlePylibmc", func() {
-		AfterEach(func() {
-			os.Setenv("LIBMEMCACHED", "")
-		})
+		DeferCleanup(os.Setenv, "LIBMEMCACHED", "")
 
 		Context("when the app uses pylibmc", func() {
 			BeforeEach(func() {
@@ -410,9 +391,7 @@ var _ = Describe("Supply", func() {
 	})
 
 	Describe("HandleFfi", func() {
-		AfterEach(func() {
-			os.Setenv("LIBFFI", "")
-		})
+		DeferCleanup(os.Setenv, "LIBFFI", "")
 
 		Context("when the app uses ffi", func() {
 			BeforeEach(func() {
@@ -769,7 +748,7 @@ export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-'--access-logfile -'}
 	})
 
 	Describe("SetupCacheDir", func() {
-		AfterEach(func() { os.Unsetenv("XDG_CACHE_HOME") })
+		DeferCleanup(os.Unsetenv, "XDG_CACHE_HOME")
 
 		It("Sets pip's cache directory", func() {
 			mockStager.EXPECT().WriteEnvFile("XDG_CACHE_HOME", filepath.Join(cacheDir, "pip_cache"))

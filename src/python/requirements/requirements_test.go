@@ -18,11 +18,8 @@ var _ = Describe("Reqs", func() {
 	BeforeEach(func() {
 		tempDir, err = os.MkdirTemp("", "requirements")
 		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(os.RemoveAll, tempDir)
 		req = Reqs{}
-	})
-
-	AfterEach(func() {
-		Expect(os.RemoveAll(tempDir)).To(Succeed())
 	})
 
 	Describe("FindAnyPackage", func() {
