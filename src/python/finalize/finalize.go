@@ -95,7 +95,7 @@ func (f *Finalizer) HandleCollectstatic() error {
 	f.Log.Info("Running python %s collectstatic --noinput --traceback", managePyPath)
 	output := new(bytes.Buffer)
 	if err = f.Command.Execute(f.Stager.BuildDir(), output, text.NewIndentWriter(os.Stderr, []byte("       ")), "python", managePyPath, "collectstatic", "--noinput", "--traceback"); err != nil {
-		f.Log.Error(fmt.Sprintf(` !     Error while running '$ python %s collectstatic --noinput'.
+		f.Log.Error(` !     Error while running '$ python %s collectstatic --noinput'.
        See traceback above for details.
 
        You may need to update application code to resolve this error.
@@ -103,7 +103,7 @@ func (f *Finalizer) HandleCollectstatic() error {
 
           $ cf set-env <app> DISABLE_COLLECTSTATIC 1
 
-       https://devcenter.heroku.com/articles/django-assets`, managePyPath))
+       https://devcenter.heroku.com/articles/django-assets`, managePyPath)
 		return err
 	}
 

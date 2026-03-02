@@ -393,7 +393,9 @@ var _ = Describe("Supply", func() {
 	})
 
 	Describe("HandleFfi", func() {
-		DeferCleanup(os.Setenv, "LIBFFI", "")
+		BeforeEach(func() {
+			DeferCleanup(os.Setenv, "LIBFFI", "")
+		})
 
 		Context("when the app uses ffi", func() {
 			BeforeEach(func() {
@@ -750,7 +752,9 @@ export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-'--access-logfile -'}
 	})
 
 	Describe("SetupCacheDir", func() {
-		DeferCleanup(os.Unsetenv, "XDG_CACHE_HOME")
+		BeforeEach(func() {
+			DeferCleanup(os.Unsetenv, "XDG_CACHE_HOME")
+		})
 
 		It("Sets pip's cache directory", func() {
 			mockStager.EXPECT().WriteEnvFile("XDG_CACHE_HOME", filepath.Join(cacheDir, "pip_cache"))
