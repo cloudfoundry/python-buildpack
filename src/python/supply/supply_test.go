@@ -295,7 +295,9 @@ var _ = Describe("Supply", func() {
 	})
 
 	Describe("HandlePylibmc", func() {
-		DeferCleanup(os.Setenv, "LIBMEMCACHED", "")
+		BeforeEach(func() {
+			DeferCleanup(os.Setenv, "LIBMEMCACHED", "")
+		})
 
 		Context("when the app uses pylibmc", func() {
 			BeforeEach(func() {
