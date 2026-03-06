@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/Dynatrace/libbuildpack-dynatrace v1.8.0
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/cloudfoundry/libbuildpack v0.0.0-20251202224209-b07cc3dab65e
+	github.com/cloudfoundry/libbuildpack v0.0.0-20260306121953-8ab9253c8181
 	github.com/cloudfoundry/switchblade v0.9.4
 	github.com/golang/mock v1.6.0
 	github.com/kr/text v0.2.0
@@ -39,7 +39,6 @@ require (
 	github.com/google/pprof v0.0.0-20260115054156-294ebfa9ad83 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
-	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
 	github.com/paketo-buildpacks/packit v1.3.1 // indirect
@@ -65,7 +64,6 @@ require (
 	golang.org/x/tools v0.41.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241104194629-dd2ea8efbc28 // indirect
-	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
