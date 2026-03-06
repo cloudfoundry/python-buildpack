@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/ansicleaner"
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -37,10 +37,13 @@ var _ = Describe("Conda", func() {
 	BeforeEach(func() {
 		buildDir, err = os.MkdirTemp("", "python-buildpack.build.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, buildDir)
 		cacheDir, err = os.MkdirTemp("", "python-buildpack.cache.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, cacheDir)
 		depsDir, err = os.MkdirTemp("", "python-buildpack.deps.")
 		Expect(err).To(BeNil())
+		DeferCleanup(os.RemoveAll, depsDir)
 		depsIdx = "13"
 		depDir = filepath.Join(depsDir, depsIdx)
 
@@ -57,13 +60,6 @@ var _ = Describe("Conda", func() {
 		logger = libbuildpack.NewLogger(ansicleaner.New(buffer))
 
 		subject = conda.New(mockInstaller, mockStager, mockCommand, logger)
-	})
-
-	AfterEach(func() {
-		mockCtrl.Finish()
-		Expect(os.RemoveAll(buildDir)).To(Succeed())
-		Expect(os.RemoveAll(cacheDir)).To(Succeed())
-		Expect(os.RemoveAll(depsDir)).To(Succeed())
 	})
 
 	Describe("Version", func() {
@@ -129,13 +125,12 @@ var _ = Describe("Conda", func() {
 
 		BeforeEach(func() {
 			condaPkgs = os.Getenv("CONDA_PKGS_DIRS")
-		})
-
-		AfterEach(func() {
-			if condaPkgs != "" {
-				os.Setenv("CONDA_PKGS_DIRS", condaPkgs)
-			}
-			os.Unsetenv("BP_DEBUG")
+			DeferCleanup(func() {
+				if condaPkgs != "" {
+					os.Setenv("CONDA_PKGS_DIRS", condaPkgs)
+				}
+				os.Unsetenv("BP_DEBUG")
+			})
 		})
 
 		It("uses staging cache for conda cache", func() {

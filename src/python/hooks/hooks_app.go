@@ -30,7 +30,7 @@ func runHook(scriptName string, compiler *libbuildpack.Stager) error {
 	if exists, err := libbuildpack.FileExists(path); err != nil {
 		return err
 	} else if exists {
-		compiler.Logger().BeginStep("Running " + scriptName + " hook")
+		compiler.Logger().BeginStep("Running %s hook", scriptName)
 		if err := os.Chmod(path, 0755); err != nil {
 			return err
 		}

@@ -139,7 +139,7 @@ func (sh SealightsHook) RewriteProcFileWithSealights(stager *libbuildpack.Stager
 		if err != nil {
 			return fmt.Errorf("Error reading file %s: %v", file, err)
 		}
-		sh.Log.Info(string(fileContents))
+		sh.Log.Info("%s", string(fileContents))
 	} else {
 		sh.Log.Info("Cannot find Procfile, skipping this step!")
 	}
