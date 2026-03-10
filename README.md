@@ -24,7 +24,9 @@ To build this buildpack, run the following commands from the buildpack's directo
 1. Install buildpack-packager
 
     ```bash
-    go install github.com/cloudfoundry/libbuildpack/packager/buildpack-packager
+    go get github.com/cloudfoundry/libbuildpack
+    cd ~/go/src/github.com/cloudfoundry/libbuildpack && GO111MODULE=on go mod download
+    cd packager/buildpack-packager &&  GO111MODULE=on go install
     ```
 
 1. Build the buildpack

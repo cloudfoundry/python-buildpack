@@ -633,10 +633,11 @@ MarkupSafe==2.0.1
 
 	Describe("InstallCommonBuildDependencies", func() {
 		Context("successful installation", func() {
-			It("runs command to install wheel and setuptools", func() {
+			It("runs command to install wheel, setuptools and flit-core", func() {
 				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "setuptools", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "flit-core", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
 
 				Expect(supplier.InstallCommonBuildDependencies()).To(Succeed())
 			})
