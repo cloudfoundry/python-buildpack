@@ -209,6 +209,15 @@ dependencies:
   - cflinuxfs4
   source: https://files.pythonhosted.org/packages/86/ff/f75651350db3cf2ef767371307eb163f3cc1ac03e16fdf3ac347607f7edb/setuptools-80.10.1.tar.gz
   source_sha256: bf2e513eb8144c3298a3bd28ab1a5edb739131ec5c22e045ff93cd7f5319703a
+- name: flit-core
+  version: 3.12.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/flit_core/flit_core-3.12.0_linux_noarch_any-stack_e8745ea3.tgz
+  sha256: e8745ea31b2af10b2056552a65181b52f8fcc645f1ac13a4f6440525fcc896d1
+  cf_stacks:
+    - cflinuxfs4
+    - cflinuxfs3
+  source: https://files.pythonhosted.org/packages/69/59/b6fc2188dfc7ea4f936cd12b49d707f66a1cb7a1d2c16172963534db741b/flit_core-3.12.0.tar.gz
+  source_sha256: 18f63100d6f94385c6ed57a72073443e1a71a4acb4339491615d0f16d6ff01b2
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md

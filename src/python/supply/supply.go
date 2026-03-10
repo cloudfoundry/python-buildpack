@@ -743,7 +743,7 @@ func (s *Supplier) RunPipVendored() error {
 // dependencies - wheel and setuptools. These are packaged by the dependency
 // pipeline within the "pip" dependency.
 func (s *Supplier) InstallCommonBuildDependencies() error {
-	var commonDeps = []string{"wheel", "setuptools"}
+	var commonDeps = []string{"wheel", "setuptools", "flit-core"}
 	tempPath := filepath.Join("/tmp", "common_build_deps")
 	if err := s.Installer.InstallOnlyVersion("pip", tempPath); err != nil {
 		return err
