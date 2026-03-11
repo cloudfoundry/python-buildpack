@@ -123,7 +123,7 @@ func (h AppdynamicsHook) RewriteRequirementsFile(stager *libbuildpack.Stager) er
 		panic(err)
 	}
 	fileContents, _ := os.ReadFile(f.Name())
-	h.Log.Info(string(fileContents))
+	h.Log.Info("%s", string(fileContents))
 
 	return nil
 }
@@ -138,7 +138,7 @@ func (h AppdynamicsHook) RewriteProcFileWithAppdynamics(stager *libbuildpack.Sta
 			return err
 		}
 		fileContents, _ := os.ReadFile(file)
-		h.Log.Info(string(fileContents))
+		h.Log.Info("%s", string(fileContents))
 	} else {
 		h.Log.Info("Cannot find Procfile, skipping this step!")
 	}
@@ -148,7 +148,7 @@ func (h AppdynamicsHook) RewriteProcFileWithAppdynamics(stager *libbuildpack.Sta
 func (h AppdynamicsHook) CreateAppDynamicsEnv(stager *libbuildpack.Stager, environmentVars map[string]string) error {
 	scriptContents := h.GenerateAppdynamicsScript(environmentVars)
 	h.Log.BeginStep("Writing Appdynamics Environment")
-	h.Log.Debug(scriptContents)
+	h.Log.Debug("%s", scriptContents)
 	return stager.WriteProfileD("appdynamics.sh", scriptContents)
 }
 
