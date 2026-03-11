@@ -5,3 +5,4 @@ log/
 **/.DS_Store
 /python_buildpack-*.zip
 .idea/
+build/buildpack.zip
