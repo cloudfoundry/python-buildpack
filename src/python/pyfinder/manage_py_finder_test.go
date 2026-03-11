@@ -6,7 +6,7 @@ import (
 
 	. "github.com/cloudfoundry/python-buildpack/src/python/pyfinder"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -20,11 +20,8 @@ var _ = Describe("ManagePyFinder", func() {
 	BeforeEach(func() {
 		tempDir, err = os.MkdirTemp("", "pyfinder")
 		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(os.RemoveAll, tempDir)
 		finder = ManagePyFinder{}
-	})
-
-	AfterEach(func() {
-		Expect(os.RemoveAll(tempDir)).To(Succeed())
 	})
 
 	Describe("FindManagePy", func() {
