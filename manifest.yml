@@ -32,6 +32,7 @@ dependencies:
 - name: libffi
   version: 3.2.1
   cf_stacks:
+  - cflinuxfs5
   - cflinuxfs4
   - cflinuxfs3
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libffi-3.2.1-linux-x64-5f5bf32c.tgz
@@ -41,6 +42,7 @@ dependencies:
 - name: libmemcache
   version: 1.0.18
   cf_stacks:
+  - cflinuxfs5
   - cflinuxfs4
   - cflinuxfs3
   uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/python/libmemcache-1.0.18-linux-x64-6d33aa02.tgz
@@ -70,6 +72,7 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.2_linux_noarch_any-stack_7dc1e988.tgz
   sha256: 7dc1e9882eb18f53150261c3a0cde7d5a39cdb18843c930ee01db8582f6b4f27
   cf_stacks:
+  - cflinuxfs5
   - cflinuxfs4
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
