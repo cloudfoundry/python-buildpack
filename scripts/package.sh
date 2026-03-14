@@ -95,7 +95,6 @@ function package::buildpack() {
   stack_flag="--any-stack"
   if [[ "${stack}" != "any" ]]; then
     stack_flag="--stack=${stack}"
-    export CF_STACK="${stack}"
   fi
 
   local file
