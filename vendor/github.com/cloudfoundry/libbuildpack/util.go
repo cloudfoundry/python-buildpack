@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -21,13 +22,17 @@ import (
 	backoff "github.com/cenkalti/backoff/v4"
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 func MoveDirectory(srcDir, destDir string) error {
 	destExists, _ := FileExists(destDir)
 	if !destExists {
 		return os.Rename(srcDir, destDir)
 	}
 
-	files, err := os.ReadDir(srcDir)
+	files, err := ioutil.ReadDir(srcDir)
 	if err != nil {
 		return err
 	}
@@ -38,7 +43,7 @@ func MoveDirectory(srcDir, destDir string) error {
 		if exists, err := FileExists(dest); err != nil {
 			return err
 		} else if !exists {
-			if m := f.Type(); m&os.ModeSymlink != 0 {
+			if m := f.Mode(); m&os.ModeSymlink != 0 {
 				if err = moveSymlinks(src, dest); err != nil {
 					return err
 				}
@@ -64,7 +69,7 @@ func CopyDirectory(srcDir, destDir string) error {
 		return errors.New("destination dir must exist")
 	}
 
-	files, err := os.ReadDir(srcDir)
+	files, err := ioutil.ReadDir(srcDir)
 	if err != nil {
 		return err
 	}
@@ -73,16 +78,12 @@ func CopyDirectory(srcDir, destDir string) error {
 		src := filepath.Join(srcDir, f.Name())
 		dest := filepath.Join(destDir, f.Name())
 
-		if m := f.Type(); m&os.ModeSymlink != 0 {
+		if m := f.Mode(); m&os.ModeSymlink != 0 {
 			if err = moveSymlinks(src, dest); err != nil {
 				return err
 			}
 		} else if f.IsDir() {
-			fi, err := f.Info()
-			if err != nil {
-				return err
-			}
-			err = os.MkdirAll(dest, fi.Mode())
+			err = os.MkdirAll(dest, f.Mode())
 			if err != nil {
 				return err
 			}
@@ -95,13 +96,7 @@ func CopyDirectory(srcDir, destDir string) error {
 				return err
 			}
 
-			fi, err := f.Info()
-			if err != nil {
-				rc.Close()
-				return err
-			}
-
-			err = writeToFile(rc, dest, fi.Mode())
+			err = writeToFile(rc, dest, f.Mode())
 			if err != nil {
 				rc.Close()
 				return err
@@ -505,7 +500,7 @@ func filterURI(rawURL string) (string, error) {
 }
 
 func CheckSha256(filePath, expectedSha256 string) error {
-	content, err := os.ReadFile(filePath)
+	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
 	}

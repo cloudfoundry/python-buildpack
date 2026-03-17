@@ -1,7 +1,7 @@
 package bratshelper
 
 import (
-	"os"
+	"io/ioutil"
 	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
@@ -13,7 +13,7 @@ var cachedLanguage string
 
 func bpLanguage() string {
 	if cachedLanguage == "" {
-		file, err := os.ReadFile(filepath.Join(bpDir(), "manifest.yml"))
+		file, err := ioutil.ReadFile(filepath.Join(bpDir(), "manifest.yml"))
 		Expect(err).ToNot(HaveOccurred())
 		obj := make(map[string]interface{})
 		Expect(yaml.Unmarshal(file, &obj)).To(Succeed())

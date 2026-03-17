@@ -1,7 +1,7 @@
 package bratshelper
 
 import (
-	"os"
+	"io/ioutil"
 	"path/filepath"
 	"time"
 
@@ -22,7 +22,7 @@ func DestroyApp(app *cutlass.App) {
 
 func AddDotProfileScriptToApp(dir string) {
 	profilePath := filepath.Join(dir, ".profile")
-	Expect(os.WriteFile(profilePath, []byte(`#!/usr/bin/env bash
+	Expect(ioutil.WriteFile(profilePath, []byte(`#!/usr/bin/env bash
 echo PROFILE_SCRIPT_IS_PRESENT_AND_RAN
 `), 0755)).To(Succeed())
 }

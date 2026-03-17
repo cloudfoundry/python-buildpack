@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -46,7 +47,7 @@ func (i *Installer) InstallDependency(dep Dependency, outputDir string) error {
 func (i *Installer) InstallDependencyWithStrip(dep Dependency, outputDir string, stripComponents int) error {
 	i.manifest.log.BeginStep("Installing %s %s", dep.Name, dep.Version)
 
-	tmpDir, err := os.MkdirTemp("", "downloads")
+	tmpDir, err := ioutil.TempDir("", "downloads")
 	if err != nil {
 		return err
 	}
