@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,7 +39,7 @@ func Dir(dir string, logger Logger) *DirSnapshot {
 			dirSnapshot.initialChecksum = checksum
 		}
 
-		dirSnapshot.command.Execute(dir, io.Discard, io.Discard, "touch", "/tmp/checkpoint")
+		dirSnapshot.command.Execute(dir, ioutil.Discard, ioutil.Discard, "touch", "/tmp/checkpoint")
 	}
 
 	return dirSnapshot

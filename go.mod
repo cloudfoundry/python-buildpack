@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/Dynatrace/libbuildpack-dynatrace v1.8.0
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/cloudfoundry/libbuildpack v0.0.0-20260306125332-dcaf55eb6f33
+	github.com/cloudfoundry/libbuildpack v0.0.0-20260306121953-8ab9253c8181
 	github.com/cloudfoundry/switchblade v0.9.4
 	github.com/golang/mock v1.6.0
 	github.com/kr/text v0.2.0

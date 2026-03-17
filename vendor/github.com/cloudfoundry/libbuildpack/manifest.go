@@ -2,6 +2,7 @@ package libbuildpack
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -178,7 +179,7 @@ func (m *Manifest) Language() string {
 }
 
 func (m *Manifest) Version() (string, error) {
-	version, err := os.ReadFile(filepath.Join(m.manifestRootDir, "VERSION"))
+	version, err := ioutil.ReadFile(filepath.Join(m.manifestRootDir, "VERSION"))
 	if err != nil {
 		return "", fmt.Errorf("unable to read VERSION file %s", err)
 	}

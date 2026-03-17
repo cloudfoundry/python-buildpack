@@ -2,7 +2,7 @@ package packager
 
 import (
 	"fmt"
-	"os"
+	"io/ioutil"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -12,7 +12,7 @@ import (
 
 func Summary(bpDir string) (string, error) {
 	manifest := Manifest{}
-	data, err := os.ReadFile(filepath.Join(bpDir, "manifest.yml"))
+	data, err := ioutil.ReadFile(filepath.Join(bpDir, "manifest.yml"))
 	if err != nil {
 		return "", err
 	}

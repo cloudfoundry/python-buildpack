@@ -3,6 +3,7 @@ package libbuildpack
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -94,7 +95,7 @@ func (s *Stager) WriteEnvFile(envVar, envVal string) error {
 
 	}
 
-	return os.WriteFile(filepath.Join(envDir, envVar), []byte(envVal), 0644)
+	return ioutil.WriteFile(filepath.Join(envDir, envVar), []byte(envVal), 0644)
 }
 
 func (s *Stager) LinkDirectoryInDepDir(destDir, depSubDir string) error {
@@ -103,7 +104,7 @@ func (s *Stager) LinkDirectoryInDepDir(destDir, depSubDir string) error {
 		return err
 	}
 
-	files, err := os.ReadDir(destDir)
+	files, err := ioutil.ReadDir(destDir)
 	if err != nil {
 		return err
 	}
@@ -152,7 +153,7 @@ func (s *Stager) StagingComplete() {
 }
 
 func (s *Stager) ClearCache() error {
-	files, err := os.ReadDir(s.cacheDir)
+	files, err := ioutil.ReadDir(s.cacheDir)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -171,7 +172,7 @@ func (s *Stager) ClearCache() error {
 }
 
 func (s *Stager) ClearDepDir() error {
-	files, err := os.ReadDir(s.DepDir())
+	files, err := ioutil.ReadDir(s.DepDir())
 	if err != nil {
 		return err
 	}
@@ -233,14 +234,14 @@ func (s *Stager) SetStagingEnvironment() error {
 	}
 
 	for _, dir := range depsPaths {
-		files, err := os.ReadDir(dir)
+		files, err := ioutil.ReadDir(dir)
 		if err != nil {
 			return err
 		}
 
 		for _, file := range files {
-			if file.Type().IsRegular() {
-				val, err := os.ReadFile(filepath.Join(dir, file.Name()))
+			if file.Mode().IsRegular() {
+				val, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
 				if err != nil {
 					return err
 				}
@@ -292,13 +293,13 @@ func (s *Stager) SetLaunchEnvironment() error {
 
 		depsIdx := sections[len(sections)-2]
 
-		files, err := os.ReadDir(dir)
+		files, err := ioutil.ReadDir(dir)
 		if err != nil {
 			return err
 		}
 
 		for _, file := range files {
-			if file.Type().IsRegular() {
+			if file.Mode().IsRegular() {
 				src := filepath.Join(dir, file.Name())
 				dest := filepath.Join(s.profileDir, depsIdx+"_"+file.Name())
 
@@ -321,7 +322,7 @@ func (s *Stager) BuildpackVersion() (string, error) {
 }
 
 func existingDepsDirs(depsDir, subDir, prefix string) ([]string, error) {
-	files, err := os.ReadDir(depsDir)
+	files, err := ioutil.ReadDir(depsDir)
 	if err != nil {
 		return nil, err
 	}

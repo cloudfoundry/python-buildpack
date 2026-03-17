@@ -3,7 +3,7 @@ package libbuildpack
 import (
 	"bytes"
 	"encoding/json"
-	"os"
+	"io/ioutil"
 )
 
 type JSON struct {
@@ -30,7 +30,7 @@ func removeBOM(b []byte) []byte {
 }
 
 func (j *JSON) Load(file string, obj interface{}) error {
-	data, err := os.ReadFile(file)
+	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
 	}

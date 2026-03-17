@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -26,7 +27,7 @@ type sha struct {
 }
 
 func readManifest(bpDir string) (Manifest, error) {
-	data, err := os.ReadFile(filepath.Join(bpDir, "manifest.yml"))
+	data, err := ioutil.ReadFile(filepath.Join(bpDir, "manifest.yml"))
 	if err != nil {
 		return Manifest{}, err
 	}
@@ -52,7 +53,7 @@ func CompileExtensionPackage(bpDir, version string, cached bool, stack string) (
 		return "", fmt.Errorf("Failed to copy %s: %v", bpDir, err)
 	}
 
-	err = os.WriteFile(filepath.Join(dir, "VERSION"), []byte(version), 0644)
+	err = ioutil.WriteFile(filepath.Join(dir, "VERSION"), []byte(version), 0644)
 	if err != nil {
 		return "", fmt.Errorf("Failed to write VERSION file: %v", err)
 	}
@@ -167,7 +168,7 @@ func Package(bpDir, cacheDir, version, stack string, cached bool) (string, error
 	}
 	defer os.RemoveAll(dir)
 
-	err = os.WriteFile(filepath.Join(dir, "VERSION"), []byte(version), 0644)
+	err = ioutil.WriteFile(filepath.Join(dir, "VERSION"), []byte(version), 0644)
 	if err != nil {
 		return "", err
 	}
@@ -303,7 +304,7 @@ func DownloadFromURI(uri, fileName string) error {
 }
 
 func checkSha256(filePath, expectedSha256 string) error {
-	content, err := os.ReadFile(filePath)
+	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -372,7 +373,7 @@ func ZipFiles(filename string, files []File) error {
 }
 
 func CopyDirectory(srcDir string) (string, error) {
-	destDir, err := os.MkdirTemp("", "buildpack-packager")
+	destDir, err := ioutil.TempDir("", "buildpack-packager")
 	if err != nil {
 		return "", err
 	}
