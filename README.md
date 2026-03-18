@@ -10,6 +10,20 @@ This buildpack supports running Django and Flask apps.
 
 Official buildpack documentation can be found at [python buildpack docs](http://docs.cloudfoundry.org/buildpacks/python/index.html).
 
+## Adding new dependencies
+
+If you want to add a new dependency to the buildpack, please add it to the [config.yml](https://github.com/ZPascal/buildpacks-ci/blob/81d4f7942a9e4f01196ab654b6a5f89681015d41/pipelines/dependency-builds/config.yml#L272) file. For example, if you want to add a new version of Python, add an entry like the following:
+
+```yaml
+python:
+  lines:
+    - line: 3.14.X
+      deprecation_date: 2030-10-07
+      link: https://peps.python.org/pep-0745/
+```
+
+The new dependency will be automatically added to the buildpack [manifest.yml](manifest.yml) file.
+
 ### Building the Buildpack
 
 To build this buildpack, run the following commands from the buildpack's directory:
@@ -24,7 +38,7 @@ To build this buildpack, run the following commands from the buildpack's directo
 1. Install buildpack-packager
 
     ```bash
-    go install github.com/cloudfoundry/libbuildpack/packager/buildpack-packager
+    go install github.com/cloudfoundry/libbuildpack/packager/buildpack-packager@latest
     ```
 
 1. Build the buildpack
