@@ -4,7 +4,7 @@
 
 All pull request authors must have a Contributor License Agreement (CLA) on-file with us. Please sign the Contributor License Agreements for Cloud Foundry ([Individual or Corporate](https://www.cloudfoundry.org/community/cla/)) via the EasyCLA application when you submit your first Pull Request.
 
-When sending signed CLA please provide your github username in case of individual CLA or the list of github usernames that can make pull requests on behalf of your organization.
+When sending signed CLA please provide your Github username in case of individual CLA or the list of Github usernames that can make pull requests on behalf of your organization.
 
 If you are confident that you're covered under a Corporate CLA, please make sure you've publicized your membership in the appropriate Github Org, per these instructions.
 
