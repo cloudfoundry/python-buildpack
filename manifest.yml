@@ -29,6 +29,15 @@ dependency_deprecation_dates:
   date: 2025-10-05
   link: https://www.python.org/dev/peps/pep-0596/
 dependencies:
+- name: flit-core
+  version: 3.12.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_3.12.0_linux_noarch_any-stack_ce08b8fa.tgz
+  sha256: ce08b8faf08c0be08c4c8c5617442bf36641e8c1cc26e9c3ad295d70252edffb
+  cf_stacks:
+  - cflinuxfs4
+  - cflinuxfs5
+  source: https://files.pythonhosted.org/packages/69/59/b6fc2188dfc7ea4f936cd12b49d707f66a1cb7a1d2c16172963534db741b/flit_core-3.12.0.tar.gz
+  source_sha256: 18f63100d6f94385c6ed57a72073443e1a71a4acb4339491615d0f16d6ff01b2
 - name: libffi
   version: 3.2.1
   cf_stacks:
