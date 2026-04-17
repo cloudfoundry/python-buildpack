@@ -24,10 +24,6 @@ dependency_deprecation_dates:
   name: python
   date: 2030-10-07
   link: https://peps.python.org/pep-0745/
-- version_line: 3.9.x
-  name: python
-  date: 2025-10-05
-  link: https://www.python.org/dev/peps/pep-0596/
 dependencies:
 - name: flit-core
   version: 3.12.0
@@ -117,22 +113,6 @@ dependencies:
   - cflinuxfs5
   source: https://files.pythonhosted.org/packages/aa/e6/76aa6cdab85d93b2d198337ad57f833f6ae9d313d9a1115090a04271a9b2/pipenv-2026.2.0.tar.gz
   source_sha256: 47533756050acbd7142ecd0d27bb6ca1f10c951ec8d7cd8ac9e94c6f9daca443
-- name: python
-  version: 3.9.24
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.24_linux_x64_cflinuxfs3_e7fcaa7e.tgz
-  sha256: e7fcaa7ebfab1610a902c86a886515b8db074039284bdf6deb54353d664a5e79
-  cf_stacks:
-  - cflinuxfs3
-  source: https://www.python.org/ftp/python/3.9.24/Python-3.9.24.tgz
-  source_sha256: 9a32cfc683aecaadbd9ed891ac2af9451ff37f48a00a2d8e1f4ecd9c2a1ffdcb
-- name: python
-  version: 3.9.25
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.9.25_linux_x64_cflinuxfs4_47183960.tgz
-  sha256: 47183960e453a25d6e30b763a6e868f812b58234ba747f2a380c241109b8856c
-  cf_stacks:
-  - cflinuxfs4
-  source: https://www.python.org/ftp/python/3.9.25/Python-3.9.25.tgz
-  source_sha256: a7438eabd3a48139f42d4e058096af8d880b0bb6e8fb8c78838892e4ce5583f2
 - name: python
   version: 3.10.19
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.19_linux_x64_cflinuxfs3_d754b71d.tgz
