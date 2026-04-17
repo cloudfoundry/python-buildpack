@@ -246,23 +246,14 @@ dependencies:
   source: https://www.python.org/ftp/python/3.14.3/Python-3.14.3.tgz
   source_sha256: d7fe130d0501ae047ca318fa92aa642603ab6f217901015a1df6ce650d5470cd
 - name: setuptools
-  version: 80.9.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_80.9.0_linux_noarch_any-stack_db9ec7d3.tgz
-  sha256: db9ec7d3c1b8e1494852b7228c3de7dd7449a1c4a53297ea9633a117eedf6787
-  cf_stacks:
-  - cflinuxfs4
-  - cflinuxfs3
-  source: https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz
-  source_sha256: f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c
-- name: setuptools
-  version: 82.0.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_82.0.0_linux_noarch_any-stack_284f639c.tgz
-  sha256: 284f639c6d85d6f159daa5eb35a28f0351f185ffebb50bd6deebf73d8d3ca444
+  version: 82.0.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_82.0.1_linux_noarch_any-stack_934b4323.tgz
+  sha256: 934b4323475131e04577a24eff3774f75a1219948f49c63afcd5e35a507d8ba7
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/82/f3/748f4d6f65d1756b9ae577f329c951cda23fb900e4de9f70900ced962085/setuptools-82.0.0.tar.gz
-  source_sha256: 22e0a2d69474c6ae4feb01951cb69d515ed23728cf96d05513d36e42b62b37cb
+  source: https://files.pythonhosted.org/packages/4f/db/cfac1baf10650ab4d1c111714410d2fbb77ac5a616db26775db562c8fab2/setuptools-82.0.1.tar.gz
+  source_sha256: 7d872682c5d01cfde07da7bccc7b65469d3dca203318515ada1de5eda35efbf9
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
