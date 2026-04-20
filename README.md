@@ -12,7 +12,7 @@ Official buildpack documentation can be found at [python buildpack docs](http://
 
 ## Adding new dependencies
 
-If you want to add a new dependency to the buildpack, please add it to the [config.yml](https://github.com/ZPascal/buildpacks-ci/blob/81d4f7942a9e4f01196ab654b6a5f89681015d41/pipelines/dependency-builds/config.yml#L272) file. For example, if you want to add a new version of Python, add an entry like the following:
+If you want to add a new dependency to the buildpack, please add it to the [config.yml](https://github.com/cloudfoundry/buildpacks-ci/blob/5a63d13df09f83d5dff7c71d0a12c3e2dc798d39/pipelines/dependency-builds/config.yml#L272) file. For example, if you want to add a new version of Python, add an entry like the following:
 
 ```yaml
 python:
