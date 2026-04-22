@@ -633,9 +633,11 @@ MarkupSafe==2.0.1
 
 	Describe("InstallCommonBuildDependencies", func() {
 		Context("successful installation", func() {
-			It("bootstraps flit-core, wheel and setuptools", func() {
+			It("bootstraps flit-core, poetry-core, wheel and setuptools", func() {
 				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
 				mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
+				mockInstaller.EXPECT().InstallOnlyVersion("poetry-core", "/tmp/common_build_deps")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--no-build-isolation", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "setuptools", "--no-index", "--no-build-isolation", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
@@ -644,19 +646,42 @@ MarkupSafe==2.0.1
 			})
 		})
 
-	Context("flit-core bootstrap fails", func() {
-		It("returns a useful error message", func() {
-			mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
-			mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
-			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation").Return(fmt.Errorf("bootstrap-error"))
-			Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not bootstrap-install flit-core: bootstrap-error"))
+		Context("flit-core bootstrap fails", func() {
+			It("returns a useful error message", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
+				mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation").Return(fmt.Errorf("bootstrap-error"))
+				Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not bootstrap-install flit-core: bootstrap-error"))
+			})
 		})
-	})
+
+		Context("poetry-core preparation fails", func() {
+			It("returns a useful error message", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
+				mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
+				mockInstaller.EXPECT().InstallOnlyVersion("poetry-core", "/tmp/common_build_deps").Return(fmt.Errorf("prepare-error"))
+				Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not prepare build-time dependency poetry-core: prepare-error"))
+			})
+		})
+
+		Context("poetry-core bootstrap fails", func() {
+			It("returns a useful error message", func() {
+				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
+				mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
+				mockInstaller.EXPECT().InstallOnlyVersion("poetry-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation").Return(fmt.Errorf("poetry-error"))
+				Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not bootstrap-install poetry-core: poetry-error"))
+			})
+		})
 
 		Context("wheel installation fails", func() {
 			It("returns a useful error message", func() {
 				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
 				mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
+				mockInstaller.EXPECT().InstallOnlyVersion("poetry-core", "/tmp/common_build_deps")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--no-build-isolation", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps").Return(fmt.Errorf("some-pip-error"))
 				Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not install build-time dependency wheel: some-pip-error"))
