@@ -633,22 +633,32 @@ MarkupSafe==2.0.1
 
 	Describe("InstallCommonBuildDependencies", func() {
 		Context("successful installation", func() {
-			It("runs command to install wheel and setuptools", func() {
+			It("bootstraps flit-core, wheel and setuptools", func() {
 				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "setuptools", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
+				mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--no-build-isolation", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "setuptools", "--no-index", "--no-build-isolation", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps")
 
 				Expect(supplier.InstallCommonBuildDependencies()).To(Succeed())
 			})
 		})
 
-		Context("installation fails", func() {
-			BeforeEach(func() {
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps").Return(fmt.Errorf("some-pip-error"))
-			})
+	Context("flit-core bootstrap fails", func() {
+		It("returns a useful error message", func() {
+			mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
+			mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+			mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation").Return(fmt.Errorf("bootstrap-error"))
+			Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not bootstrap-install flit-core: bootstrap-error"))
+		})
+	})
 
+		Context("wheel installation fails", func() {
 			It("returns a useful error message", func() {
-				mockInstaller.EXPECT().InstallOnlyVersion(gomock.Any(), gomock.Any()).Times(1)
+				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/common_build_deps")
+				mockInstaller.EXPECT().InstallOnlyVersion("flit-core", "/tmp/common_build_deps")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "/tmp/common_build_deps", "--no-build-isolation")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "wheel", "--no-index", "--no-build-isolation", "--upgrade-strategy=only-if-needed", "--find-links=/tmp/common_build_deps").Return(fmt.Errorf("some-pip-error"))
 				Expect(supplier.InstallCommonBuildDependencies()).To(MatchError("could not install build-time dependency wheel: some-pip-error"))
 			})
 		})

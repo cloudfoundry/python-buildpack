@@ -743,15 +743,23 @@ func (s *Supplier) RunPipVendored() error {
 // dependencies - wheel and setuptools. These are packaged by the dependency
 // pipeline within the "pip" dependency.
 func (s *Supplier) InstallCommonBuildDependencies() error {
-	var commonDeps = []string{"wheel", "setuptools"}
 	tempPath := filepath.Join("/tmp", "common_build_deps")
 	if err := s.Installer.InstallOnlyVersion("pip", tempPath); err != nil {
 		return err
 	}
+	if err := s.Installer.InstallOnlyVersion("flit-core", tempPath); err != nil {
+		return err
+	}
 
-	for _, dep := range commonDeps {
+	s.Log.Info("Installing build-time dependency flit-core (bootstrap)")
+	args := []string{tempPath, "--no-build-isolation"}
+	if err := s.runPipInstall(args...); err != nil {
+		return fmt.Errorf("could not bootstrap-install flit-core: %v", err)
+	}
+
+	for _, dep := range []string{"wheel", "setuptools"} {
 		s.Log.Info("Installing build-time dependency %s", dep)
-		args := []string{dep, "--no-index", "--upgrade-strategy=only-if-needed", fmt.Sprintf("--find-links=%s", tempPath)}
+		args := []string{dep, "--no-index", "--no-build-isolation", "--upgrade-strategy=only-if-needed", fmt.Sprintf("--find-links=%s", tempPath)}
 		if err := s.runPipInstall(args...); err != nil {
 			return fmt.Errorf("could not install build-time dependency %s: %v", dep, err)
 		}
