@@ -98,21 +98,21 @@ dependencies:
   source: https://files.pythonhosted.org/packages/ca/5b/8ce5227713d692913c186d9a3164eee0236fbc3eaca87d7e2bd5dbb1da36/pipenv-2024.4.1.tar.gz
   source_sha256: e8ea6105c1cdda7d5c19df7bd6439a006751f3d4e017602c791e7b51314adf84
 - name: pipenv
-  version: 2026.5.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2026.5.2_linux_noarch_cflinuxfs4_74c1a3ab.tgz
-  sha256: 74c1a3ab922ae87de22698eeec0aaa7ba54a1b7af767144eb52d34ef0c7acab5
+  version: 2026.6.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2026.6.0_linux_noarch_cflinuxfs4_58f104da.tgz
+  sha256: 58f104dad8efcc80eea9c36a6d020460378d95762d809e63904b822692ef557b
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/00/bf/9e5a536eae91adcbed6ee9c44861250bdfdc42bf2663680ce44cf5253fdb/pipenv-2026.5.2.tar.gz
-  source_sha256: cf5985038a4cc4a1ffe9b48a2e580d2595245823dcc5684d07b1a53929ab47cc
+  source: https://files.pythonhosted.org/packages/64/23/ea62f9e90c15cf4070e6a44aacacb667c2d723e624e830a591d2fbddf36c/pipenv-2026.6.0.tar.gz
+  source_sha256: 84262cc298ffed36f7463d8c16255d9edf63e5fda5dbee8ccc4a80f6d774590f
 - name: pipenv
-  version: 2026.5.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2026.5.2_linux_noarch_cflinuxfs5_569f70b0.tgz
-  sha256: 569f70b09c3b3440c6385aad160bef6b3539fd7b6211a73bfe41600d8b3fdfad
+  version: 2026.6.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2026.6.0_linux_noarch_cflinuxfs5_643f9994.tgz
+  sha256: 643f99946ef3aa89e3ee9222b522309bf64b2e294d647811d255bd85e2fe0ba0
   cf_stacks:
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/00/bf/9e5a536eae91adcbed6ee9c44861250bdfdc42bf2663680ce44cf5253fdb/pipenv-2026.5.2.tar.gz
-  source_sha256: cf5985038a4cc4a1ffe9b48a2e580d2595245823dcc5684d07b1a53929ab47cc
+  source: https://files.pythonhosted.org/packages/64/23/ea62f9e90c15cf4070e6a44aacacb667c2d723e624e830a591d2fbddf36c/pipenv-2026.6.0.tar.gz
+  source_sha256: 84262cc298ffed36f7463d8c16255d9edf63e5fda5dbee8ccc4a80f6d774590f
 - name: poetry-core
   version: 2.3.2
   uri: https://buildpacks.cloudfoundry.org/dependencies/poetry-core/poetry-core_2.3.2_linux_noarch_cflinuxfs4_d72fba6b.tgz
