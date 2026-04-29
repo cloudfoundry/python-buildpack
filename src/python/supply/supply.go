@@ -747,14 +747,14 @@ func (s *Supplier) InstallCommonBuildDependencies() error {
 	if err := s.Installer.InstallOnlyVersion("pip", tempPath); err != nil {
 		return err
 	}
-	if err := s.Installer.InstallOnlyVersion("flit-core", tempPath); err != nil {
-		return err
-	}
-
-	s.Log.Info("Installing build-time dependency flit-core (bootstrap)")
-	args := []string{tempPath, "--no-build-isolation"}
-	if err := s.runPipInstall(args...); err != nil {
-		return fmt.Errorf("could not bootstrap-install flit-core: %v", err)
+	for _, dep := range []string{"flit-core", "poetry-core"} {
+		if err := s.Installer.InstallOnlyVersion(dep, tempPath); err != nil {
+			return fmt.Errorf("could not prepare build-time dependency %s: %v", dep, err)
+		}
+		s.Log.Info("Installing build-time dependency %s (bootstrap)", dep)
+		if err := s.runPipInstall(tempPath, "--no-build-isolation"); err != nil {
+			return fmt.Errorf("could not bootstrap-install %s: %v", dep, err)
+		}
 	}
 
 	for _, dep := range []string{"wheel", "setuptools"} {
@@ -764,6 +764,8 @@ func (s *Supplier) InstallCommonBuildDependencies() error {
 			return fmt.Errorf("could not install build-time dependency %s: %v", dep, err)
 		}
 	}
+
+
 	return nil
 }
 
