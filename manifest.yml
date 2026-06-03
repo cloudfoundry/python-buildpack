@@ -236,8 +236,8 @@ dependencies:
   source_sha256: b4c059d5895f030e7df9663894ce3732bfa1b32cd3ab2883980266a45ce3cb3b
 - name: setuptools
   version: 82.0.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_82.0.1_linux_noarch_any-stack_934b4323.tgz
-  sha256: 934b4323475131e04577a24eff3774f75a1219948f49c63afcd5e35a507d8ba7
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_82.0.1_linux_noarch_cflinuxfs4_37ffb2f1.tgz
+  sha256: 37ffb2f161394d9ccb578cee2dca5a2432a24f48af7910a9546e3ef0af356bfe
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs5
