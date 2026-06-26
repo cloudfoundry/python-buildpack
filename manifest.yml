@@ -27,8 +27,8 @@ dependency_deprecation_dates:
 dependencies:
 - name: flit-core
   version: 3.12.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_3.12.0_linux_noarch_any-stack_ce08b8fa.tgz
-  sha256: ce08b8faf08c0be08c4c8c5617442bf36641e8c1cc26e9c3ad295d70252edffb
+  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_3.12.0_linux_noarch_cflinuxfs4_2e12c5e8.tgz
+  sha256: 2e12c5e8572cdb9c2c4010eb133f9a49e219d12e18a3c81f7c8cc62ddb5d343e
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs5
