@@ -114,14 +114,14 @@ dependencies:
   source: https://files.pythonhosted.org/packages/00/bf/9e5a536eae91adcbed6ee9c44861250bdfdc42bf2663680ce44cf5253fdb/pipenv-2026.5.2.tar.gz
   source_sha256: cf5985038a4cc4a1ffe9b48a2e580d2595245823dcc5684d07b1a53929ab47cc
 - name: poetry-core
-  version: 2.4.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/poetry-core/poetry-core_2.4.0_linux_noarch_cflinuxfs4_cd4ae6ac.tgz
-  sha256: cd4ae6ac3e7afb4a0541522d04c630e55c73866812036714045521b1eda7f387
+  version: 2.4.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/poetry-core/poetry-core_2.4.1_linux_noarch_cflinuxfs4_e8608303.tgz
+  sha256: e8608303f2f76854a35a5ffe33bf8f89887b639a4bc2aef0d2e024732552ba02
   cf_stacks:
   - cflinuxfs4
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/b0/97/f7bb55470bb7890d9b3d3f9fa761083d5c9a6838b17c94a41bf2939f89ef/poetry_core-2.4.0.tar.gz
-  source_sha256: 4e8c7496cf797998ffc493f2e23eba4b038c894c08eadacdcdf688945de6b43a
+  source: https://files.pythonhosted.org/packages/b2/f2/fa88c58efb9a737c7e0e40e470edd0973fe33f0f277d24dcf17454b50974/poetry_core-2.4.1.tar.gz
+  source_sha256: 89dceb6c10e9c6d8650a16183400e3c9ff9ddee13b0a81023b5575334a2b3744
 - name: python
   version: 3.10.19
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.19_linux_x64_cflinuxfs3_d754b71d.tgz
