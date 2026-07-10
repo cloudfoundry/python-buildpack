@@ -341,6 +341,13 @@ func (s *Supplier) InstallPip() error {
 		return err
 	}
 
+	// pip 26+ requires flit-core as a build dependency
+	// Install it to the same tempPath so pip can find it during build
+	if err := s.Installer.InstallOnlyVersion("flit-core", tempPath); err != nil {
+		// Log warning but continue - older pip versions don't need flit-core
+		s.Log.Warning("Could not install flit-core (required for pip 26+): %v", err)
+	}
+
 	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
 		"python",
 		"-m", "pip",
