@@ -27,10 +27,17 @@ dependency_deprecation_dates:
 dependencies:
 - name: flit-core
   version: 3.12.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_3.12.0_linux_noarch_any-stack_ce08b8fa.tgz
-  sha256: ce08b8faf08c0be08c4c8c5617442bf36641e8c1cc26e9c3ad295d70252edffb
+  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_3.12.0_linux_noarch_cflinuxfs4_37419af8.tgz
+  sha256: 37419af8c6ebb4e7665ef4d2ed0d92a7aa6d9f9dce2afcdf50467e6f1c8ea7ca
   cf_stacks:
   - cflinuxfs4
+  source: https://files.pythonhosted.org/packages/69/59/b6fc2188dfc7ea4f936cd12b49d707f66a1cb7a1d2c16172963534db741b/flit_core-3.12.0.tar.gz
+  source_sha256: 18f63100d6f94385c6ed57a72073443e1a71a4acb4339491615d0f16d6ff01b2
+- name: flit-core
+  version: 3.12.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_3.12.0_linux_noarch_cflinuxfs5_9c3d597a.tgz
+  sha256: 9c3d597a1afaeca6d26268e0c225d6d10ea11353c3640be4bb9c49e68aa34ff9
+  cf_stacks:
   - cflinuxfs5
   source: https://files.pythonhosted.org/packages/69/59/b6fc2188dfc7ea4f936cd12b49d707f66a1cb7a1d2c16172963534db741b/flit_core-3.12.0.tar.gz
   source_sha256: 18f63100d6f94385c6ed57a72073443e1a71a4acb4339491615d0f16d6ff01b2
@@ -77,18 +84,25 @@ dependencies:
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_25.2_linux_noarch_any-stack_7dc1e988.tgz
   sha256: 7dc1e9882eb18f53150261c3a0cde7d5a39cdb18843c930ee01db8582f6b4f27
   cf_stacks:
-  - cflinuxfs5
-  - cflinuxfs4
   - cflinuxfs3
   source: https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
   source_sha256: 578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2
 - name: pip
-  version: 26.0.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_26.0.1_linux_noarch_any-stack_0750a38b.tgz
-  sha256: 0750a38b65c6038a0415a4ff15ef2df61fcaa6c1e5ec9d8c6678222dbac91306
-  cf_stacks: []
-  source: https://files.pythonhosted.org/packages/48/83/0d7d4e9efe3344b8e2fe25d93be44f64b65364d3c8d7bc6dc90198d5422e/pip-26.0.1.tar.gz
-  source_sha256: c4037d8a277c89b320abe636d59f91e6d0922d08a05b60e85e53b296613346d8
+  version: 26.2.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_26.2.1_linux_noarch_cflinuxfs4_22e7a825.tgz
+  sha256: 22e7a8258b20b0f50f713d1e506c228c1ca7620aa3b483b67266b90392eeb91e
+  cf_stacks:
+  - cflinuxfs4
+  source: https://files.pythonhosted.org/packages/ae/15/4500e320e6b101ec3b719ae85b697d9940b6cda672bc555bd6016fc60c6f/pip-26.2.1.tar.gz
+  source_sha256: f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f
+- name: pip
+  version: 26.2.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_26.2.1_linux_noarch_cflinuxfs5_22e7a825.tgz
+  sha256: 22e7a8258b20b0f50f713d1e506c228c1ca7620aa3b483b67266b90392eeb91e
+  cf_stacks:
+  - cflinuxfs5
+  source: https://files.pythonhosted.org/packages/ae/15/4500e320e6b101ec3b719ae85b697d9940b6cda672bc555bd6016fc60c6f/pip-26.2.1.tar.gz
+  source_sha256: f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f
 - name: pipenv
   version: 2024.4.1
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2024.4.1_linux_noarch_cflinuxfs3_b3c74c78.tgz
@@ -114,14 +128,21 @@ dependencies:
   source: https://files.pythonhosted.org/packages/00/bf/9e5a536eae91adcbed6ee9c44861250bdfdc42bf2663680ce44cf5253fdb/pipenv-2026.5.2.tar.gz
   source_sha256: cf5985038a4cc4a1ffe9b48a2e580d2595245823dcc5684d07b1a53929ab47cc
 - name: poetry-core
-  version: 2.3.2
-  uri: https://buildpacks.cloudfoundry.org/dependencies/poetry-core/poetry-core_2.3.2_linux_noarch_cflinuxfs4_d72fba6b.tgz
-  sha256: d72fba6be08a3ba47acce01261b14cd5a54100fea3c9e3ede867ca7d5c207397
+  version: 2.4.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/poetry-core/poetry-core_2.4.1_linux_noarch_cflinuxfs4_a87a0beb.tgz
+  sha256: a87a0beb31ec3dcf74cafb3c98376784b2bdd422fb2c14d4a527b2ee9e3e4f2e
   cf_stacks:
   - cflinuxfs4
+  source: https://files.pythonhosted.org/packages/b2/f2/fa88c58efb9a737c7e0e40e470edd0973fe33f0f277d24dcf17454b50974/poetry_core-2.4.1.tar.gz
+  source_sha256: 89dceb6c10e9c6d8650a16183400e3c9ff9ddee13b0a81023b5575334a2b3744
+- name: poetry-core
+  version: 2.4.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/poetry-core/poetry-core_2.4.1_linux_noarch_cflinuxfs5_d80c5384.tgz
+  sha256: d80c5384da537f0e70b45bd617342a5976a87d1e6ca7492a8c2bf9d94005bd28
+  cf_stacks:
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/10/48/5b4f344c252ee2f75051b6bf7dfb68ab53aa00a107f5f8e5cbf795701dad/poetry_core-2.3.2.tar.gz
-  source_sha256: 20cb71be27b774628da9f384effd9183dfceb53bcef84063248a8672aa47031f
+  source: https://files.pythonhosted.org/packages/b2/f2/fa88c58efb9a737c7e0e40e470edd0973fe33f0f277d24dcf17454b50974/poetry_core-2.4.1.tar.gz
+  source_sha256: 89dceb6c10e9c6d8650a16183400e3c9ff9ddee13b0a81023b5575334a2b3744
 - name: python
   version: 3.10.19
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.19_linux_x64_cflinuxfs3_d754b71d.tgz
@@ -235,14 +256,21 @@ dependencies:
   source: https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tgz
   source_sha256: b4c059d5895f030e7df9663894ce3732bfa1b32cd3ab2883980266a45ce3cb3b
 - name: setuptools
-  version: 82.0.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_82.0.1_linux_noarch_any-stack_934b4323.tgz
-  sha256: 934b4323475131e04577a24eff3774f75a1219948f49c63afcd5e35a507d8ba7
+  version: 84.0.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_84.0.0_linux_noarch_cflinuxfs4_dc798ecb.tgz
+  sha256: dc798ecb1eb2ed9375f94fa2b9bbedd0516f0184e6cb33598b94a4e3bbe4cc82
   cf_stacks:
   - cflinuxfs4
+  source: https://files.pythonhosted.org/packages/6d/44/f5da03a8ef95d369145c5bb53050e7877c9f3d312e128605fd9504829143/setuptools-84.0.0.tar.gz
+  source_sha256: f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73
+- name: setuptools
+  version: 84.0.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_84.0.0_linux_noarch_cflinuxfs5_bbb8d7e4.tgz
+  sha256: bbb8d7e47d541c55ff4a99808118a4ffdd2a5418615d0236b8a33d76335c0a06
+  cf_stacks:
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/4f/db/cfac1baf10650ab4d1c111714410d2fbb77ac5a616db26775db562c8fab2/setuptools-82.0.1.tar.gz
-  source_sha256: 7d872682c5d01cfde07da7bccc7b65469d3dca203318515ada1de5eda35efbf9
+  source: https://files.pythonhosted.org/packages/6d/44/f5da03a8ef95d369145c5bb53050e7877c9f3d312e128605fd9504829143/setuptools-84.0.0.tar.gz
+  source_sha256: f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
