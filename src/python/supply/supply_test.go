@@ -394,17 +394,23 @@ var _ = Describe("Supply", func() {
 				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
 			})
 
-			It("installs uv and generates requirements.txt with uv export", func() {
+			It("installs uv and generates requirements.txt with hashes using uv export", func() {
+				const exported = "flask==3.1.3 \\\n    --hash=sha256:4eda\ngunicorn==26.2.0 \\\n    --hash=sha256:17ef\n"
 				mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
 					Expect(cmd.Path).To(Equal("/tmp/uv/uv"))
 					Expect(cmd.Args[1:]).To(Equal([]string{
 						"export", "--frozen", "--format", "requirements-txt",
-						"--no-dev", "--no-editable", "--no-hashes", "--no-header", "--no-annotate",
+						"--no-dev", "--no-editable", "--no-header", "--no-annotate",
 					}))
 					Expect(cmd.Dir).To(Equal(buildDir))
-					Expect(cmd.Env).To(ContainElements("UV_NO_CACHE=1", "UV_PYTHON_DOWNLOADS=never"))
-					return []byte("flask==3.1.3\ngunicorn==26.2.0\n"), nil
+					Expect(cmd.Env).To(ContainElements(
+						"UV_CACHE_DIR="+filepath.Join(cacheDir, "uv_cache"),
+						"UV_PYTHON="+filepath.Join(depDir, "python", "bin", "python"),
+						"UV_PYTHON_DOWNLOADS=never",
+						"UV_SYSTEM_CERTS=1",
+					))
+					return []byte(exported), nil
 				})
 
 				Expect(supplier.InstallUv()).To(Succeed())
@@ -412,110 +418,24 @@ var _ = Describe("Supply", func() {
 
 				requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(requirementsContents)).To(Equal("flask==3.1.3\ngunicorn==26.2.0\n"))
+				Expect(string(requirementsContents)).To(Equal(exported))
 			})
 
-			Context("when uv.lock uses package indexes other than PyPI", func() {
+			Context("when UV_SYSTEM_CERTS is set by the app", func() {
 				BeforeEach(func() {
-					const uvLock = `version = 1
-requires-python = ">=3.10"
+					DeferCleanup(os.Unsetenv, "UV_SYSTEM_CERTS")
+					Expect(os.Setenv("UV_SYSTEM_CERTS", "false")).To(Succeed())
+				})
 
-[[package]]
-name = "flask"
-version = "3.1.3"
-source = { registry = "https://pypi.org/simple" }
-
-[[package]]
-name = "internal-lib"
-version = "1.0.0"
-source = { registry = "https://artifactory.example.com/api/pypi/pypi/simple/" }
-
-[[package]]
-name = "other-lib"
-version = "2.0.0"
-source = { registry = "https://artifactory.example.com/api/pypi/pypi/simple/" }
-
-[[package]]
-name = "my-app"
-version = "0.1.0"
-source = { virtual = "." }
-`
-					Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte(uvLock), 0644)).To(Succeed())
+				It("does not override it", func() {
 					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
-					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("flask==3.1.3\ninternal-lib==1.0.0\n"), nil)
-				})
-
-				It("adds the indexes to requirements.txt", func() {
-					Expect(supplier.InstallUv()).To(Succeed())
-
-					requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(string(requirementsContents)).To(Equal(
-						"-i https://pypi.org/simple\n" +
-							"--extra-index-url https://artifactory.example.com/api/pypi/pypi/simple\n" +
-							"flask==3.1.3\ninternal-lib==1.0.0\n"))
-				})
-
-				Context("when PIP_INDEX_URL is set", func() {
-					BeforeEach(func() {
-						DeferCleanup(os.Unsetenv, "PIP_INDEX_URL")
-						Expect(os.Setenv("PIP_INDEX_URL", "https://mirror.example.com/simple")).To(Succeed())
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
+						Expect(cmd.Env).To(ContainElement("UV_SYSTEM_CERTS=false"))
+						Expect(cmd.Env).NotTo(ContainElement("UV_SYSTEM_CERTS=1"))
+						return []byte("flask==3.1.3\n"), nil
 					})
 
-					It("does not add indexes to requirements.txt", func() {
-						Expect(supplier.InstallUv()).To(Succeed())
-						Expect(buffer.String()).To(ContainSubstring("Using pip index configuration from environment instead of uv.lock"))
-
-						requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
-						Expect(err).ToNot(HaveOccurred())
-						Expect(string(requirementsContents)).To(Equal("flask==3.1.3\ninternal-lib==1.0.0\n"))
-					})
-				})
-			})
-
-			Context("when uv.lock only uses a single private index", func() {
-				BeforeEach(func() {
-					const uvLock = `version = 1
-
-[[package]]
-name = "internal-lib"
-version = "1.0.0"
-source = { registry = "https://artifactory.example.com/simple" }
-`
-					Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte(uvLock), 0644)).To(Succeed())
-					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
-					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("internal-lib==1.0.0\n"), nil)
-				})
-
-				It("uses it as the primary index", func() {
 					Expect(supplier.InstallUv()).To(Succeed())
-
-					requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(string(requirementsContents)).To(Equal("-i https://artifactory.example.com/simple\ninternal-lib==1.0.0\n"))
-				})
-			})
-
-			Context("when uv.lock only uses PyPI", func() {
-				BeforeEach(func() {
-					const uvLock = `version = 1
-
-[[package]]
-name = "flask"
-version = "3.1.3"
-source = { registry = "https://pypi.org/simple" }
-`
-					Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte(uvLock), 0644)).To(Succeed())
-					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
-					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("flask==3.1.3\n"), nil)
-				})
-
-				It("does not add index options", func() {
-					Expect(supplier.InstallUv()).To(Succeed())
-
-					requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(string(requirementsContents)).To(Equal("flask==3.1.3\n"))
 				})
 			})
 
@@ -536,6 +456,34 @@ source = { registry = "https://pypi.org/simple" }
 					Expect(supplier.InstallUv()).To(MatchError("failed to export uv.lock: exit status 2"))
 					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
 				})
+			})
+		})
+	})
+
+	Describe("RunUvSync", func() {
+		It("installs the locked packages into the Python installation", func() {
+			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
+				Expect(cmd.Path).To(Equal("/tmp/uv/uv"))
+				Expect(cmd.Args[1:]).To(Equal([]string{"sync", "--frozen", "--no-dev", "--no-editable", "--inexact"}))
+				Expect(cmd.Dir).To(Equal(buildDir))
+				Expect(cmd.Env).To(ContainElements(
+					"UV_PROJECT_ENVIRONMENT="+filepath.Join(depDir, "python"),
+					"UV_PYTHON="+filepath.Join(depDir, "python", "bin", "python"),
+					"UV_PYTHON_DOWNLOADS=never",
+				))
+				return nil
+			})
+			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+
+			Expect(supplier.RunUvSync()).To(Succeed())
+			Expect(buffer.String()).To(ContainSubstring("Running uv sync"))
+		})
+
+		Context("when uv sync fails", func() {
+			It("returns a useful error", func() {
+				mockCommand.EXPECT().Run(gomock.Any()).Return(errors.New("exit status 1"))
+
+				Expect(supplier.RunUvSync()).To(MatchError("could not run uv sync: exit status 1"))
 			})
 		})
 	})

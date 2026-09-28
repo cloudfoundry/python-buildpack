@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strings"
 
 	"github.com/cloudfoundry/python-buildpack/src/python/conda"
@@ -22,6 +21,8 @@ import (
 )
 
 const EnvPipVersion = "BP_PIP_VERSION"
+
+var uvDir = filepath.Join("/tmp", "uv")
 
 type Stager interface {
 	BuildDir() string
@@ -48,6 +49,7 @@ type Installer interface {
 type Command interface {
 	Execute(dir string, stdout io.Writer, stderr io.Writer, program string, args ...string) error
 	Output(dir string, program string, args ...string) (string, error)
+	Run(cmd *exec.Cmd) error
 	RunWithOutput(cmd *exec.Cmd) ([]byte, error)
 }
 
@@ -66,6 +68,7 @@ type Supplier struct {
 	Logfile                *os.File
 	HasNltkData            bool
 	removeRequirementsText bool
+	usesUv                 bool
 	Requirements           Reqs
 }
 
@@ -149,7 +152,12 @@ func RunPython(s *Supplier) error {
 		return fmt.Errorf("could not check vendor existence: %v", err)
 	}
 
-	if vendored {
+	if s.usesUv && !vendored {
+		if err := s.RunUvSync(); err != nil {
+			s.Log.Error("Could not install packages with uv: %v", err)
+			return err
+		}
+	} else if vendored {
 		if err := s.RunPipVendored(); err != nil {
 			s.Log.Error("Could not install vendored pip packages: %v", err)
 			return err
@@ -522,10 +530,11 @@ func (s *Supplier) InstallPipEnv() error {
 	return s.writeTempRequirementsTxt(outputString)
 }
 
-// InstallUv generates a temporary requirements.txt from uv.lock, so that the
-// dependencies are installed by the regular pip flow (vendoring, libffi and
-// libmemcache detection, stale package removal). An existing requirements.txt
-// always takes precedence.
+// InstallUv installs uv for apps with a uv.lock and exports the locked
+// packages into a temporary requirements.txt, which is used to detect
+// packages that need special handling (e.g. libffi or Django). The packages
+// themselves are installed by RunUvSync. An existing requirements.txt always
+// takes precedence.
 func (s *Supplier) InstallUv() error {
 	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
 	if err != nil {
@@ -543,79 +552,47 @@ func (s *Supplier) InstallUv() error {
 	}
 
 	s.Log.Info("Installing uv")
-	uvDir := filepath.Join("/tmp", "uv")
 	if err := s.Installer.InstallOnlyVersionWithStrip("uv", uvDir, 1); err != nil {
 		return err
 	}
+	s.usesUv = true
 
 	s.Log.Info("Generating 'requirements.txt' from uv.lock")
 	cmd := exec.Command(filepath.Join(uvDir, "uv"), uvExportArgs()...)
 	cmd.Dir = s.Stager.BuildDir()
-	cmd.Env = append(os.Environ(), "UV_NO_CACHE=1", "UV_PYTHON_DOWNLOADS=never")
+	cmd.Env = s.uvEnv()
 	cmd.Stderr = indentWriter(os.Stderr)
 	output, err := s.Command.RunWithOutput(cmd)
 	if err != nil {
 		return fmt.Errorf("failed to export uv.lock: %v", err)
 	}
 
-	indexOptions, err := s.uvIndexOptions(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
-	if err != nil {
-		return fmt.Errorf("failed to read package indexes from uv.lock: %v", err)
-	}
-
-	return s.writeTempRequirementsTxt(indexOptions + string(output))
+	return s.writeTempRequirementsTxt(string(output))
 }
 
-// uvIndexOptions returns pip index options for the package registries used
-// in uv.lock, since 'uv export' does not emit them. PyPI stays the primary
-// index when it is used next to other registries. Explicitly configured pip
-// indexes take precedence, as they may contain credentials which uv strips
-// from the lock file.
-func (s *Supplier) uvIndexOptions(lockFilePath string) (string, error) {
-	if os.Getenv("PIP_INDEX_URL") != "" || os.Getenv("PIP_EXTRA_INDEX_URL") != "" {
-		s.Log.Info("Using pip index configuration from environment instead of uv.lock")
-		return "", nil
+// RunUvSync installs the locked packages with 'uv sync' directly into the
+// Python installation, verifying them against the hashes in uv.lock.
+func (s *Supplier) RunUvSync() error {
+	s.Log.BeginStep("Running uv sync")
+
+	args := uvSyncArgs()
+	s.Log.Info("uv %s", strings.Join(args, " "))
+
+	cmd := exec.Command(filepath.Join(uvDir, "uv"), args...)
+	cmd.Dir = s.Stager.BuildDir()
+	cmd.Env = append(s.uvEnv(), "UV_PROJECT_ENVIRONMENT="+filepath.Join(s.Stager.DepDir(), "python"))
+	cmd.Stdout = indentWriter(os.Stdout)
+	cmd.Stderr = indentWriter(os.Stderr)
+	if err := s.Command.Run(cmd); err != nil {
+		return fmt.Errorf("could not run uv sync: %v", err)
 	}
 
-	lockContents, err := os.ReadFile(lockFilePath)
-	if err != nil {
-		return "", err
-	}
-
-	const pypiURL = "https://pypi.org/simple"
-	var registries []string
-	usesPypi := false
-	re := regexp.MustCompile(`(?m)^source\s*=\s*\{.*\bregistry\s*=\s*"([^"]+)"`)
-	for _, match := range re.FindAllStringSubmatch(string(lockContents), -1) {
-		registry := strings.TrimSuffix(match[1], "/")
-		if registry == pypiURL {
-			usesPypi = true
-		} else if !slices.Contains(registries, registry) {
-			registries = append(registries, registry)
-		}
-	}
-
-	if len(registries) == 0 {
-		return "", nil
-	}
-	if usesPypi {
-		registries = append([]string{pypiURL}, registries...)
-	}
-
-	buf := &bytes.Buffer{}
-	for i, registry := range registries {
-		if i == 0 {
-			fmt.Fprintf(buf, "-i %s\n", registry)
-		} else {
-			fmt.Fprintf(buf, "--extra-index-url %s\n", registry)
-		}
-	}
-	return buf.String(), nil
+	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
 }
 
 // uvExportArgs exports the locked production dependencies without touching
 // the network. The project itself is only emitted if it is a package (i.e.
-// it defines a build-system), and is then installed non-editable.
+// it defines a build-system).
 func uvExportArgs() []string {
 	return []string{
 		"export",
@@ -623,10 +600,36 @@ func uvExportArgs() []string {
 		"--format", "requirements-txt",
 		"--no-dev",
 		"--no-editable",
-		"--no-hashes",
 		"--no-header",
 		"--no-annotate",
 	}
+}
+
+// uvSyncArgs installs the same packages as exported by uvExportArgs.
+// '--inexact' keeps packages that are not part of uv.lock, like pip.
+func uvSyncArgs() []string {
+	return []string{
+		"sync",
+		"--frozen",
+		"--no-dev",
+		"--no-editable",
+		"--inexact",
+	}
+}
+
+// uvEnv makes uv use the Python installed by the buildpack, trust the same
+// certificates as pip, and keep its cache in the app cache.
+func (s *Supplier) uvEnv() []string {
+	env := append(os.Environ(),
+		"UV_CACHE_DIR="+filepath.Join(s.Stager.CacheDir(), "uv_cache"),
+		"UV_LINK_MODE=copy",
+		"UV_PYTHON="+filepath.Join(s.Stager.DepDir(), "python", "bin", "python"),
+		"UV_PYTHON_DOWNLOADS=never",
+	)
+	if os.Getenv("UV_SYSTEM_CERTS") == "" {
+		env = append(env, "UV_SYSTEM_CERTS=1")
+	}
+	return env
 }
 
 func pipfileToRequirements(lockFilePath string) (string, error) {
