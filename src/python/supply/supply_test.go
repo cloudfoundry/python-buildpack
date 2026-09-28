@@ -488,6 +488,38 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
+	Describe("RunUvVendored", func() {
+		It("installs the exported packages from the vendor directory", func() {
+			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
+				Expect(cmd.Path).To(Equal("/tmp/uv/uv"))
+				Expect(cmd.Args[1:]).To(Equal([]string{
+					"pip", "install",
+					"--python", filepath.Join(depDir, "python", "bin", "python"),
+					"--offline",
+					"--no-index",
+					"--find-links", filepath.Join(buildDir, "vendor"),
+					"-r", filepath.Join(buildDir, "requirements.txt"),
+				}))
+				Expect(cmd.Dir).To(Equal(buildDir))
+				Expect(cmd.Env).To(ContainElement("UV_PYTHON_DOWNLOADS=never"))
+				return nil
+			})
+			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+
+			Expect(supplier.RunUvVendored()).To(Succeed())
+			Expect(buffer.String()).To(ContainSubstring("Running uv pip install (Vendored)"))
+		})
+
+		Context("when uv pip install fails", func() {
+			It("alerts the user", func() {
+				mockCommand.EXPECT().Run(gomock.Any()).Return(errors.New("exit status 1"))
+
+				Expect(supplier.RunUvVendored()).To(MatchError("could not run uv pip install: exit status 1"))
+				Expect(buffer.String()).To(ContainSubstring("The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock."))
+			})
+		})
+	})
+
 	Describe("MoveGeneratedRequirementsTxt", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())

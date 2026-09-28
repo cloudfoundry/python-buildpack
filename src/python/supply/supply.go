@@ -152,7 +152,12 @@ func RunPython(s *Supplier) error {
 		return fmt.Errorf("could not check vendor existence: %v", err)
 	}
 
-	if s.usesUv && !vendored {
+	if s.usesUv && vendored {
+		if err := s.RunUvVendored(); err != nil {
+			s.Log.Error("Could not install vendored packages with uv: %v", err)
+			return err
+		}
+	} else if s.usesUv {
 		if err := s.RunUvSync(); err != nil {
 			s.Log.Error("Could not install packages with uv: %v", err)
 			return err
@@ -585,6 +590,37 @@ func (s *Supplier) RunUvSync() error {
 	cmd.Stderr = indentWriter(os.Stderr)
 	if err := s.Command.Run(cmd); err != nil {
 		return fmt.Errorf("could not run uv sync: %v", err)
+	}
+
+	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
+}
+
+// RunUvVendored installs the packages exported from uv.lock from the vendor
+// directory without network access. 'uv sync' cannot be used for this, as it
+// only downloads the files referenced in uv.lock. The hashes in the exported
+// requirements.txt are still verified.
+func (s *Supplier) RunUvVendored() error {
+	s.Log.BeginStep("Running uv pip install (Vendored)")
+
+	pythonPath := filepath.Join(s.Stager.DepDir(), "python", "bin", "python")
+	args := []string{
+		"pip", "install",
+		"--python", pythonPath,
+		"--offline",
+		"--no-index",
+		"--find-links", filepath.Join(s.Stager.BuildDir(), "vendor"),
+		"-r", filepath.Join(s.Stager.BuildDir(), "requirements.txt"),
+	}
+	s.Log.Info("uv %s", strings.Join(args, " "))
+
+	cmd := exec.Command(filepath.Join(uvDir, "uv"), args...)
+	cmd.Dir = s.Stager.BuildDir()
+	cmd.Env = s.uvEnv()
+	cmd.Stdout = indentWriter(os.Stdout)
+	cmd.Stderr = indentWriter(os.Stderr)
+	if err := s.Command.Run(cmd); err != nil {
+		s.Log.Info("Running uv pip install failed. The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock.")
+		return fmt.Errorf("could not run uv pip install: %v", err)
 	}
 
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
