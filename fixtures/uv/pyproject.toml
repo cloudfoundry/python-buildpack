@@ -1,0 +1,13 @@
+[project]
+name = "uv-app"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "flask",
+    "gunicorn",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
