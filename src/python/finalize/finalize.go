@@ -75,10 +75,19 @@ func (f *Finalizer) HandleCollectstatic() error {
 		return nil
 	}
 
-	exists, err := f.Requirements.FindAnyPackage(f.Stager.BuildDir(), "django", "Django")
-	if err != nil {
-		f.Log.Debug("Error during FindAnyPackage, skipping collectstatic")
-		return err
+	// Supply moves a generated requirements.txt (e.g. from Pipfile.lock or
+	// uv.lock) from the app directory to the deps dir.
+	var exists bool
+	for _, dir := range []string{f.Stager.BuildDir(), f.Stager.DepDir()} {
+		found, err := f.Requirements.FindAnyPackage(dir, "django")
+		if err != nil {
+			f.Log.Debug("Error during FindAnyPackage, skipping collectstatic")
+			return err
+		}
+		if found {
+			exists = true
+			break
+		}
 	}
 
 	if !exists {

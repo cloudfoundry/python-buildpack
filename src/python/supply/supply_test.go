@@ -540,6 +540,43 @@ source = { registry = "https://pypi.org/simple" }
 		})
 	})
 
+	Describe("MoveGeneratedRequirementsTxt", func() {
+		BeforeEach(func() {
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+		})
+
+		Context("when requirements.txt was generated", func() {
+			BeforeEach(func() {
+				const lockFileContent string = `{"_meta":{"sources":[]},"default":{"django":{"version":"==5.2"}}}`
+				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(lockFileContent), 0644)).To(Succeed())
+				Expect(supplier.InstallPipEnv()).To(Succeed())
+			})
+
+			It("moves it from the app directory to the deps dir", func() {
+				Expect(supplier.MoveGeneratedRequirementsTxt()).To(Succeed())
+
+				Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				requirementsContents, err := os.ReadFile(filepath.Join(depDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(requirementsContents)).To(Equal("django==5.2\n"))
+			})
+		})
+
+		Context("when requirements.txt was provided by the app", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("django"), 0644)).To(Succeed())
+			})
+
+			It("keeps it in the app directory", func() {
+				Expect(supplier.MoveGeneratedRequirementsTxt()).To(Succeed())
+
+				Expect(filepath.Join(buildDir, "requirements.txt")).To(BeARegularFile())
+				Expect(filepath.Join(depDir, "requirements.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+	})
+
 	Describe("HandlePylibmc", func() {
 		BeforeEach(func() {
 			DeferCleanup(os.Setenv, "LIBMEMCACHED", "")

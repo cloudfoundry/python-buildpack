@@ -180,11 +180,9 @@ func RunPython(s *Supplier) error {
 		s.Log.Debug("Size of pip cache dir: %s", cacheDirSize)
 	}
 
-	if s.removeRequirementsText {
-		if err := os.Remove(filepath.Join(s.Stager.BuildDir(), "requirements.txt")); err != nil {
-			s.Log.Error("Unable to clean up app directory: %s", err.Error())
-			return err
-		}
+	if err := s.MoveGeneratedRequirementsTxt(); err != nil {
+		s.Log.Error("Unable to clean up app directory: %s", err.Error())
+		return err
 	}
 
 	dirSnapshot.Diff()
@@ -1105,6 +1103,21 @@ func (s *Supplier) formatVersion(version string) string {
 func (s *Supplier) writeTempRequirementsTxt(content string) error {
 	s.removeRequirementsText = true
 	return os.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(content), 0644)
+}
+
+// MoveGeneratedRequirementsTxt removes a generated requirements.txt from the
+// app directory. A copy is kept in the deps dir, so that finalize can still
+// detect packages like Django.
+func (s *Supplier) MoveGeneratedRequirementsTxt() error {
+	if !s.removeRequirementsText {
+		return nil
+	}
+
+	requirementsPath := filepath.Join(s.Stager.BuildDir(), "requirements.txt")
+	if err := libbuildpack.CopyFile(requirementsPath, filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
+		return err
+	}
+	return os.Remove(requirementsPath)
 }
 
 func (s *Supplier) hasBuildOptions() bool {
