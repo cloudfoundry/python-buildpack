@@ -1,0 +1,3 @@
+*.pyc
+.venv
+static_root
