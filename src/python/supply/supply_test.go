@@ -415,6 +415,110 @@ var _ = Describe("Supply", func() {
 				Expect(string(requirementsContents)).To(Equal("flask==3.1.3\ngunicorn==26.2.0\n"))
 			})
 
+			Context("when uv.lock uses package indexes other than PyPI", func() {
+				BeforeEach(func() {
+					const uvLock = `version = 1
+requires-python = ">=3.10"
+
+[[package]]
+name = "flask"
+version = "3.1.3"
+source = { registry = "https://pypi.org/simple" }
+
+[[package]]
+name = "internal-lib"
+version = "1.0.0"
+source = { registry = "https://artifactory.example.com/api/pypi/pypi/simple/" }
+
+[[package]]
+name = "other-lib"
+version = "2.0.0"
+source = { registry = "https://artifactory.example.com/api/pypi/pypi/simple/" }
+
+[[package]]
+name = "my-app"
+version = "0.1.0"
+source = { virtual = "." }
+`
+					Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte(uvLock), 0644)).To(Succeed())
+					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("flask==3.1.3\ninternal-lib==1.0.0\n"), nil)
+				})
+
+				It("adds the indexes to requirements.txt", func() {
+					Expect(supplier.InstallUv()).To(Succeed())
+
+					requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(requirementsContents)).To(Equal(
+						"-i https://pypi.org/simple\n" +
+							"--extra-index-url https://artifactory.example.com/api/pypi/pypi/simple\n" +
+							"flask==3.1.3\ninternal-lib==1.0.0\n"))
+				})
+
+				Context("when PIP_INDEX_URL is set", func() {
+					BeforeEach(func() {
+						DeferCleanup(os.Unsetenv, "PIP_INDEX_URL")
+						Expect(os.Setenv("PIP_INDEX_URL", "https://mirror.example.com/simple")).To(Succeed())
+					})
+
+					It("does not add indexes to requirements.txt", func() {
+						Expect(supplier.InstallUv()).To(Succeed())
+						Expect(buffer.String()).To(ContainSubstring("Using pip index configuration from environment instead of uv.lock"))
+
+						requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+						Expect(err).ToNot(HaveOccurred())
+						Expect(string(requirementsContents)).To(Equal("flask==3.1.3\ninternal-lib==1.0.0\n"))
+					})
+				})
+			})
+
+			Context("when uv.lock only uses a single private index", func() {
+				BeforeEach(func() {
+					const uvLock = `version = 1
+
+[[package]]
+name = "internal-lib"
+version = "1.0.0"
+source = { registry = "https://artifactory.example.com/simple" }
+`
+					Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte(uvLock), 0644)).To(Succeed())
+					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("internal-lib==1.0.0\n"), nil)
+				})
+
+				It("uses it as the primary index", func() {
+					Expect(supplier.InstallUv()).To(Succeed())
+
+					requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(requirementsContents)).To(Equal("-i https://artifactory.example.com/simple\ninternal-lib==1.0.0\n"))
+				})
+			})
+
+			Context("when uv.lock only uses PyPI", func() {
+				BeforeEach(func() {
+					const uvLock = `version = 1
+
+[[package]]
+name = "flask"
+version = "3.1.3"
+source = { registry = "https://pypi.org/simple" }
+`
+					Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte(uvLock), 0644)).To(Succeed())
+					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("flask==3.1.3\n"), nil)
+				})
+
+				It("does not add index options", func() {
+					Expect(supplier.InstallUv()).To(Succeed())
+
+					requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(requirementsContents)).To(Equal("flask==3.1.3\n"))
+				})
+			})
+
 			Context("when uv cannot be installed", func() {
 				It("returns the error", func() {
 					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1).Return(errors.New("no versions of uv found"))

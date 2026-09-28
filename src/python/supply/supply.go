@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/cloudfoundry/python-buildpack/src/python/conda"
@@ -559,7 +560,59 @@ func (s *Supplier) InstallUv() error {
 		return fmt.Errorf("failed to export uv.lock: %v", err)
 	}
 
-	return s.writeTempRequirementsTxt(string(output))
+	indexOptions, err := s.uvIndexOptions(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	if err != nil {
+		return fmt.Errorf("failed to read package indexes from uv.lock: %v", err)
+	}
+
+	return s.writeTempRequirementsTxt(indexOptions + string(output))
+}
+
+// uvIndexOptions returns pip index options for the package registries used
+// in uv.lock, since 'uv export' does not emit them. PyPI stays the primary
+// index when it is used next to other registries. Explicitly configured pip
+// indexes take precedence, as they may contain credentials which uv strips
+// from the lock file.
+func (s *Supplier) uvIndexOptions(lockFilePath string) (string, error) {
+	if os.Getenv("PIP_INDEX_URL") != "" || os.Getenv("PIP_EXTRA_INDEX_URL") != "" {
+		s.Log.Info("Using pip index configuration from environment instead of uv.lock")
+		return "", nil
+	}
+
+	lockContents, err := os.ReadFile(lockFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	const pypiURL = "https://pypi.org/simple"
+	var registries []string
+	usesPypi := false
+	re := regexp.MustCompile(`(?m)^source\s*=\s*\{.*\bregistry\s*=\s*"([^"]+)"`)
+	for _, match := range re.FindAllStringSubmatch(string(lockContents), -1) {
+		registry := strings.TrimSuffix(match[1], "/")
+		if registry == pypiURL {
+			usesPypi = true
+		} else if !slices.Contains(registries, registry) {
+			registries = append(registries, registry)
+		}
+	}
+
+	if len(registries) == 0 {
+		return "", nil
+	}
+	if usesPypi {
+		registries = append([]string{pypiURL}, registries...)
+	}
+
+	buf := &bytes.Buffer{}
+	for i, registry := range registries {
+		if i == 0 {
+			fmt.Fprintf(buf, "-i %s\n", registry)
+		} else {
+			fmt.Fprintf(buf, "--extra-index-url %s\n", registry)
+		}
+	}
+	return buf.String(), nil
 }
 
 // uvExportArgs exports the locked production dependencies without touching
