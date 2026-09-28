@@ -41,6 +41,7 @@ type Manifest interface {
 type Installer interface {
 	InstallDependency(dep libbuildpack.Dependency, outputDir string) error
 	InstallOnlyVersion(depName, installDir string) error
+	InstallOnlyVersionWithStrip(depName, installDir string, stripComponents int) error
 }
 
 type Command interface {
@@ -104,6 +105,11 @@ func RunPython(s *Supplier) error {
 
 	if err := s.InstallPip(); err != nil {
 		s.Log.Error("Could not install pip: %v", err)
+		return err
+	}
+
+	if err := s.InstallUv(); err != nil {
+		s.Log.Error("Could not install uv: %v", err)
 		return err
 	}
 
@@ -450,6 +456,61 @@ func (s *Supplier) InstallPipEnv() error {
 	}
 
 	return s.writeTempRequirementsTxt(outputString)
+}
+
+// InstallUv generates a temporary requirements.txt from uv.lock, so that the
+// dependencies are installed by the regular pip flow (vendoring, libffi and
+// libmemcache detection, stale package removal). An existing requirements.txt
+// always takes precedence.
+func (s *Supplier) InstallUv() error {
+	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	if err != nil {
+		return fmt.Errorf("could not check uv.lock existence: %v", err)
+	} else if !uvLockExists {
+		return nil
+	}
+
+	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
+	if err != nil {
+		return err
+	} else if requirementstxtExists {
+		s.Log.Info("Found requirements.txt, ignoring uv.lock")
+		return nil
+	}
+
+	s.Log.Info("Installing uv")
+	uvDir := filepath.Join("/tmp", "uv")
+	if err := s.Installer.InstallOnlyVersionWithStrip("uv", uvDir, 1); err != nil {
+		return err
+	}
+
+	s.Log.Info("Generating 'requirements.txt' from uv.lock")
+	cmd := exec.Command(filepath.Join(uvDir, "uv"), uvExportArgs()...)
+	cmd.Dir = s.Stager.BuildDir()
+	cmd.Env = append(os.Environ(), "UV_NO_CACHE=1", "UV_PYTHON_DOWNLOADS=never")
+	cmd.Stderr = indentWriter(os.Stderr)
+	output, err := s.Command.RunWithOutput(cmd)
+	if err != nil {
+		return fmt.Errorf("failed to export uv.lock: %v", err)
+	}
+
+	return s.writeTempRequirementsTxt(string(output))
+}
+
+// uvExportArgs exports the locked production dependencies without touching
+// the network. The project itself is only emitted if it is a package (i.e.
+// it defines a build-system), and is then installed non-editable.
+func uvExportArgs() []string {
+	return []string{
+		"export",
+		"--frozen",
+		"--format", "requirements-txt",
+		"--no-dev",
+		"--no-editable",
+		"--no-hashes",
+		"--no-header",
+		"--no-annotate",
+	}
 }
 
 func pipfileToRequirements(lockFilePath string) (string, error) {

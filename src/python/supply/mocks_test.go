@@ -251,6 +251,20 @@ func (mr *MockInstallerMockRecorder) InstallOnlyVersion(depName, installDir inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstallOnlyVersion", reflect.TypeOf((*MockInstaller)(nil).InstallOnlyVersion), depName, installDir)
 }
 
+// InstallOnlyVersionWithStrip mocks base method.
+func (m *MockInstaller) InstallOnlyVersionWithStrip(depName, installDir string, stripComponents int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstallOnlyVersionWithStrip", depName, installDir, stripComponents)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InstallOnlyVersionWithStrip indicates an expected call of InstallOnlyVersionWithStrip.
+func (mr *MockInstallerMockRecorder) InstallOnlyVersionWithStrip(depName, installDir, stripComponents interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstallOnlyVersionWithStrip", reflect.TypeOf((*MockInstaller)(nil).InstallOnlyVersionWithStrip), depName, installDir, stripComponents)
+}
+
 // MockCommand is a mock of Command interface.
 type MockCommand struct {
 	ctrl     *gomock.Controller

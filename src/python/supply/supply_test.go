@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/cloudfoundry/python-buildpack/src/python/supply"
@@ -293,6 +294,82 @@ var _ = Describe("Supply", func() {
 
 				By("removes extraneous pipenv lock output")
 				Expect(string(requirementsContents)).To(Equal("line 1\nline 2\n"))
+			})
+		})
+	})
+
+	Describe("InstallUv", func() {
+		BeforeEach(func() {
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+		})
+
+		Context("when uv.lock does not exist", func() {
+			It("does not install uv", func() {
+				Expect(supplier.InstallUv()).To(Succeed())
+				Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
+		Context("when uv.lock and requirements.txt both exist", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("flask"), 0644)).To(Succeed())
+			})
+
+			It("does not install uv and keeps requirements.txt", func() {
+				Expect(supplier.InstallUv()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("Found requirements.txt, ignoring uv.lock"))
+
+				requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(requirementsContents)).To(Equal("flask"))
+			})
+		})
+
+		Context("when uv.lock exists but requirements.txt does not exist", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+			})
+
+			It("installs uv and generates requirements.txt with uv export", func() {
+				mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+				mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
+					Expect(cmd.Path).To(Equal("/tmp/uv/uv"))
+					Expect(cmd.Args[1:]).To(Equal([]string{
+						"export", "--frozen", "--format", "requirements-txt",
+						"--no-dev", "--no-editable", "--no-hashes", "--no-header", "--no-annotate",
+					}))
+					Expect(cmd.Dir).To(Equal(buildDir))
+					Expect(cmd.Env).To(ContainElements("UV_NO_CACHE=1", "UV_PYTHON_DOWNLOADS=never"))
+					return []byte("flask==3.1.3\ngunicorn==26.2.0\n"), nil
+				})
+
+				Expect(supplier.InstallUv()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("Generating 'requirements.txt' from uv.lock"))
+
+				requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(requirementsContents)).To(Equal("flask==3.1.3\ngunicorn==26.2.0\n"))
+			})
+
+			Context("when uv cannot be installed", func() {
+				It("returns the error", func() {
+					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1).Return(errors.New("no versions of uv found"))
+
+					Expect(supplier.InstallUv()).To(MatchError("no versions of uv found"))
+					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				})
+			})
+
+			Context("when uv export fails", func() {
+				It("returns a useful error", func() {
+					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return(nil, errors.New("exit status 2"))
+
+					Expect(supplier.InstallUv()).To(MatchError("failed to export uv.lock: exit status 2"))
+					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				})
 			})
 		})
 	})
