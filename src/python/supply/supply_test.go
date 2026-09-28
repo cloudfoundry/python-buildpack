@@ -212,6 +212,68 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
+	Describe("HandleUvPythonVersion", func() {
+		BeforeEach(func() {
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+		})
+
+		DescribeTable("creates runtime.txt from .python-version",
+			func(pythonVersion, expectedRuntime string) {
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte(pythonVersion), 0644)).To(Succeed())
+
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+
+				runtimeContents, err := os.ReadFile(filepath.Join(depDir, "runtime.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(runtimeContents)).To(Equal(expectedRuntime))
+			},
+			Entry("minor version", "3.12\n", "python-3.12.x"),
+			Entry("patch version", "3.12.4\n", "python-3.12.4"),
+			Entry("implementation prefix", "cpython-3.13\n", "python-3.13.x"),
+			Entry("comments and multiple versions", "# pinned\n\n3.11\n3.12\n", "python-3.11.x"),
+		)
+
+		Context("when .python-version contains an unsupported version", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("pypy@3.10\n"), 0644)).To(Succeed())
+			})
+
+			It("warns and falls back to the default Python version", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("Unsupported Python version in .python-version"))
+				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
+		Context("when runtime.txt already exists", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(depDir, "runtime.txt"), []byte("python-3.11.x"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("3.12\n"), 0644)).To(Succeed())
+			})
+
+			It("keeps runtime.txt", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+
+				runtimeContents, err := os.ReadFile(filepath.Join(depDir, "runtime.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(runtimeContents)).To(Equal("python-3.11.x"))
+			})
+		})
+
+		Context("when the app does not use uv", func() {
+			BeforeEach(func() {
+				Expect(os.Remove(filepath.Join(buildDir, "uv.lock"))).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("3.12\n"), 0644)).To(Succeed())
+			})
+
+			It("ignores .python-version", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+	})
+
 	// Add the expects for what the installFfi function uses
 	expectInstallFfi := func() string {
 		ffiDir := filepath.Join(depDir, "libffi")

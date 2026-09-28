@@ -93,6 +93,11 @@ func RunPython(s *Supplier) error {
 		return err
 	}
 
+	if err := s.HandleUvPythonVersion(); err != nil {
+		s.Log.Error("Error checking for .python-version: %v", err)
+		return err
+	}
+
 	if err := s.HandlePipfile(); err != nil {
 		s.Log.Error("Error checking for Pipfile.lock: %v", err)
 		return err
@@ -222,6 +227,66 @@ func (s *Supplier) HandlePipfile() error {
 		}
 	}
 	return nil
+}
+
+// HandleUvPythonVersion writes runtime.txt from the .python-version file of a
+// uv app, unless the app provides its own runtime.txt.
+func (s *Supplier) HandleUvPythonVersion() error {
+	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	if err != nil {
+		return err
+	}
+
+	runtimeExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "runtime.txt"))
+	if err != nil {
+		return err
+	}
+
+	pythonVersionPath := filepath.Join(s.Stager.BuildDir(), ".python-version")
+	pythonVersionExists, err := libbuildpack.FileExists(pythonVersionPath)
+	if err != nil {
+		return err
+	}
+
+	if !uvLockExists || runtimeExists || !pythonVersionExists {
+		return nil
+	}
+
+	contents, err := os.ReadFile(pythonVersionPath)
+	if err != nil {
+		return err
+	}
+
+	version, ok := parsePythonVersionFile(string(contents))
+	if !ok {
+		s.Log.Warning("Unsupported Python version in .python-version, using the default Python version")
+		return nil
+	}
+
+	s.Log.Info("Using Python version %s from .python-version", version)
+	return os.WriteFile(filepath.Join(s.Stager.DepDir(), "runtime.txt"), []byte(s.formatVersion(version)), 0644)
+}
+
+// parsePythonVersionFile returns the first version in a .python-version
+// file. Only CPython versions like "3.12", "3.12.4" or "cpython-3.12" are
+// supported.
+func parsePythonVersionFile(contents string) (string, bool) {
+	versionRegex := regexp.MustCompile(`^(?:cpython[-@]?)?(\d+\.\d+(?:\.\d+)?)$`)
+
+	for _, line := range strings.Split(contents, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		match := versionRegex.FindStringSubmatch(line)
+		if match == nil {
+			return "", false
+		}
+		return match[1], true
+	}
+
+	return "", false
 }
 
 func (s *Supplier) InstallPython() error {
