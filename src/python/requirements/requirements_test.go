@@ -60,6 +60,33 @@ package6[test]==6.0.0
 				})
 			})
 
+			Context("package names are written differently", func() {
+				BeforeEach(func() {
+					Expect(os.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`pynacl==1.5.0
+argon2_cffi==23.1.0
+Django==5.2
+`), 0644)).To(Succeed())
+				})
+
+				It("matches the normalized package names", func() {
+					exists, err := req.FindAnyPackage(tempDir, "PyNaCl")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeTrue())
+
+					exists, err = req.FindAnyPackage(tempDir, "argon2-cffi")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeTrue())
+
+					exists, err = req.FindAnyPackage(tempDir, "django")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeTrue())
+
+					exists, err = req.FindAnyPackage(tempDir, "cffi")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeFalse())
+				})
+			})
+
 			Context("multiple requirements.txt files", func() {
 				Context("packages are in a recursive requirements.txt file", func() {
 					BeforeEach(func() {

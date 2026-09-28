@@ -28,9 +28,11 @@ func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool,
 			return false, err
 		}
 
-		for _, searchedPackage := range searchedPackages {
-			if containsPackage(reqPackages, searchedPackage) {
-				return true, nil
+		for _, reqPackage := range reqPackages {
+			for _, searchedPackage := range searchedPackages {
+				if normalizePackageName(reqPackage) == normalizePackageName(searchedPackage) {
+					return true, nil
+				}
 			}
 		}
 	}
@@ -79,6 +81,12 @@ func containsPackage(packages []string, searchedPackage string) bool {
 		}
 	}
 	return false
+}
+
+// normalizePackageName normalizes a package name as defined in PEP 503, since
+// e.g. 'PyNaCl' may be written as 'pynacl' in generated requirements files.
+func normalizePackageName(name string) string {
+	return strings.ToLower(regexp.MustCompile(`[-_.]+`).ReplaceAllString(name, "-"))
 }
 
 func packageIsExcluded(excludedPackages []string, packageFullName string) bool {
