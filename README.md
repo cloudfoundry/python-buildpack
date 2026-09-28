@@ -10,6 +10,22 @@ This buildpack supports running Django and Flask apps.
 
 Official buildpack documentation can be found at [python buildpack docs](http://docs.cloudfoundry.org/buildpacks/python/index.html).
 
+### uv
+
+Apps managed with [uv](https://docs.astral.sh/uv/) are supported by pushing the `pyproject.toml` together with a `uv.lock`:
+
+* During staging the buildpack runs `uv export --frozen` to generate a temporary `requirements.txt` from `uv.lock`, which is then installed with pip. Keep `uv.lock` up to date (`uv lock`) before pushing, as it is used as is.
+* Only the default dependencies are installed, dependency groups such as `dev` are skipped. If the project defines a `[build-system]`, the project itself is installed as well.
+* The Python version is taken from `.python-version` (e.g. `3.12`, as written by `uv python pin`), unless a `runtime.txt` exists.
+* Package indexes configured via `[[tool.uv.index]]` are passed on to pip. Credentials are not part of `uv.lock`, so for authenticated indexes set `PIP_INDEX_URL` / `PIP_EXTRA_INDEX_URL` instead, which then take precedence.
+* If the app also contains a `requirements.txt`, the `uv.lock` is ignored.
+* For vendored (offline) installs, download the wheels for the target platform into the `vendor` directory. Write the exported file outside the app, so that it does not take precedence over `uv.lock`:
+
+  ```bash
+  uv export --frozen --no-dev --no-hashes -o /tmp/requirements.txt
+  pip download -r /tmp/requirements.txt -d vendor --only-binary=:all: --platform manylinux2014_x86_64 --python-version 3.12
+  ```
+
 ## Adding new dependencies
 
 If you want to add a new dependency to the buildpack, please add it to the [config.yml](https://github.com/cloudfoundry/buildpacks-ci/blob/5a63d13df09f83d5dff7c71d0a12c3e2dc798d39/pipelines/dependency-builds/config.yml#L272) file. For example, if you want to add a new version of Python, add an entry like the following:
