@@ -351,6 +351,8 @@ func (h *Hook) getDownloadURL(c *credentials, operatingSystem string) string {
 		for _, tech := range h.IncludeTechnologies {
 			if tech == "process" || !slices.Contains(remove, tech) {
 				keepTech = append(keepTech, tech)
+			} else {
+				h.Log.Debug("Removing code module from download: %s", tech)
 			}
 		}
 		h.IncludeTechnologies = keepTech
