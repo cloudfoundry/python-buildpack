@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -343,19 +344,16 @@ func (h *Hook) getDownloadURL(c *credentials, operatingSystem string) string {
 		qv.Add("networkZone", c.NetworkZone)
 	}
 
+	keepTech := []string{}
 	if c.RemoveTechnologies != "" {
 		// remove configured OneAgent code modules, except 'process'
-		for _, removeTech := range strings.Split(c.RemoveTechnologies, ",") {
-			if removeTech == "process" {
-				continue
-			}
-			for i, tech := range h.IncludeTechnologies {
-				if tech == removeTech {
-					h.Log.Debug("Removing code module from download: %s", removeTech)
-					h.IncludeTechnologies[i] = ""
-				}
+		remove := strings.Split(c.RemoveTechnologies, ",")
+		for _, tech := range h.IncludeTechnologies {
+			if tech == "process" || !slices.Contains(remove, tech) {
+				keepTech = append(keepTech, tech)
 			}
 		}
+		h.IncludeTechnologies = keepTech
 	}
 
 	for _, t := range h.IncludeTechnologies {

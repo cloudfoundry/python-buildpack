@@ -1,7 +1,7 @@
 # code.cloudfoundry.org/lager v2.0.0+incompatible
 ## explicit
 code.cloudfoundry.org/lager
-# github.com/Dynatrace/libbuildpack-dynatrace v1.9.1-0.20261006065138-049dab3f0db5
+# github.com/Dynatrace/libbuildpack-dynatrace v1.9.1-0.20261006090150-2983b44ea04f
 ## explicit; go 1.19
 github.com/Dynatrace/libbuildpack-dynatrace
 # github.com/Masterminds/semver v1.5.0
