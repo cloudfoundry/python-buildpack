@@ -343,20 +343,13 @@ func (h *Hook) getDownloadURL(c *credentials, operatingSystem string) string {
 		qv.Add("networkZone", c.NetworkZone)
 	}
 
-	//FIXME
-	h.Log.Debug("outside remove tech if-statement")
 	if c.RemoveTechnologies != "" {
-		//FIXME
-		h.Log.Debug("inside remove tech if-statement")
 		// remove configured OneAgent code modules, except 'process'
 		for _, removeTech := range strings.Split(c.RemoveTechnologies, ",") {
-			h.Log.Debug("inside outer for-loop")
 			if removeTech == "process" {
-				h.Log.Debug("ignoring removal of process code module")
 				continue
 			}
 			for i, tech := range h.IncludeTechnologies {
-				h.Log.Debug("inside inner for-loop")
 				if tech == removeTech {
 					h.Log.Debug("Removing code module from download: %s", removeTech)
 					h.IncludeTechnologies[i] = ""
