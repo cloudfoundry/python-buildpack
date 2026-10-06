@@ -11,5 +11,6 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# vim session file
+# various editor files
 Session.vim
+*.swp

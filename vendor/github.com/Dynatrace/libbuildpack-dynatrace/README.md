@@ -21,7 +21,12 @@ func init() {
 
 ## Configuration
 
-The Hook will look for credentials in the configurations for existing services (which is represented in the runtime as the VCAP_SERVICES environment variable in JSON format.) We look for service names having the 'dynatrace' substring.
+The Hook will look for credentials in the configurations for existing services. It searches for service credentials depending on the binding type:
+
+1. **File-based**: If the `VCAP_SERVICES_FILE_PATH` environment variable is set, the hook reads the VCAP_SERVICES JSON from the file at that path.
+2. **Environment variable**: If the env var `VCAP_SERVICES` is set, it reads the JSON from the `VCAP_SERVICES` environment variable directly.
+
+In both cases, we look for service names having the 'dynatrace' substring.
 
 We support the following configuration fields,
 
@@ -33,6 +38,7 @@ We support the following configuration fields,
 | skiperrors    | boolean | If true, the deployment doesn't fail if the Dynatrace agent download fails.                 | No       | false           |
 | networkzone   | string  | If set, agent is configured to choose communication endpoints located at the field's value. | No       | empty           |
 | enablefips    | boolean | If true, the [FIPS 140-2 mode](https://www.dynatrace.com/news/blog/dynatrace-achieves-fips-140-2-certification/) is enabled | No       | false           |
+| removetechnologies| string | Removes OneAgent code-modules via a comma-separated list. This is applied *before* addtechnologies. | No | empty |
 | addtechnologies| string | Adds additional OneAgent code-modules via a comma-separated list. See [supported values](https://docs.dynatrace.com/docs/dynatrace-api/environment-api/deployment/oneagent/download-oneagent-version#parameters) in the "included" row | No | empty |
 
 For example,
@@ -47,8 +53,9 @@ We also support standard Dynatrace environment variables.
 
 ## Requirements
 
-- Go 1.11
-- Linux to run the tests.
+- Go 1.19 or higher.
+- Deployment targets: Linux and Windows.
+- Development and testing: Linux, Mac OS, and Windows.
 
 ## Development
 
@@ -57,7 +64,14 @@ You can download or clone the repository.
 You can run tests through,
 
 ```
-go test
+go test ./...
+```
+
+By default, tests simulate the Linux platform. To test against a different target OS, use the `-os` flag:
+
+```
+go test ./... -os=windows
+go test ./... -os=linux
 ```
 
 If you modify/add interfaces, you may need to regenerate the mocks. For this you need [gomock](https://github.com/golang/mock):
