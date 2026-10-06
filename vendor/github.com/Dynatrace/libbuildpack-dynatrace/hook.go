@@ -359,9 +359,7 @@ func (h *Hook) getDownloadURL(c *credentials, operatingSystem string) string {
 	}
 
 	for _, t := range h.IncludeTechnologies {
-		if t != "" {
-			qv.Add("include", t)
-		}
+		qv.Add("include", t)
 	}
 
 	if c.AddTechnologies != "" {
