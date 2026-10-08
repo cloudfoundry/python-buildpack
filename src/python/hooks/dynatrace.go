@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	libbuildpack.AddHook(dynatrace.NewHook("sdk", "process"))
+	libbuildpack.AddHook(dynatrace.NewHook("python", "sdk", "process"))
 }
