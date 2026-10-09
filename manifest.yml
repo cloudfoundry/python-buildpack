@@ -281,20 +281,28 @@ dependencies:
   source_sha256: f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73
 - name: uv
   version: 0.12.23
-  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.12.23_linux_x64_cflinuxfs4_a2c819b5.tgz
-  sha256: a2c819b5c16f60a01584d1cbbbe766d994aa308ec1de756453776af4e0f95ee9
-  cf_stacks:
-  - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/6d/f5/34435c1d9ee52d38bda1d7d2948d8ef48a9ac9ec79e6fbfd81ced8b0ad19/uv-0.12.23.tar.gz
-  source_sha256: e952162a5be6847deaccf3fd5b41a628506fd9ff1ea4363b8c975bd6f927d832
-- name: uv
-  version: 0.12.23
   uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.12.23_linux_x64_cflinuxfs5_03b8f360.tgz
   sha256: 03b8f36010c10ec4947877e91f529db085745ccda4590c45aade80386d72b24d
   cf_stacks:
   - cflinuxfs5
   source: https://files.pythonhosted.org/packages/6d/f5/34435c1d9ee52d38bda1d7d2948d8ef48a9ac9ec79e6fbfd81ced8b0ad19/uv-0.12.23.tar.gz
   source_sha256: e952162a5be6847deaccf3fd5b41a628506fd9ff1ea4363b8c975bd6f927d832
+- name: uv
+  version: 0.13.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.0_linux_x64_cflinuxfs4_0bffe629.tgz
+  sha256: 0bffe629ab59c9782eb7d56325e7ea84b6fb16b8099df1a7aae585d5fbab742e
+  cf_stacks:
+  - cflinuxfs4
+  source: https://files.pythonhosted.org/packages/05/ba/01146b98d782872d5f62b8568325d1faee9e190d97f7cef647bd19e243b3/uv-0.13.0.tar.gz
+  source_sha256: 9a38bd3406b2106288a38888df785f12c5ddc6db22871aacfe0a0ee766f9f6c0
+- name: uv
+  version: 0.13.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.0_linux_x64_cflinuxfs5_91e66ae5.tgz
+  sha256: 91e66ae5a182c2fe5e28d02b86807359406070ab0e4e043408f8bd5d1bdf7717
+  cf_stacks:
+  - cflinuxfs5
+  source: https://files.pythonhosted.org/packages/05/ba/01146b98d782872d5f62b8568325d1faee9e190d97f7cef647bd19e243b3/uv-0.13.0.tar.gz
+  source_sha256: 9a38bd3406b2106288a38888df785f12c5ddc6db22871aacfe0a0ee766f9f6c0
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
