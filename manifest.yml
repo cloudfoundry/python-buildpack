@@ -112,14 +112,6 @@ dependencies:
   source: https://files.pythonhosted.org/packages/ca/5b/8ce5227713d692913c186d9a3164eee0236fbc3eaca87d7e2bd5dbb1da36/pipenv-2024.4.1.tar.gz
   source_sha256: e8ea6105c1cdda7d5c19df7bd6439a006751f3d4e017602c791e7b51314adf84
 - name: pipenv
-  version: 2026.10.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2026.10.1_linux_noarch_cflinuxfs5_7cd5805a.tgz
-  sha256: 7cd5805a7a77bbb661e08f4bb0a8af9269e0679e46e330dbbab08d6cccedee84
-  cf_stacks:
-  - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/c5/94/2b63fd4a13159e87d27ce1d390d82bc17431176358ef638989447cea76c5/pipenv-2026.10.1.tar.gz
-  source_sha256: 8dc8aebe5c8bf59abfbf7e91bfe964637eb0863f29991ebe74cce61b1326dbfe
-- name: pipenv
   version: 2026.10.2
   uri: https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2026.10.2_linux_noarch_cflinuxfs4_e7f1e42c.tgz
   sha256: e7f1e42cf0a649d8a8e56c083f4937fbfec3da9bfd9e0627f09a121736b17cfb
