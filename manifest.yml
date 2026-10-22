@@ -256,21 +256,21 @@ dependencies:
   source: https://www.python.org/ftp/python/3.14.8/Python-3.14.8.tgz
   source_sha256: a65b20a728f169f4e66ae143f40b1bd3d33c38d770251663f627c9767b79b210
 - name: setuptools
-  version: 84.2.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_84.2.0_linux_noarch_cflinuxfs4_f0609f7b.tgz
-  sha256: f0609f7bf2a1ec3092cc458820d5f643315021b4a3bbfddbfb981bd749e57406
+  version: 84.2.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_84.2.1_linux_noarch_cflinuxfs4_b187c0e5.tgz
+  sha256: b187c0e57a959fe5917b399029110b4e3452b39be66acb39aa3fd7f0c12a62e5
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/63/40/e2c41d00a4bfea5548c31420a74c6cf149cc0e7c36b45c4c82202ce867aa/setuptools-84.2.0.tar.gz
-  source_sha256: 6f445ca2ce864605f81e223f262b4c94ffcb9a4a63473bae0ed7be5aab0291da
+  source: https://files.pythonhosted.org/packages/70/b3/c19426f783614d625699a4b247faf628ea9ab1db228674491767b417f9e1/setuptools-84.2.1.tar.gz
+  source_sha256: 3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc
 - name: setuptools
-  version: 84.2.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_84.2.0_linux_noarch_cflinuxfs5_147c8025.tgz
-  sha256: 147c8025b7c7a6a61d603764a2765dc046b7f3f62f0863ab5e0fc96607df75a7
+  version: 84.2.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/setuptools/setuptools_84.2.1_linux_noarch_cflinuxfs5_cd4edafb.tgz
+  sha256: cd4edafba5b573915ef489118cb994f87cb61d2cf094448321f12f7e24594e69
   cf_stacks:
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/63/40/e2c41d00a4bfea5548c31420a74c6cf149cc0e7c36b45c4c82202ce867aa/setuptools-84.2.0.tar.gz
-  source_sha256: 6f445ca2ce864605f81e223f262b4c94ffcb9a4a63473bae0ed7be5aab0291da
+  source: https://files.pythonhosted.org/packages/70/b3/c19426f783614d625699a4b247faf628ea9ab1db228674491767b417f9e1/setuptools-84.2.1.tar.gz
+  source_sha256: 3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc
 - name: uv
   version: 0.13.3
   uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.3_linux_x64_cflinuxfs4_53e95c9b.tgz
