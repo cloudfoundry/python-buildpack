@@ -272,14 +272,6 @@ dependencies:
   source: https://files.pythonhosted.org/packages/63/40/e2c41d00a4bfea5548c31420a74c6cf149cc0e7c36b45c4c82202ce867aa/setuptools-84.2.0.tar.gz
   source_sha256: 6f445ca2ce864605f81e223f262b4c94ffcb9a4a63473bae0ed7be5aab0291da
 - name: uv
-  version: 0.13.3
-  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.3_linux_x64_cflinuxfs5_53e95c9b.tgz
-  sha256: 53e95c9b001ca48ffbf42edbece6512a97d155c0d62d6caf2839474d9e2e29a1
-  cf_stacks:
-  - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/b2/0d/0cf59876b94f537055fdcc6a32126fd9abb841620b6589ae3fcbf6e21f69/uv-0.13.3.tar.gz
-  source_sha256: fe8587cb414b324753eb2c1b2a54d2f93b2aed7e9cf02e9c1efa3776547a3aae
-- name: uv
   version: 0.13.5
   uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.5_linux_x64_cflinuxfs4_4a873e08.tgz
   sha256: 4a873e08d7a57cc63f6e229eeec0947f8b88f69ff75b80082c23df51b47e3625
