@@ -88,14 +88,6 @@ dependencies:
   source: https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
   source_sha256: 578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2
 - name: pip
-  version: 26.2.1
-  uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_26.2.1_linux_noarch_cflinuxfs5_22e7a825.tgz
-  sha256: 22e7a8258b20b0f50f713d1e506c228c1ca7620aa3b483b67266b90392eeb91e
-  cf_stacks:
-  - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/ae/15/4500e320e6b101ec3b719ae85b697d9940b6cda672bc555bd6016fc60c6f/pip-26.2.1.tar.gz
-  source_sha256: f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f
-- name: pip
   version: 26.2.2
   uri: https://buildpacks.cloudfoundry.org/dependencies/pip/pip_26.2.2_linux_noarch_cflinuxfs4_d876df6b.tgz
   sha256: d876df6b58ea3264950a319c11d4d98e9a4095a774ae9b6d98edec1563a98679
