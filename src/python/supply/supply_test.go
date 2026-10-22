@@ -154,7 +154,7 @@ var _ = Describe("Supply", func() {
 
 			It("installs latest from manifest", func() {
 				mockInstaller.EXPECT().InstallOnlyVersion("pip", "/tmp/pip")
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "pip", "--exists-action=w", "--no-index", "--ignore-installed", "--find-links=/tmp/pip")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "pip", "--exists-action=w", "--no-index", "--no-build-isolation", "--ignore-installed", "--find-links=/tmp/pip")
 				mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(filepath.Join(depDir, "python"), "bin"), "bin")
 
 				Expect(supplier.InstallPip()).To(Succeed())

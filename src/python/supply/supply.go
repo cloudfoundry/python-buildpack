@@ -341,12 +341,18 @@ func (s *Supplier) InstallPip() error {
 		return err
 	}
 
+	// Use --no-build-isolation to avoid resolving build dependencies from
+	// pip's pyproject.toml (which requires flit-core <4). Without this flag,
+	// pip tries to create an isolated build environment and fails when the
+	// manifest carries flit-core >=4. This matches the approach used by
+	// InstallCommonBuildDependencies() for the vendored sdist path.
 	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
 		"python",
 		"-m", "pip",
 		"install", "pip",
 		"--exists-action=w",
 		"--no-index",
+		"--no-build-isolation",
 		"--ignore-installed",
 		fmt.Sprintf("--find-links=%s", tempPath),
 	); err != nil {
@@ -764,7 +770,6 @@ func (s *Supplier) InstallCommonBuildDependencies() error {
 			return fmt.Errorf("could not install build-time dependency %s: %v", dep, err)
 		}
 	}
-
 
 	return nil
 }
