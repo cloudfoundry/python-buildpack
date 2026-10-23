@@ -1,11 +1,13 @@
 package integration_test
 
 import (
-	"github.com/cloudfoundry/switchblade"
-	"github.com/sclevine/spec"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
+
+	"github.com/cloudfoundry/switchblade"
+	"github.com/sclevine/spec"
 
 	. "github.com/cloudfoundry/switchblade/matchers"
 	. "github.com/onsi/gomega"
@@ -48,7 +50,7 @@ func testMiscellaneous(platform switchblade.Platform, fixtures string) func(*tes
 					Execute(name, source)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(deployment).Should(Serve(ContainSubstring("The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced")))
+				Eventually(deployment, 30*time.Second).Should(Serve(ContainSubstring("The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced")))
 
 				Expect(logs.String()).To(SatisfyAll(
 					ContainSubstring("Downloading NLTK packages: brown"),
