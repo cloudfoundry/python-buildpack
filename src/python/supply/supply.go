@@ -341,12 +341,35 @@ func (s *Supplier) InstallPip() error {
 		return err
 	}
 
+	// The pip dependency tarball bundles a flit-core wheel (the build backend
+	// required by pip's pyproject.toml). We must bootstrap flit-core into the
+	// Python environment before installing pip, because:
+	//   - pip's pyproject.toml declares build-requires: flit-core >=3.11,<4
+	//   - With build isolation, pip would try to install flit-core into a
+	//     temporary venv, but --no-index prevents network access and the
+	//     bundled flit-core version may not satisfy the <4 constraint
+	//   - With --no-build-isolation, pip skips the isolated env but needs
+	//     flit_core importable in the current environment
+	// This matches the pattern used by InstallCommonBuildDependencies().
+	s.Log.Info("Installing build backend flit-core (bootstrap)")
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
+		"python",
+		"-m", "pip",
+		"install", "flit-core",
+		"--no-index",
+		"--no-build-isolation",
+		fmt.Sprintf("--find-links=%s", tempPath),
+	); err != nil {
+		return fmt.Errorf("could not bootstrap flit-core: %v", err)
+	}
+
 	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
 		"python",
 		"-m", "pip",
 		"install", "pip",
 		"--exists-action=w",
 		"--no-index",
+		"--no-build-isolation",
 		"--ignore-installed",
 		fmt.Sprintf("--find-links=%s", tempPath),
 	); err != nil {
@@ -764,7 +787,6 @@ func (s *Supplier) InstallCommonBuildDependencies() error {
 			return fmt.Errorf("could not install build-time dependency %s: %v", dep, err)
 		}
 	}
-
 
 	return nil
 }
