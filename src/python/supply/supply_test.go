@@ -396,9 +396,10 @@ var _ = Describe("Supply", func() {
 
 			It("installs uv and generates requirements.txt with hashes using uv export", func() {
 				const exported = "flask==3.1.3 \\\n    --hash=sha256:4eda\ngunicorn==26.2.0 \\\n    --hash=sha256:17ef\n"
-				mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+				mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
-					Expect(cmd.Path).To(Equal("/tmp/uv/uv"))
+					Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
 					Expect(cmd.Args[1:]).To(Equal([]string{
 						"export", "--frozen", "--format", "requirements-txt",
 						"--no-dev", "--no-editable", "--no-header", "--no-annotate",
@@ -428,7 +429,8 @@ var _ = Describe("Supply", func() {
 				})
 
 				It("does not override it", func() {
-					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
 					mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
 						Expect(cmd.Env).To(ContainElement("UV_SYSTEM_CERTS=false"))
 						Expect(cmd.Env).NotTo(ContainElement("UV_SYSTEM_CERTS=1"))
@@ -441,16 +443,27 @@ var _ = Describe("Supply", func() {
 
 			Context("when uv cannot be installed", func() {
 				It("returns the error", func() {
-					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1).Return(errors.New("no versions of uv found"))
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any()).Return(errors.New("no versions of uv found"))
 
 					Expect(supplier.InstallUv()).To(MatchError("no versions of uv found"))
 					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
 				})
 			})
 
+			Context("when pip cannot install the uv wheel", func() {
+				It("returns a useful error", func() {
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv").Return(errors.New("exit status 1"))
+
+					Expect(supplier.InstallUv()).To(MatchError("could not install uv: exit status 1"))
+					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				})
+			})
+
 			Context("when uv export fails", func() {
 				It("returns a useful error", func() {
-					mockInstaller.EXPECT().InstallOnlyVersionWithStrip("uv", "/tmp/uv", 1)
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
 					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return(nil, errors.New("exit status 2"))
 
 					Expect(supplier.InstallUv()).To(MatchError("failed to export uv.lock: exit status 2"))
@@ -463,7 +476,7 @@ var _ = Describe("Supply", func() {
 	Describe("RunUvSync", func() {
 		It("installs the locked packages into the Python installation", func() {
 			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
-				Expect(cmd.Path).To(Equal("/tmp/uv/uv"))
+				Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
 				Expect(cmd.Args[1:]).To(Equal([]string{"sync", "--frozen", "--no-dev", "--no-editable", "--inexact"}))
 				Expect(cmd.Dir).To(Equal(buildDir))
 				Expect(cmd.Env).To(ContainElements(
@@ -491,7 +504,7 @@ var _ = Describe("Supply", func() {
 	Describe("RunUvVendored", func() {
 		It("installs the exported packages from the vendor directory", func() {
 			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
-				Expect(cmd.Path).To(Equal("/tmp/uv/uv"))
+				Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
 				Expect(cmd.Args[1:]).To(Equal([]string{
 					"pip", "install",
 					"--python", filepath.Join(depDir, "python", "bin", "python"),

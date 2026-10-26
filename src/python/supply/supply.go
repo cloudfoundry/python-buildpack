@@ -23,6 +23,7 @@ import (
 const EnvPipVersion = "BP_PIP_VERSION"
 
 var uvDir = filepath.Join("/tmp", "uv")
+var uvBin = filepath.Join(uvDir, "bin", "uv")
 
 type Stager interface {
 	BuildDir() string
@@ -43,7 +44,6 @@ type Manifest interface {
 type Installer interface {
 	InstallDependency(dep libbuildpack.Dependency, outputDir string) error
 	InstallOnlyVersion(depName, installDir string) error
-	InstallOnlyVersionWithStrip(depName, installDir string, stripComponents int) error
 }
 
 type Command interface {
@@ -557,13 +557,13 @@ func (s *Supplier) InstallUv() error {
 	}
 
 	s.Log.Info("Installing uv")
-	if err := s.Installer.InstallOnlyVersionWithStrip("uv", uvDir, 1); err != nil {
+	if err := s.installUv(); err != nil {
 		return err
 	}
 	s.usesUv = true
 
 	s.Log.Info("Generating 'requirements.txt' from uv.lock")
-	cmd := exec.Command(filepath.Join(uvDir, "uv"), uvExportArgs()...)
+	cmd := exec.Command(uvBin, uvExportArgs()...)
 	cmd.Dir = s.Stager.BuildDir()
 	cmd.Env = s.uvEnv()
 	cmd.Stderr = indentWriter(os.Stderr)
@@ -575,6 +575,33 @@ func (s *Supplier) InstallUv() error {
 	return s.writeTempRequirementsTxt(string(output))
 }
 
+// installUv installs the uv wheel from the manifest into uvDir, outside of the
+// Python installation, so that uv does not end up in the droplet.
+func (s *Supplier) installUv() error {
+	wheelDir, err := os.MkdirTemp("", "uv-wheel")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(wheelDir)
+
+	if err := s.Installer.InstallOnlyVersion("uv", wheelDir); err != nil {
+		return err
+	}
+
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
+		"python",
+		"-m", "pip",
+		"install", "uv",
+		"--no-index",
+		fmt.Sprintf("--find-links=%s", wheelDir),
+		fmt.Sprintf("--target=%s", uvDir),
+	); err != nil {
+		return fmt.Errorf("could not install uv: %v", err)
+	}
+
+	return nil
+}
+
 // RunUvSync installs the locked packages with 'uv sync' directly into the
 // Python installation, verifying them against the hashes in uv.lock.
 func (s *Supplier) RunUvSync() error {
@@ -583,7 +610,7 @@ func (s *Supplier) RunUvSync() error {
 	args := uvSyncArgs()
 	s.Log.Info("uv %s", strings.Join(args, " "))
 
-	cmd := exec.Command(filepath.Join(uvDir, "uv"), args...)
+	cmd := exec.Command(uvBin, args...)
 	cmd.Dir = s.Stager.BuildDir()
 	cmd.Env = append(s.uvEnv(), "UV_PROJECT_ENVIRONMENT="+filepath.Join(s.Stager.DepDir(), "python"))
 	cmd.Stdout = indentWriter(os.Stdout)
@@ -613,7 +640,7 @@ func (s *Supplier) RunUvVendored() error {
 	}
 	s.Log.Info("uv %s", strings.Join(args, " "))
 
-	cmd := exec.Command(filepath.Join(uvDir, "uv"), args...)
+	cmd := exec.Command(uvBin, args...)
 	cmd.Dir = s.Stager.BuildDir()
 	cmd.Env = s.uvEnv()
 	cmd.Stdout = indentWriter(os.Stdout)
