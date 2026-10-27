@@ -272,21 +272,21 @@ dependencies:
   source: https://files.pythonhosted.org/packages/70/b3/c19426f783614d625699a4b247faf628ea9ab1db228674491767b417f9e1/setuptools-84.2.1.tar.gz
   source_sha256: 3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc
 - name: uv
-  version: 0.13.5
-  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.5_linux_x64_cflinuxfs4_4a873e08.tgz
-  sha256: 4a873e08d7a57cc63f6e229eeec0947f8b88f69ff75b80082c23df51b47e3625
+  version: 0.13.6
+  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.6_linux_x64_cflinuxfs4_163a5327.tgz
+  sha256: 163a5327c25a1e16e6b73689c1bbf18b4b83fe0c513561fcaf6ac920896a134c
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/de/f0/7565e80415f841c3500ed69d86516c7676e3b24470a218ab61b1f43071a2/uv-0.13.5.tar.gz
-  source_sha256: 979409b8c9a78df140ffb19c53f511b7a73526da8d1d5e36558833055e371c6c
+  source: https://files.pythonhosted.org/packages/08/d5/88d43310d425f6e3a43997ad771658ded3237d0ed78c16a89b2353eddf56/uv-0.13.6.tar.gz
+  source_sha256: d762215478854f6cf20c3faed8f1eb30c8101d568e7bc32a3abafc063929d5c5
 - name: uv
-  version: 0.13.5
-  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.5_linux_x64_cflinuxfs5_df0489b1.tgz
-  sha256: df0489b125d2d2e018b6c83ef135a9cc0f689c4239dca662e649c2317fda1a82
+  version: 0.13.6
+  uri: https://buildpacks.cloudfoundry.org/dependencies/uv/uv_0.13.6_linux_x64_cflinuxfs5_e62c03a7.tgz
+  sha256: e62c03a7b9233e69d29a51463b874c6f98f24da30cf9ffc9bd312350a97c38a6
   cf_stacks:
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/de/f0/7565e80415f841c3500ed69d86516c7676e3b24470a218ab61b1f43071a2/uv-0.13.5.tar.gz
-  source_sha256: 979409b8c9a78df140ffb19c53f511b7a73526da8d1d5e36558833055e371c6c
+  source: https://files.pythonhosted.org/packages/08/d5/88d43310d425f6e3a43997ad771658ded3237d0ed78c16a89b2353eddf56/uv-0.13.6.tar.gz
+  source_sha256: d762215478854f6cf20c3faed8f1eb30c8101d568e7bc32a3abafc063929d5c5
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md
