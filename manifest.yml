@@ -26,21 +26,21 @@ dependency_deprecation_dates:
   link: https://peps.python.org/pep-0745/
 dependencies:
 - name: flit-core
-  version: 4.1.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_4.1.0_linux_noarch_cflinuxfs4_ce54b91e.tgz
-  sha256: ce54b91e705926623657e7c18a40e965b381fcf141ccafce05fac82fb8562fd1
+  version: 4.2.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_4.2.0_linux_noarch_cflinuxfs4_a9f95a63.tgz
+  sha256: a9f95a63040ff9ff8ad43ff94032954ccfa94970245836aefaea8839f5947ac1
   cf_stacks:
   - cflinuxfs4
-  source: https://files.pythonhosted.org/packages/e7/91/add211b38c357bf1b94900b4f79c34661a92be65c0243d2b0a3393c5092d/flit_core-4.1.0.tar.gz
-  source_sha256: 62e12b63ead8335b37f59fabb977c7167fe476dafb5e41785dfa8c9aff843bc6
+  source: https://files.pythonhosted.org/packages/d3/8b/0370578a456986d6995344967a479dd5c9d4e064681550c2a9594bb58b4a/flit_core-4.2.0.tar.gz
+  source_sha256: 84e4e4d8fdd45ba2613800a3ebc6834de26d47ec9746efc3719f94181137b460
 - name: flit-core
-  version: 4.1.0
-  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_4.1.0_linux_noarch_cflinuxfs5_0c64c560.tgz
-  sha256: 0c64c560d4b5d0aeb2a82f171ed9164bc022902432b8df9e6a331116d636e916
+  version: 4.2.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/flit-core/flit-core_4.2.0_linux_noarch_cflinuxfs5_7cf8b1d5.tgz
+  sha256: 7cf8b1d52e454e71aacc64f678707642e1e9ae4032029cd3e4d937d7c17687a5
   cf_stacks:
   - cflinuxfs5
-  source: https://files.pythonhosted.org/packages/e7/91/add211b38c357bf1b94900b4f79c34661a92be65c0243d2b0a3393c5092d/flit_core-4.1.0.tar.gz
-  source_sha256: 62e12b63ead8335b37f59fabb977c7167fe476dafb5e41785dfa8c9aff843bc6
+  source: https://files.pythonhosted.org/packages/d3/8b/0370578a456986d6995344967a479dd5c9d4e064681550c2a9594bb58b4a/flit_core-4.2.0.tar.gz
+  source_sha256: 84e4e4d8fdd45ba2613800a3ebc6834de26d47ec9746efc3719f94181137b460
 - name: libffi
   version: 3.2.1
   cf_stacks:
