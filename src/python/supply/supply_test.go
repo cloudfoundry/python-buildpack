@@ -261,6 +261,18 @@ var _ = Describe("Supply", func() {
 			})
 		})
 
+		Context("when the app provides a requirements.txt", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("flask"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("3.12\n"), 0644)).To(Succeed())
+			})
+
+			It("ignores .python-version, as uv.lock is ignored as well", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
 		Context("when the app does not use uv", func() {
 			BeforeEach(func() {
 				Expect(os.Remove(filepath.Join(buildDir, "uv.lock"))).To(Succeed())
@@ -528,7 +540,7 @@ var _ = Describe("Supply", func() {
 				mockCommand.EXPECT().Run(gomock.Any()).Return(errors.New("exit status 1"))
 
 				Expect(supplier.RunUvVendored()).To(MatchError("could not run uv pip install: exit status 1"))
-				Expect(buffer.String()).To(ContainSubstring("The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock."))
+				Expect(buffer.String()).To(ContainSubstring("The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock. If the project defines a [build-system], its build backend must be vendored as well."))
 			})
 		})
 	})
@@ -538,12 +550,14 @@ var _ = Describe("Supply", func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
 		})
 
-		Context("when requirements.txt was generated", func() {
+		Context("when requirements.txt was generated from uv.lock", func() {
 			BeforeEach(func() {
-				const lockFileContent string = `{"_meta":{"sources":[]},"default":{"django":{"version":"==5.2"}}}`
-				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
-				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(lockFileContent), 0644)).To(Succeed())
-				Expect(supplier.InstallPipEnv()).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+				mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("django==5.2\n"), nil)
+				Expect(supplier.InstallUv()).To(Succeed())
 			})
 
 			It("moves it from the app directory to the deps dir", func() {
@@ -553,6 +567,22 @@ var _ = Describe("Supply", func() {
 				requirementsContents, err := os.ReadFile(filepath.Join(depDir, "requirements.txt"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(requirementsContents)).To(Equal("django==5.2\n"))
+			})
+		})
+
+		Context("when requirements.txt was generated from Pipfile.lock", func() {
+			BeforeEach(func() {
+				const lockFileContent string = `{"_meta":{"sources":[]},"default":{"django":{"version":"==5.2"}}}`
+				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(lockFileContent), 0644)).To(Succeed())
+				Expect(supplier.InstallPipEnv()).To(Succeed())
+			})
+
+			It("removes it from the app directory without keeping a copy", func() {
+				Expect(supplier.MoveGeneratedRequirementsTxt()).To(Succeed())
+
+				Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				Expect(filepath.Join(depDir, "requirements.txt")).NotTo(BeAnExistingFile())
 			})
 		})
 

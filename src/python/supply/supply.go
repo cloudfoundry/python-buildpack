@@ -242,9 +242,15 @@ func (s *Supplier) HandlePipfile() error {
 }
 
 // HandleUvPythonVersion writes runtime.txt from the .python-version file of a
-// uv app, unless the app provides its own runtime.txt.
+// uv app, unless the app provides its own runtime.txt. Like InstallUv, it
+// ignores apps that provide a requirements.txt.
 func (s *Supplier) HandleUvPythonVersion() error {
 	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	if err != nil {
+		return err
+	}
+
+	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
 	if err != nil {
 		return err
 	}
@@ -260,7 +266,7 @@ func (s *Supplier) HandleUvPythonVersion() error {
 		return err
 	}
 
-	if !uvLockExists || runtimeExists || !pythonVersionExists {
+	if !uvLockExists || requirementstxtExists || runtimeExists || !pythonVersionExists {
 		return nil
 	}
 
@@ -588,6 +594,10 @@ func (s *Supplier) installUv() error {
 		return err
 	}
 
+	if err := os.RemoveAll(uvDir); err != nil {
+		return err
+	}
+
 	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
 		"python",
 		"-m", "pip",
@@ -646,7 +656,7 @@ func (s *Supplier) RunUvVendored() error {
 	cmd.Stdout = indentWriter(os.Stdout)
 	cmd.Stderr = indentWriter(os.Stderr)
 	if err := s.Command.Run(cmd); err != nil {
-		s.Log.Info("Running uv pip install failed. The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock.")
+		s.Log.Info("Running uv pip install failed. The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock. If the project defines a [build-system], its build backend must be vendored as well.")
 		return fmt.Errorf("could not run uv pip install: %v", err)
 	}
 
@@ -1172,16 +1182,19 @@ func (s *Supplier) writeTempRequirementsTxt(content string) error {
 }
 
 // MoveGeneratedRequirementsTxt removes a generated requirements.txt from the
-// app directory. A copy is kept in the deps dir, so that finalize can still
-// detect packages like Django.
+// app directory. For uv apps, a copy is kept in the deps dir, so that
+// finalize can still detect packages like Django. Pipfile apps keep their
+// previous behaviour and do not get a copy.
 func (s *Supplier) MoveGeneratedRequirementsTxt() error {
 	if !s.removeRequirementsText {
 		return nil
 	}
 
 	requirementsPath := filepath.Join(s.Stager.BuildDir(), "requirements.txt")
-	if err := libbuildpack.CopyFile(requirementsPath, filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
-		return err
+	if s.usesUv {
+		if err := libbuildpack.CopyFile(requirementsPath, filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
+			return err
+		}
 	}
 	return os.Remove(requirementsPath)
 }

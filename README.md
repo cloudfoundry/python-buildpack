@@ -19,7 +19,7 @@ Apps managed with [uv](https://docs.astral.sh/uv/) are supported by pushing the 
 * The Python version is taken from `.python-version` (e.g. `3.12`, as written by `uv python pin`), unless a `runtime.txt` exists. uv never downloads its own Python; staging fails if the version does not satisfy `requires-python`.
 * Package indexes configured via `[[tool.uv.index]]` are used as configured. Credentials are not part of `uv.lock`; provide them as environment variables, e.g. `cf set-env <app> UV_INDEX_<NAME>_USERNAME ...` and `UV_INDEX_<NAME>_PASSWORD`. uv trusts the system certificate store, like pip does.
 * Django's `collectstatic`, as well as the installation of libffi and libmemcached, work as for pip apps.
-* If the app also contains a `requirements.txt`, the `uv.lock` is ignored and pip is used.
+* If the app also contains a `requirements.txt`, the `uv.lock` and `.python-version` are ignored and pip is used.
 * For vendored (offline) installs, download the wheels for the target platform into the `vendor` directory. They are installed with `uv pip install --offline` and are verified against the hashes in `uv.lock` as well. Write the exported file outside the app, so that it does not take precedence over `uv.lock`:
 
   ```bash
