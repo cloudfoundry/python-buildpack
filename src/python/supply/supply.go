@@ -22,6 +22,9 @@ import (
 
 const EnvPipVersion = "BP_PIP_VERSION"
 
+var uvDir = filepath.Join("/tmp", "uv")
+var uvBin = filepath.Join(uvDir, "bin", "uv")
+
 type Stager interface {
 	BuildDir() string
 	CacheDir() string
@@ -46,6 +49,7 @@ type Installer interface {
 type Command interface {
 	Execute(dir string, stdout io.Writer, stderr io.Writer, program string, args ...string) error
 	Output(dir string, program string, args ...string) (string, error)
+	Run(cmd *exec.Cmd) error
 	RunWithOutput(cmd *exec.Cmd) ([]byte, error)
 }
 
@@ -64,6 +68,7 @@ type Supplier struct {
 	Logfile                *os.File
 	HasNltkData            bool
 	removeRequirementsText bool
+	usesUv                 bool
 	Requirements           Reqs
 }
 
@@ -92,6 +97,11 @@ func RunPython(s *Supplier) error {
 		return err
 	}
 
+	if err := s.HandleUvPythonVersion(); err != nil {
+		s.Log.Error("Error checking for .python-version: %v", err)
+		return err
+	}
+
 	if err := s.HandlePipfile(); err != nil {
 		s.Log.Error("Error checking for Pipfile.lock: %v", err)
 		return err
@@ -104,6 +114,11 @@ func RunPython(s *Supplier) error {
 
 	if err := s.InstallPip(); err != nil {
 		s.Log.Error("Could not install pip: %v", err)
+		return err
+	}
+
+	if err := s.InstallUv(); err != nil {
+		s.Log.Error("Could not install uv: %v", err)
 		return err
 	}
 
@@ -137,7 +152,17 @@ func RunPython(s *Supplier) error {
 		return fmt.Errorf("could not check vendor existence: %v", err)
 	}
 
-	if vendored {
+	if s.usesUv && vendored {
+		if err := s.RunUvVendored(); err != nil {
+			s.Log.Error("Could not install vendored packages with uv: %v", err)
+			return err
+		}
+	} else if s.usesUv {
+		if err := s.RunUvSync(); err != nil {
+			s.Log.Error("Could not install packages with uv: %v", err)
+			return err
+		}
+	} else if vendored {
 		if err := s.RunPipVendored(); err != nil {
 			s.Log.Error("Could not install vendored pip packages: %v", err)
 			return err
@@ -168,11 +193,9 @@ func RunPython(s *Supplier) error {
 		s.Log.Debug("Size of pip cache dir: %s", cacheDirSize)
 	}
 
-	if s.removeRequirementsText {
-		if err := os.Remove(filepath.Join(s.Stager.BuildDir(), "requirements.txt")); err != nil {
-			s.Log.Error("Unable to clean up app directory: %s", err.Error())
-			return err
-		}
+	if err := s.MoveGeneratedRequirementsTxt(); err != nil {
+		s.Log.Error("Unable to clean up app directory: %s", err.Error())
+		return err
 	}
 
 	dirSnapshot.Diff()
@@ -216,6 +239,72 @@ func (s *Supplier) HandlePipfile() error {
 		}
 	}
 	return nil
+}
+
+// HandleUvPythonVersion writes runtime.txt from the .python-version file of a
+// uv app, unless the app provides its own runtime.txt. Like InstallUv, it
+// ignores apps that provide a requirements.txt.
+func (s *Supplier) HandleUvPythonVersion() error {
+	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	if err != nil {
+		return err
+	}
+
+	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
+	if err != nil {
+		return err
+	}
+
+	runtimeExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.DepDir(), "runtime.txt"))
+	if err != nil {
+		return err
+	}
+
+	pythonVersionPath := filepath.Join(s.Stager.BuildDir(), ".python-version")
+	pythonVersionExists, err := libbuildpack.FileExists(pythonVersionPath)
+	if err != nil {
+		return err
+	}
+
+	if !uvLockExists || requirementstxtExists || runtimeExists || !pythonVersionExists {
+		return nil
+	}
+
+	contents, err := os.ReadFile(pythonVersionPath)
+	if err != nil {
+		return err
+	}
+
+	version, ok := parsePythonVersionFile(string(contents))
+	if !ok {
+		s.Log.Warning("Unsupported Python version in .python-version, using the default Python version")
+		return nil
+	}
+
+	s.Log.Info("Using Python version %s from .python-version", version)
+	return os.WriteFile(filepath.Join(s.Stager.DepDir(), "runtime.txt"), []byte(s.formatVersion(version)), 0644)
+}
+
+// parsePythonVersionFile returns the first version in a .python-version
+// file. Only CPython versions like "3.12", "3.12.4" or "cpython-3.12" are
+// supported.
+func parsePythonVersionFile(contents string) (string, bool) {
+	versionRegex := regexp.MustCompile(`^(?:cpython[-@]?)?(\d+\.\d+(?:\.\d+)?)$`)
+
+	for _, line := range strings.Split(contents, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		match := versionRegex.FindStringSubmatch(line)
+		if match == nil {
+			return "", false
+		}
+		return match[1], true
+	}
+
+	return "", false
 }
 
 func (s *Supplier) InstallPython() error {
@@ -450,6 +539,170 @@ func (s *Supplier) InstallPipEnv() error {
 	}
 
 	return s.writeTempRequirementsTxt(outputString)
+}
+
+// InstallUv installs uv for apps with a uv.lock and exports the locked
+// packages into a temporary requirements.txt, which is used to detect
+// packages that need special handling (e.g. libffi or Django). The packages
+// themselves are installed by RunUvSync. An existing requirements.txt always
+// takes precedence.
+func (s *Supplier) InstallUv() error {
+	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	if err != nil {
+		return fmt.Errorf("could not check uv.lock existence: %v", err)
+	} else if !uvLockExists {
+		return nil
+	}
+
+	requirementstxtExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "requirements.txt"))
+	if err != nil {
+		return err
+	} else if requirementstxtExists {
+		s.Log.Info("Found requirements.txt, ignoring uv.lock")
+		return nil
+	}
+
+	s.Log.Info("Installing uv")
+	if err := s.installUv(); err != nil {
+		return err
+	}
+	s.usesUv = true
+
+	s.Log.Info("Generating 'requirements.txt' from uv.lock")
+	cmd := exec.Command(uvBin, uvExportArgs()...)
+	cmd.Dir = s.Stager.BuildDir()
+	cmd.Env = s.uvEnv()
+	cmd.Stderr = indentWriter(os.Stderr)
+	output, err := s.Command.RunWithOutput(cmd)
+	if err != nil {
+		return fmt.Errorf("failed to export uv.lock: %v", err)
+	}
+
+	return s.writeTempRequirementsTxt(string(output))
+}
+
+// installUv installs the uv wheel from the manifest into uvDir, outside of the
+// Python installation, so that uv does not end up in the droplet.
+func (s *Supplier) installUv() error {
+	wheelDir, err := os.MkdirTemp("", "uv-wheel")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(wheelDir)
+
+	if err := s.Installer.InstallOnlyVersion("uv", wheelDir); err != nil {
+		return err
+	}
+
+	if err := os.RemoveAll(uvDir); err != nil {
+		return err
+	}
+
+	if err := s.Command.Execute(s.Stager.BuildDir(), indentWriter(os.Stdout), indentWriter(os.Stderr),
+		"python",
+		"-m", "pip",
+		"install", "uv",
+		"--no-index",
+		fmt.Sprintf("--find-links=%s", wheelDir),
+		fmt.Sprintf("--target=%s", uvDir),
+	); err != nil {
+		return fmt.Errorf("could not install uv: %v", err)
+	}
+
+	return nil
+}
+
+// RunUvSync installs the locked packages with 'uv sync' directly into the
+// Python installation, verifying them against the hashes in uv.lock.
+func (s *Supplier) RunUvSync() error {
+	s.Log.BeginStep("Running uv sync")
+
+	args := uvSyncArgs()
+	s.Log.Info("uv %s", strings.Join(args, " "))
+
+	cmd := exec.Command(uvBin, args...)
+	cmd.Dir = s.Stager.BuildDir()
+	cmd.Env = append(s.uvEnv(), "UV_PROJECT_ENVIRONMENT="+filepath.Join(s.Stager.DepDir(), "python"))
+	cmd.Stdout = indentWriter(os.Stdout)
+	cmd.Stderr = indentWriter(os.Stderr)
+	if err := s.Command.Run(cmd); err != nil {
+		return fmt.Errorf("could not run uv sync: %v", err)
+	}
+
+	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
+}
+
+// RunUvVendored installs the packages exported from uv.lock from the vendor
+// directory without network access. 'uv sync' cannot be used for this, as it
+// only downloads the files referenced in uv.lock. The hashes in the exported
+// requirements.txt are still verified.
+func (s *Supplier) RunUvVendored() error {
+	s.Log.BeginStep("Running uv pip install (Vendored)")
+
+	pythonPath := filepath.Join(s.Stager.DepDir(), "python", "bin", "python")
+	args := []string{
+		"pip", "install",
+		"--python", pythonPath,
+		"--offline",
+		"--no-index",
+		"--find-links", filepath.Join(s.Stager.BuildDir(), "vendor"),
+		"-r", filepath.Join(s.Stager.BuildDir(), "requirements.txt"),
+	}
+	s.Log.Info("uv %s", strings.Join(args, " "))
+
+	cmd := exec.Command(uvBin, args...)
+	cmd.Dir = s.Stager.BuildDir()
+	cmd.Env = s.uvEnv()
+	cmd.Stdout = indentWriter(os.Stdout)
+	cmd.Stderr = indentWriter(os.Stderr)
+	if err := s.Command.Run(cmd); err != nil {
+		s.Log.Info("Running uv pip install failed. The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock. If the project defines a [build-system], its build backend must be vendored as well.")
+		return fmt.Errorf("could not run uv pip install: %v", err)
+	}
+
+	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
+}
+
+// uvExportArgs exports the locked production dependencies without touching
+// the network. The project itself is only emitted if it is a package (i.e.
+// it defines a build-system).
+func uvExportArgs() []string {
+	return []string{
+		"export",
+		"--frozen",
+		"--format", "requirements-txt",
+		"--no-dev",
+		"--no-editable",
+		"--no-header",
+		"--no-annotate",
+	}
+}
+
+// uvSyncArgs installs the same packages as exported by uvExportArgs.
+// '--inexact' keeps packages that are not part of uv.lock, like pip.
+func uvSyncArgs() []string {
+	return []string{
+		"sync",
+		"--frozen",
+		"--no-dev",
+		"--no-editable",
+		"--inexact",
+	}
+}
+
+// uvEnv makes uv use the Python installed by the buildpack, trust the same
+// certificates as pip, and keep its cache in the app cache.
+func (s *Supplier) uvEnv() []string {
+	env := append(os.Environ(),
+		"UV_CACHE_DIR="+filepath.Join(s.Stager.CacheDir(), "uv_cache"),
+		"UV_LINK_MODE=copy",
+		"UV_PYTHON="+filepath.Join(s.Stager.DepDir(), "python", "bin", "python"),
+		"UV_PYTHON_DOWNLOADS=never",
+	)
+	if os.Getenv("UV_SYSTEM_CERTS") == "" {
+		env = append(env, "UV_SYSTEM_CERTS=1")
+	}
+	return env
 }
 
 func pipfileToRequirements(lockFilePath string) (string, error) {
@@ -926,6 +1179,24 @@ func (s *Supplier) formatVersion(version string) string {
 func (s *Supplier) writeTempRequirementsTxt(content string) error {
 	s.removeRequirementsText = true
 	return os.WriteFile(filepath.Join(s.Stager.BuildDir(), "requirements.txt"), []byte(content), 0644)
+}
+
+// MoveGeneratedRequirementsTxt removes a generated requirements.txt from the
+// app directory. For uv apps, a copy is kept in the deps dir, so that
+// finalize can still detect packages like Django. Pipfile apps keep their
+// previous behaviour and do not get a copy.
+func (s *Supplier) MoveGeneratedRequirementsTxt() error {
+	if !s.removeRequirementsText {
+		return nil
+	}
+
+	requirementsPath := filepath.Join(s.Stager.BuildDir(), "requirements.txt")
+	if s.usesUv {
+		if err := libbuildpack.CopyFile(requirementsPath, filepath.Join(s.Stager.DepDir(), "requirements.txt")); err != nil {
+			return err
+		}
+	}
+	return os.Remove(requirementsPath)
 }
 
 func (s *Supplier) hasBuildOptions() bool {

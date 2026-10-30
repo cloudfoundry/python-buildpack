@@ -11,6 +11,8 @@ import (
 
 const requirementsParserRegex = `(?m)^[\w\-\w\[\]]+`
 
+var packageNameSeparatorRegex = regexp.MustCompile(`[-_.]+`)
+
 type Reqs struct{}
 
 func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error) {
@@ -28,9 +30,17 @@ func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool,
 			return false, err
 		}
 
-		for _, searchedPackage := range searchedPackages {
-			if containsPackage(reqPackages, searchedPackage) {
-				return true, nil
+		normalizedSearchedPackages := make([]string, len(searchedPackages))
+		for i, searchedPackage := range searchedPackages {
+			normalizedSearchedPackages[i] = normalizePackageName(searchedPackage)
+		}
+
+		for _, reqPackage := range reqPackages {
+			normalizedReqPackage := normalizePackageName(reqPackage)
+			for _, searchedPackage := range normalizedSearchedPackages {
+				if normalizedReqPackage == searchedPackage {
+					return true, nil
+				}
 			}
 		}
 	}
@@ -79,6 +89,12 @@ func containsPackage(packages []string, searchedPackage string) bool {
 		}
 	}
 	return false
+}
+
+// normalizePackageName normalizes a package name as defined in PEP 503, since
+// e.g. 'PyNaCl' may be written as 'pynacl' in generated requirements files.
+func normalizePackageName(name string) string {
+	return strings.ToLower(packageNameSeparatorRegex.ReplaceAllString(name, "-"))
 }
 
 func packageIsExcluded(excludedPackages []string, packageFullName string) bool {

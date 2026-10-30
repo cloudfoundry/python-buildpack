@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/cloudfoundry/python-buildpack/src/python/supply"
@@ -211,6 +212,80 @@ var _ = Describe("Supply", func() {
 		})
 	})
 
+	Describe("HandleUvPythonVersion", func() {
+		BeforeEach(func() {
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+		})
+
+		DescribeTable("creates runtime.txt from .python-version",
+			func(pythonVersion, expectedRuntime string) {
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte(pythonVersion), 0644)).To(Succeed())
+
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+
+				runtimeContents, err := os.ReadFile(filepath.Join(depDir, "runtime.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(runtimeContents)).To(Equal(expectedRuntime))
+			},
+			Entry("minor version", "3.12\n", "python-3.12.x"),
+			Entry("patch version", "3.12.4\n", "python-3.12.4"),
+			Entry("implementation prefix", "cpython-3.13\n", "python-3.13.x"),
+			Entry("comments and multiple versions", "# pinned\n\n3.11\n3.12\n", "python-3.11.x"),
+		)
+
+		Context("when .python-version contains an unsupported version", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("pypy@3.10\n"), 0644)).To(Succeed())
+			})
+
+			It("warns and falls back to the default Python version", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("Unsupported Python version in .python-version"))
+				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
+		Context("when runtime.txt already exists", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(depDir, "runtime.txt"), []byte("python-3.11.x"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("3.12\n"), 0644)).To(Succeed())
+			})
+
+			It("keeps runtime.txt", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+
+				runtimeContents, err := os.ReadFile(filepath.Join(depDir, "runtime.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(runtimeContents)).To(Equal("python-3.11.x"))
+			})
+		})
+
+		Context("when the app provides a requirements.txt", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("flask"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("3.12\n"), 0644)).To(Succeed())
+			})
+
+			It("ignores .python-version, as uv.lock is ignored as well", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
+		Context("when the app does not use uv", func() {
+			BeforeEach(func() {
+				Expect(os.Remove(filepath.Join(buildDir, "uv.lock"))).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("3.12\n"), 0644)).To(Succeed())
+			})
+
+			It("ignores .python-version", func() {
+				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
+				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+	})
+
 	// Add the expects for what the installFfi function uses
 	expectInstallFfi := func() string {
 		ffiDir := filepath.Join(depDir, "libffi")
@@ -293,6 +368,234 @@ var _ = Describe("Supply", func() {
 
 				By("removes extraneous pipenv lock output")
 				Expect(string(requirementsContents)).To(Equal("line 1\nline 2\n"))
+			})
+		})
+	})
+
+	Describe("InstallUv", func() {
+		BeforeEach(func() {
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+		})
+
+		Context("when uv.lock does not exist", func() {
+			It("does not install uv", func() {
+				Expect(supplier.InstallUv()).To(Succeed())
+				Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
+		Context("when uv.lock and requirements.txt both exist", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("flask"), 0644)).To(Succeed())
+			})
+
+			It("does not install uv and keeps requirements.txt", func() {
+				Expect(supplier.InstallUv()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("Found requirements.txt, ignoring uv.lock"))
+
+				requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(requirementsContents)).To(Equal("flask"))
+			})
+		})
+
+		Context("when uv.lock exists but requirements.txt does not exist", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+			})
+
+			It("installs uv and generates requirements.txt with hashes using uv export", func() {
+				const exported = "flask==3.1.3 \\\n    --hash=sha256:4eda\ngunicorn==26.2.0 \\\n    --hash=sha256:17ef\n"
+				mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+				mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
+					Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
+					Expect(cmd.Args[1:]).To(Equal([]string{
+						"export", "--frozen", "--format", "requirements-txt",
+						"--no-dev", "--no-editable", "--no-header", "--no-annotate",
+					}))
+					Expect(cmd.Dir).To(Equal(buildDir))
+					Expect(cmd.Env).To(ContainElements(
+						"UV_CACHE_DIR="+filepath.Join(cacheDir, "uv_cache"),
+						"UV_PYTHON="+filepath.Join(depDir, "python", "bin", "python"),
+						"UV_PYTHON_DOWNLOADS=never",
+						"UV_SYSTEM_CERTS=1",
+					))
+					return []byte(exported), nil
+				})
+
+				Expect(supplier.InstallUv()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("Generating 'requirements.txt' from uv.lock"))
+
+				requirementsContents, err := os.ReadFile(filepath.Join(buildDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(requirementsContents)).To(Equal(exported))
+			})
+
+			Context("when UV_SYSTEM_CERTS is set by the app", func() {
+				BeforeEach(func() {
+					DeferCleanup(os.Unsetenv, "UV_SYSTEM_CERTS")
+					Expect(os.Setenv("UV_SYSTEM_CERTS", "false")).To(Succeed())
+				})
+
+				It("does not override it", func() {
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
+						Expect(cmd.Env).To(ContainElement("UV_SYSTEM_CERTS=false"))
+						Expect(cmd.Env).NotTo(ContainElement("UV_SYSTEM_CERTS=1"))
+						return []byte("flask==3.1.3\n"), nil
+					})
+
+					Expect(supplier.InstallUv()).To(Succeed())
+				})
+			})
+
+			Context("when uv cannot be installed", func() {
+				It("returns the error", func() {
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any()).Return(errors.New("no versions of uv found"))
+
+					Expect(supplier.InstallUv()).To(MatchError("no versions of uv found"))
+					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				})
+			})
+
+			Context("when pip cannot install the uv wheel", func() {
+				It("returns a useful error", func() {
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv").Return(errors.New("exit status 1"))
+
+					Expect(supplier.InstallUv()).To(MatchError("could not install uv: exit status 1"))
+					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				})
+			})
+
+			Context("when uv export fails", func() {
+				It("returns a useful error", func() {
+					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return(nil, errors.New("exit status 2"))
+
+					Expect(supplier.InstallUv()).To(MatchError("failed to export uv.lock: exit status 2"))
+					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				})
+			})
+		})
+	})
+
+	Describe("RunUvSync", func() {
+		It("installs the locked packages into the Python installation", func() {
+			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
+				Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
+				Expect(cmd.Args[1:]).To(Equal([]string{"sync", "--frozen", "--no-dev", "--no-editable", "--inexact"}))
+				Expect(cmd.Dir).To(Equal(buildDir))
+				Expect(cmd.Env).To(ContainElements(
+					"UV_PROJECT_ENVIRONMENT="+filepath.Join(depDir, "python"),
+					"UV_PYTHON="+filepath.Join(depDir, "python", "bin", "python"),
+					"UV_PYTHON_DOWNLOADS=never",
+				))
+				return nil
+			})
+			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+
+			Expect(supplier.RunUvSync()).To(Succeed())
+			Expect(buffer.String()).To(ContainSubstring("Running uv sync"))
+		})
+
+		Context("when uv sync fails", func() {
+			It("returns a useful error", func() {
+				mockCommand.EXPECT().Run(gomock.Any()).Return(errors.New("exit status 1"))
+
+				Expect(supplier.RunUvSync()).To(MatchError("could not run uv sync: exit status 1"))
+			})
+		})
+	})
+
+	Describe("RunUvVendored", func() {
+		It("installs the exported packages from the vendor directory", func() {
+			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
+				Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
+				Expect(cmd.Args[1:]).To(Equal([]string{
+					"pip", "install",
+					"--python", filepath.Join(depDir, "python", "bin", "python"),
+					"--offline",
+					"--no-index",
+					"--find-links", filepath.Join(buildDir, "vendor"),
+					"-r", filepath.Join(buildDir, "requirements.txt"),
+				}))
+				Expect(cmd.Dir).To(Equal(buildDir))
+				Expect(cmd.Env).To(ContainElement("UV_PYTHON_DOWNLOADS=never"))
+				return nil
+			})
+			mockStager.EXPECT().LinkDirectoryInDepDir(filepath.Join(depDir, "python", "bin"), "bin")
+
+			Expect(supplier.RunUvVendored()).To(Succeed())
+			Expect(buffer.String()).To(ContainSubstring("Running uv pip install (Vendored)"))
+		})
+
+		Context("when uv pip install fails", func() {
+			It("alerts the user", func() {
+				mockCommand.EXPECT().Run(gomock.Any()).Return(errors.New("exit status 1"))
+
+				Expect(supplier.RunUvVendored()).To(MatchError("could not run uv pip install: exit status 1"))
+				Expect(buffer.String()).To(ContainSubstring("The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock. If the project defines a [build-system], its build backend must be vendored as well."))
+			})
+		})
+	})
+
+	Describe("MoveGeneratedRequirementsTxt", func() {
+		BeforeEach(func() {
+			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+		})
+
+		Context("when requirements.txt was generated from uv.lock", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+				mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("django==5.2\n"), nil)
+				Expect(supplier.InstallUv()).To(Succeed())
+			})
+
+			It("moves it from the app directory to the deps dir", func() {
+				Expect(supplier.MoveGeneratedRequirementsTxt()).To(Succeed())
+
+				Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				requirementsContents, err := os.ReadFile(filepath.Join(depDir, "requirements.txt"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(requirementsContents)).To(Equal("django==5.2\n"))
+			})
+		})
+
+		Context("when requirements.txt was generated from Pipfile.lock", func() {
+			BeforeEach(func() {
+				const lockFileContent string = `{"_meta":{"sources":[]},"default":{"django":{"version":"==5.2"}}}`
+				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile"), []byte("some content"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, "Pipfile.lock"), []byte(lockFileContent), 0644)).To(Succeed())
+				Expect(supplier.InstallPipEnv()).To(Succeed())
+			})
+
+			It("removes it from the app directory without keeping a copy", func() {
+				Expect(supplier.MoveGeneratedRequirementsTxt()).To(Succeed())
+
+				Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+				Expect(filepath.Join(depDir, "requirements.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
+		Context("when requirements.txt was provided by the app", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("django"), 0644)).To(Succeed())
+			})
+
+			It("keeps it in the app directory", func() {
+				Expect(supplier.MoveGeneratedRequirementsTxt()).To(Succeed())
+
+				Expect(filepath.Join(buildDir, "requirements.txt")).To(BeARegularFile())
+				Expect(filepath.Join(depDir, "requirements.txt")).NotTo(BeAnExistingFile())
 			})
 		})
 	})

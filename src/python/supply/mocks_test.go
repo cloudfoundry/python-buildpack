@@ -313,6 +313,20 @@ func (mr *MockCommandMockRecorder) Output(dir, program interface{}, args ...inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Output", reflect.TypeOf((*MockCommand)(nil).Output), varargs...)
 }
 
+// Run mocks base method.
+func (m *MockCommand) Run(cmd *exec.Cmd) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Run", cmd)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Run indicates an expected call of Run.
+func (mr *MockCommandMockRecorder) Run(cmd interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockCommand)(nil).Run), cmd)
+}
+
 // RunWithOutput mocks base method.
 func (m *MockCommand) RunWithOutput(cmd *exec.Cmd) ([]byte, error) {
 	m.ctrl.T.Helper()
