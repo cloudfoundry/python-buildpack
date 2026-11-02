@@ -76,7 +76,7 @@ func testVersions(platform switchblade.Platform, fixtures, root string) func(*te
 					file, err := os.OpenFile(filepath.Join(source, "runtime.txt"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 					Expect(err).NotTo(HaveOccurred())
 
-					_, err = file.WriteString("python-3.10.x")
+					_, err = file.WriteString("python-3.14.x")
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(file.Close()).To(Succeed())
@@ -94,7 +94,7 @@ func testVersions(platform switchblade.Platform, fixtures, root string) func(*te
 					Eventually(deployment).Should(Serve("Hello, World!"))
 
 					Expect(logs.String()).To(SatisfyAll(
-						ContainSubstring("Installing python 3.10"),
+						ContainSubstring("Installing python 3.14"),
 					))
 				})
 			})

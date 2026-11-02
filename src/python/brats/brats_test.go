@@ -28,22 +28,10 @@ var _ = Describe("Python buildpack", func() {
 			Expect(bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte("Hello, bcrypt"))).ToNot(HaveOccurred())
 		})
 		By("supports postgres by raising a no connection error", func() {
-			Expect(app.GetBody("/pg")).To(
-				Or(
-					// Database client versions have different messages for the same error.
-					ContainSubstring("could not connect to server: No such file or directory"),
-					ContainSubstring("failed: No such file or directory"),
-				),
-			)
+			Expect(app.GetBody("/pg")).To(ContainSubstring("failed: No such file or directory"))
 		})
 		By("supports mysql by raising a no connection error", func() {
-			Expect(app.GetBody("/mysql")).To(
-				Or(
-					// Database client versions have different messages for the same error.
-					ContainSubstring("Can't connect to local MySQL server through socket"),
-					ContainSubstring("Can't connect to local server through socket"),
-				),
-			)
+			Expect(app.GetBody("/mysql")).To(ContainSubstring("Can't connect to local server through socket"))
 		})
 		By("supports loading and running the hiredis lib", func() {
 			Expect(app.GetBody("/redis")).To(ContainSubstring("Hello"))

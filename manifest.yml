@@ -2,12 +2,8 @@
 language: python
 default_versions:
 - name: python
-  version: 3.10.x
+  version: 3.14.x
 dependency_deprecation_dates:
-- version_line: 3.10.x
-  name: python
-  date: 2026-10-04
-  link: https://www.python.org/dev/peps/pep-0619/
 - version_line: 3.11.x
   name: python
   date: 2027-10-24
@@ -123,22 +119,6 @@ dependencies:
   - cflinuxfs5
   source: https://files.pythonhosted.org/packages/42/b5/50f1fda26c4fe5b1d6ce5cdf0391bdfa1ca12fdcb8ad68344d5cf678fc90/poetry_core-2.5.0.tar.gz
   source_sha256: 81d04c9253b19d0604718268d781867c8f7b2128e5b25bbf1e84141eec6b89c4
-- name: python
-  version: 3.10.22
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.22_linux_x64_cflinuxfs4_e1af3723.tgz
-  sha256: e1af372322dcbf05a0458bfb792b811abafd944d40035c63ce367f6ee334e75c
-  cf_stacks:
-  - cflinuxfs4
-  source: https://www.python.org/ftp/python/3.10.22/Python-3.10.22.tgz
-  source_sha256: 9448b34d16f8e3db0964ac3ed9fb283197747543c2c021f283ffd2c8b7287357
-- name: python
-  version: 3.10.22
-  uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.10.22_linux_x64_cflinuxfs5_d8a723d9.tgz
-  sha256: d8a723d94bda5eb0e28bcaeaaa51fcccfd28174d09562bc85133b470b5689057
-  cf_stacks:
-  - cflinuxfs5
-  source: https://www.python.org/ftp/python/3.10.22/Python-3.10.22.tgz
-  source_sha256: 9448b34d16f8e3db0964ac3ed9fb283197747543c2c021f283ffd2c8b7287357
 - name: python
   version: 3.11.18
   uri: https://buildpacks.cloudfoundry.org/dependencies/python/python_3.11.18_linux_x64_cflinuxfs4_2dd696f8.tgz
