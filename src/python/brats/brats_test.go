@@ -30,7 +30,7 @@ var _ = Describe("Python buildpack", func() {
 		By("supports postgres by raising a no connection error", func() {
 			Expect(app.GetBody("/pg")).To(
 				Or(
-					// cflinuxfs3 and cflinuxfs4 have different messages for the same error.
+					// Database client versions have different messages for the same error.
 					ContainSubstring("could not connect to server: No such file or directory"),
 					ContainSubstring("failed: No such file or directory"),
 				),
@@ -39,7 +39,7 @@ var _ = Describe("Python buildpack", func() {
 		By("supports mysql by raising a no connection error", func() {
 			Expect(app.GetBody("/mysql")).To(
 				Or(
-					// cflinuxfs3 and cflinuxfs4 have different messages for the same error.
+					// Database client versions have different messages for the same error.
 					ContainSubstring("Can't connect to local MySQL server through socket"),
 					ContainSubstring("Can't connect to local server through socket"),
 				),

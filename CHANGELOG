@@ -1,3 +1,9 @@
+Unreleased
+=====================
+
+* Remove support for the cflinuxfs3 stack. Migrate applications to a supported
+  stack before upgrading.
+
 v1.8.43 
 =====================
 

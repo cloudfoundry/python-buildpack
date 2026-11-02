@@ -6,6 +6,9 @@ A Cloud Foundry [buildpack](http://docs.cloudfoundry.org/buildpacks/) for Python
 
 This buildpack supports running Django and Flask apps.
 
+Supported stacks are cflinuxfs4 and cflinuxfs5. See
+[manifest.yml](manifest.yml) for dependency availability on each stack.
+
 ### Buildpack User Documentation
 
 Official buildpack documentation can be found at [python buildpack docs](http://docs.cloudfoundry.org/buildpacks/python/index.html).
