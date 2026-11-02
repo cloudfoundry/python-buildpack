@@ -1,3 +1,15 @@
+Unreleased
+=====================
+
+* Remove Python 3.10 and change the default runtime from Python 3.10 to
+  Python 3.14. Applications without an explicit runtime selection will use
+  Python 3.14 on their next staging. Verify application and dependency
+  compatibility before upgrading, or explicitly select another supported
+  Python version.
+
+* Remove support for the cflinuxfs3 stack. Migrate applications to a supported
+  stack before upgrading.
+
 v1.8.43 
 =====================
 
