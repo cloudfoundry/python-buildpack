@@ -10,6 +10,25 @@ This buildpack supports running Django and Flask apps.
 
 Official buildpack documentation can be found at [python buildpack docs](http://docs.cloudfoundry.org/buildpacks/python/index.html).
 
+### uv
+
+Apps managed with [uv](https://docs.astral.sh/uv/) are supported by pushing the `pyproject.toml` together with a `uv.lock`:
+
+* During staging the buildpack runs `uv sync --frozen` to install the locked packages into the buildpack's Python installation. Every package is verified against the hashes in `uv.lock`, and staging fails on a mismatch. Keep `uv.lock` up to date (`uv lock`) before pushing, as it is used as is.
+* Only the default dependencies are installed, dependency groups such as `dev` are skipped. If the project defines a `[build-system]`, the project itself is installed as well (non-editable).
+* The Python version is taken from `.python-version` (e.g. `3.12`, as written by `uv python pin`), unless a `runtime.txt` exists. Only CPython versions like `3.12` or `3.12.4` are supported; staging fails for other values (e.g. `pypy@3.10` or `>=3.11`). uv never downloads its own Python; staging fails if the version does not satisfy `requires-python`.
+* Package indexes configured via `[[tool.uv.index]]` are used as configured. Credentials are not part of `uv.lock`; provide them as environment variables, e.g. `cf set-env <app> UV_INDEX_<NAME>_USERNAME ...` and `UV_INDEX_<NAME>_PASSWORD`. uv trusts the system certificate store, like pip does.
+* Django's `collectstatic`, as well as the installation of libffi and libmemcached, work as for pip apps. They are detected from the packages exported from `uv.lock` with the same selection as `uv sync`. Packages restricted by environment markers (e.g. `sys_platform == 'win32'`) are taken into account for detection even if their markers do not match, but are only installed if they do.
+* If the app also contains a `requirements.txt`, the `uv.lock` and `.python-version` are ignored and pip is used. Both `pyproject.toml` and `uv.lock` are required for the app to be treated as a uv app.
+* For vendored (offline) installs, download the wheels for the target platform into the `vendor` directory. They are installed with `uv pip install --offline` from the packages exported from `uv.lock`, which are the same packages as installed by `uv sync`, and are verified against the hashes in `uv.lock` as well. Staging fails if the `vendor` directory is empty. Write the exported file outside the app, so that it does not take precedence over `uv.lock`:
+
+  ```bash
+  uv export --frozen --no-dev --no-hashes --no-emit-project -o /tmp/requirements.txt
+  pip download -r /tmp/requirements.txt -d vendor --only-binary=:all: --platform manylinux2014_x86_64 --python-version 3.12
+  ```
+
+  If the project defines a `[build-system]`, its build backend (e.g. `hatchling`) must be vendored as well.
+
 ## Adding new dependencies
 
 If you want to add a new dependency to the buildpack, please add it to the [config.yml](https://github.com/cloudfoundry/buildpacks-ci/blob/5a63d13df09f83d5dff7c71d0a12c3e2dc798d39/pipelines/dependency-builds/config.yml#L272) file. For example, if you want to add a new version of Python, add an entry like the following:

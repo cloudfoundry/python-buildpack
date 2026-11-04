@@ -60,6 +60,56 @@ package6[test]==6.0.0
 				})
 			})
 
+			Context("package names are written differently", func() {
+				BeforeEach(func() {
+					Expect(os.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(`pynacl==1.5.0
+argon2_cffi==23.1.0
+Django==5.2
+`), 0644)).To(Succeed())
+				})
+
+				It("matches the normalized package names", func() {
+					exists, err := req.FindAnyPackage(tempDir, "PyNaCl")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeTrue())
+
+					exists, err = req.FindAnyPackage(tempDir, "argon2-cffi")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeTrue())
+
+					exists, err = req.FindAnyPackage(tempDir, "django")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeTrue())
+
+					exists, err = req.FindAnyPackage(tempDir, "cffi")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeFalse())
+				})
+			})
+
+			DescribeTable("package names with separators and extras",
+				func(requirement, searchedPackage string, expected bool) {
+					Expect(os.WriteFile(filepath.Join(tempDir, "requirements.txt"), []byte(requirement+"\n"), 0644)).To(Succeed())
+
+					exists, err := req.FindAnyPackage(tempDir, searchedPackage)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(Equal(expected))
+				},
+				Entry("underscore matches hyphen", "argon2_cffi==23.1.0", "argon2-cffi", true),
+				Entry("dot matches hyphen", "argon2.cffi==23.1.0", "argon2-cffi", true),
+				Entry("hyphen matches underscore", "django-foo==1.0", "django_foo", true),
+				Entry("name with dots is not truncated", "django.foo==1.0", "django", false),
+				Entry("name with underscore is not a prefix match", "Django_Foo==1.0", "django", false),
+				Entry("different name containing the package", "pylibmc_extra==1.0", "pylibmc", false),
+				Entry("pylibmc with different case", "PyLibMC==1.6.3", "pylibmc", true),
+				Entry("requirement with extras matches the plain package", "django[argon2]==5.2", "django", true),
+				Entry("requirement with the searched extra", "Django[argon2]==5.2", "django[argon2]", true),
+				Entry("requirement with several extras", "django[bcrypt, argon2]==5.2", "django[argon2]", true),
+				Entry("requirement without the searched extra", "django==5.2", "django[argon2]", false),
+				Entry("requirement with a different extra", "django[bcrypt]==5.2", "django[argon2]", false),
+				Entry("requirement with environment markers", "cffi==1.17.1 ; sys_platform == 'linux'", "cffi", true),
+			)
+
 			Context("multiple requirements.txt files", func() {
 				Context("packages are in a recursive requirements.txt file", func() {
 					BeforeEach(func() {

@@ -11,6 +11,14 @@ import (
 
 const requirementsParserRegex = `(?m)^[\w\-\w\[\]]+`
 
+var packageNameSeparatorRegex = regexp.MustCompile(`[-_.]+`)
+
+// packageNameRegex matches the package name of a requirement, including dots
+// (e.g. 'zope.interface') and extras (e.g. 'django[argon2]').
+var packageNameRegex = regexp.MustCompile(`(?m)^[\w\-.]+(?:\[[^\]]*\])?`)
+
+var packageExtrasRegex = regexp.MustCompile(`\[(.*)\]`)
+
 type Reqs struct{}
 
 func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool, error) {
@@ -28,9 +36,11 @@ func (m Reqs) FindAnyPackage(buildDir string, searchedPackages ...string) (bool,
 			return false, err
 		}
 
-		for _, searchedPackage := range searchedPackages {
-			if containsPackage(reqPackages, searchedPackage) {
-				return true, nil
+		for _, reqPackage := range reqPackages {
+			for _, searchedPackage := range searchedPackages {
+				if packageMatches(reqPackage, searchedPackage) {
+					return true, nil
+				}
 			}
 		}
 	}
@@ -81,6 +91,42 @@ func containsPackage(packages []string, searchedPackage string) bool {
 	return false
 }
 
+// packageMatches returns whether a requirement like 'Django[argon2]' matches
+// a searched package. The names are compared normalized, and the requirement
+// must have all extras of the searched package, so that 'django' matches
+// 'django[argon2]', but 'django[argon2]' does not match 'django'.
+func packageMatches(reqPackage, searchedPackage string) bool {
+	reqName, reqExtras := splitPackageExtras(reqPackage)
+	searchedName, searchedExtras := splitPackageExtras(searchedPackage)
+	if reqName != searchedName {
+		return false
+	}
+
+	for _, searchedExtra := range searchedExtras {
+		if !containsPackage(reqExtras, searchedExtra) {
+			return false
+		}
+	}
+	return true
+}
+
+// splitPackageExtras returns the normalized name and extras of a package.
+func splitPackageExtras(pkg string) (string, []string) {
+	var extras []string
+	if match := packageExtrasRegex.FindStringSubmatch(pkg); match != nil {
+		for _, extra := range strings.Split(match[1], ",") {
+			extras = append(extras, normalizePackageName(strings.TrimSpace(extra)))
+		}
+	}
+	return normalizePackageName(packageExtrasRegex.ReplaceAllString(pkg, "")), extras
+}
+
+// normalizePackageName normalizes a package name as defined in PEP 503, since
+// e.g. 'PyNaCl' may be written as 'pynacl' in generated requirements files.
+func normalizePackageName(name string) string {
+	return strings.ToLower(packageNameSeparatorRegex.ReplaceAllString(name, "-"))
+}
+
 func packageIsExcluded(excludedPackages []string, packageFullName string) bool {
 
 	regex := regexp.MustCompile(requirementsParserRegex)
@@ -125,6 +171,5 @@ func parseRequirementsWithoutVersion(requirementsPath string) ([]string, error) 
 		return nil, err
 	}
 
-	regex := regexp.MustCompile(`(?m)^[\w\-\w\[\]]+`)
-	return regex.FindAllString(strings.Join(parsedRequirements, "\n"), -1), nil
+	return packageNameRegex.FindAllString(strings.Join(parsedRequirements, "\n"), -1), nil
 }

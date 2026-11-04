@@ -87,7 +87,7 @@ var _ = Describe("Finalize", func() {
 			})
 			Context("app uses Django", func() {
 				BeforeEach(func() {
-					mockRequirements.EXPECT().FindAnyPackage(buildDir, "django", "Django").Return(true, nil)
+					mockRequirements.EXPECT().FindAnyPackage(buildDir, "django").Return(true, nil)
 					mockManagePyFinder.EXPECT().FindManagePy(buildDir).Return("/foo/bar/manage.py", nil)
 				})
 
@@ -112,10 +112,24 @@ var _ = Describe("Finalize", func() {
 
 			Context("app does not use Django", func() {
 				BeforeEach(func() {
-					mockRequirements.EXPECT().FindAnyPackage(buildDir, "django", "Django").Return(false, nil)
+					mockRequirements.EXPECT().FindAnyPackage(buildDir, "django").Return(false, nil)
+					mockRequirements.EXPECT().FindAnyPackage(filepath.Join(depsDir, depsIdx), "django").Return(false, nil)
 				})
 
 				It("does not run anything", func() {
+					Expect(finalizer.HandleCollectstatic()).To(Succeed())
+				})
+			})
+
+			Context("Django is only in the requirements.txt generated during supply", func() {
+				BeforeEach(func() {
+					mockRequirements.EXPECT().FindAnyPackage(buildDir, "django").Return(false, nil)
+					mockRequirements.EXPECT().FindAnyPackage(filepath.Join(depsDir, depsIdx), "django").Return(true, nil)
+					mockManagePyFinder.EXPECT().FindManagePy(buildDir).Return("/foo/bar/manage.py", nil)
+				})
+
+				It("runs collectstatic", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "/foo/bar/manage.py", "collectstatic", "--noinput", "--traceback").Return(nil)
 					Expect(finalizer.HandleCollectstatic()).To(Succeed())
 				})
 			})
