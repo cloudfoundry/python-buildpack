@@ -18,9 +18,9 @@ Apps managed with [uv](https://docs.astral.sh/uv/) are supported by pushing the 
 * Only the default dependencies are installed, dependency groups such as `dev` are skipped. If the project defines a `[build-system]`, the project itself is installed as well (non-editable).
 * The Python version is taken from `.python-version` (e.g. `3.12`, as written by `uv python pin`), unless a `runtime.txt` exists. Only CPython versions like `3.12` or `3.12.4` are supported; staging fails for other values (e.g. `pypy@3.10` or `>=3.11`). uv never downloads its own Python; staging fails if the version does not satisfy `requires-python`.
 * Package indexes configured via `[[tool.uv.index]]` are used as configured. Credentials are not part of `uv.lock`; provide them as environment variables, e.g. `cf set-env <app> UV_INDEX_<NAME>_USERNAME ...` and `UV_INDEX_<NAME>_PASSWORD`. uv trusts the system certificate store, like pip does.
-* Django's `collectstatic`, as well as the installation of libffi and libmemcached, work as for pip apps.
+* Django's `collectstatic`, as well as the installation of libffi and libmemcached, work as for pip apps. They are detected from the packages exported from `uv.lock` with the same selection as `uv sync`. Packages restricted by environment markers (e.g. `sys_platform == 'win32'`) are taken into account for detection even if their markers do not match, but are only installed if they do.
 * If the app also contains a `requirements.txt`, the `uv.lock` and `.python-version` are ignored and pip is used.
-* For vendored (offline) installs, download the wheels for the target platform into the `vendor` directory. They are installed with `uv pip install --offline` and are verified against the hashes in `uv.lock` as well. Write the exported file outside the app, so that it does not take precedence over `uv.lock`:
+* For vendored (offline) installs, download the wheels for the target platform into the `vendor` directory. They are installed with `uv pip install --offline` from the packages exported from `uv.lock`, which are the same packages as installed by `uv sync`, and are verified against the hashes in `uv.lock` as well. Write the exported file outside the app, so that it does not take precedence over `uv.lock`:
 
   ```bash
   uv export --frozen --no-dev --no-hashes --no-emit-project -o /tmp/requirements.txt

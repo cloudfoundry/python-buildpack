@@ -674,31 +674,28 @@ func (s *Supplier) RunUvVendored() error {
 	return s.Stager.LinkDirectoryInDepDir(filepath.Join(s.Stager.DepDir(), "python", "bin"), "bin")
 }
 
-// uvExportArgs exports the locked production dependencies without touching
-// the network. The project itself is only emitted if it is a package (i.e.
-// it defines a build-system).
+// uvSelectionArgs selects the packages from uv.lock without touching the
+// network. They are shared by uvExportArgs and uvSyncArgs, so that the
+// exported requirements.txt used for package detection and the vendored
+// install contains the same packages as installed by 'uv sync'. Packages with
+// environment markers (e.g. sys_platform == 'win32') are exported with their
+// markers, but are only installed if the markers match.
+var uvSelectionArgs = []string{"--frozen", "--no-dev", "--no-editable"}
+
+// uvExportArgs exports the locked production dependencies. The project itself
+// is only emitted if it is a package (i.e. it defines a build-system).
 func uvExportArgs() []string {
-	return []string{
-		"export",
-		"--frozen",
+	return append(append([]string{"export"}, uvSelectionArgs...),
 		"--format", "requirements-txt",
-		"--no-dev",
-		"--no-editable",
 		"--no-header",
 		"--no-annotate",
-	}
+	)
 }
 
 // uvSyncArgs installs the same packages as exported by uvExportArgs.
 // '--inexact' keeps packages that are not part of uv.lock, like pip.
 func uvSyncArgs() []string {
-	return []string{
-		"sync",
-		"--frozen",
-		"--no-dev",
-		"--no-editable",
-		"--inexact",
-	}
+	return append(append([]string{"sync"}, uvSelectionArgs...), "--inexact")
 }
 
 // uvEnv makes uv use the Python installed by the buildpack, trust the same

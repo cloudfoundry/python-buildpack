@@ -54,6 +54,7 @@ func testUv(platform switchblade.Platform, fixtures string) func(*testing.T, spe
 					ContainSubstring("+ flask==3.1.3"),
 					ContainSubstring("+ gunicorn==26.2.0"),
 					Not(ContainSubstring("pytest")),
+					Not(ContainSubstring("+ colorama")),
 					Not(ContainSubstring("Running Pip Install")),
 				))
 			})

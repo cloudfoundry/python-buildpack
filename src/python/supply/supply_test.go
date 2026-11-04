@@ -432,8 +432,8 @@ var _ = Describe("Supply", func() {
 					Expect(supplier.UvDir).To(BeADirectory())
 					Expect(cmd.Path).To(Equal(filepath.Join(supplier.UvDir, "bin", "uv")))
 					Expect(cmd.Args[1:]).To(Equal([]string{
-						"export", "--frozen", "--format", "requirements-txt",
-						"--no-dev", "--no-editable", "--no-header", "--no-annotate",
+						"export", "--frozen", "--no-dev", "--no-editable",
+						"--format", "requirements-txt", "--no-header", "--no-annotate",
 					}))
 					Expect(cmd.Dir).To(Equal(buildDir))
 					Expect(cmd.Env).To(ContainElements(
