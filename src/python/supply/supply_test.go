@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -416,14 +417,20 @@ var _ = Describe("Supply", func() {
 			BeforeEach(func() {
 				Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
 				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+				DeferCleanup(func() { os.RemoveAll(supplier.UvDir) })
 			})
 
 			It("installs uv and generates requirements.txt with hashes using uv export", func() {
 				const exported = "flask==3.1.3 \\\n    --hash=sha256:4eda\ngunicorn==26.2.0 \\\n    --hash=sha256:17ef\n"
 				mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), gomock.Any()).
+					DoAndReturn(func(_ string, _, _ io.Writer, _ string, args ...string) error {
+						Expect(args[len(args)-1]).To(Equal("--target=" + supplier.UvDir))
+						return nil
+					})
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
-					Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
+					Expect(supplier.UvDir).To(BeADirectory())
+					Expect(cmd.Path).To(Equal(filepath.Join(supplier.UvDir, "bin", "uv")))
 					Expect(cmd.Args[1:]).To(Equal([]string{
 						"export", "--frozen", "--format", "requirements-txt",
 						"--no-dev", "--no-editable", "--no-header", "--no-annotate",
@@ -454,7 +461,7 @@ var _ = Describe("Supply", func() {
 
 				It("does not override it", func() {
 					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), gomock.Any())
 					mockCommand.EXPECT().RunWithOutput(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) ([]byte, error) {
 						Expect(cmd.Env).To(ContainElement("UV_SYSTEM_CERTS=false"))
 						Expect(cmd.Env).NotTo(ContainElement("UV_SYSTEM_CERTS=1"))
@@ -477,7 +484,7 @@ var _ = Describe("Supply", func() {
 			Context("when pip cannot install the uv wheel", func() {
 				It("returns a useful error", func() {
 					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv").Return(errors.New("exit status 1"))
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), gomock.Any()).Return(errors.New("exit status 1"))
 
 					Expect(supplier.InstallUv()).To(MatchError("could not install uv: exit status 1"))
 					Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
@@ -487,7 +494,7 @@ var _ = Describe("Supply", func() {
 			Context("when uv export fails", func() {
 				It("returns a useful error", func() {
 					mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
-					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), gomock.Any())
 					mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return(nil, errors.New("exit status 2"))
 
 					Expect(supplier.InstallUv()).To(MatchError("failed to export uv.lock: exit status 2"))
@@ -498,9 +505,13 @@ var _ = Describe("Supply", func() {
 	})
 
 	Describe("RunUvSync", func() {
+		BeforeEach(func() {
+			supplier.UvDir = "/tmp/uv-test"
+		})
+
 		It("installs the locked packages into the Python installation", func() {
 			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
-				Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
+				Expect(cmd.Path).To(Equal("/tmp/uv-test/bin/uv"))
 				Expect(cmd.Args[1:]).To(Equal([]string{"sync", "--frozen", "--no-dev", "--no-editable", "--inexact"}))
 				Expect(cmd.Dir).To(Equal(buildDir))
 				Expect(cmd.Env).To(ContainElements(
@@ -526,9 +537,13 @@ var _ = Describe("Supply", func() {
 	})
 
 	Describe("RunUvVendored", func() {
+		BeforeEach(func() {
+			supplier.UvDir = "/tmp/uv-test"
+		})
+
 		It("installs the exported packages from the vendor directory", func() {
 			mockCommand.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
-				Expect(cmd.Path).To(Equal("/tmp/uv/bin/uv"))
+				Expect(cmd.Path).To(Equal("/tmp/uv-test/bin/uv"))
 				Expect(cmd.Args[1:]).To(Equal([]string{
 					"pip", "install",
 					"--python", filepath.Join(depDir, "python", "bin", "python"),
@@ -567,9 +582,10 @@ var _ = Describe("Supply", func() {
 				Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
 				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
 				mockInstaller.EXPECT().InstallOnlyVersion("uv", gomock.Any())
-				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), "--target=/tmp/uv")
+				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "python", "-m", "pip", "install", "uv", "--no-index", gomock.Any(), gomock.Any())
 				mockCommand.EXPECT().RunWithOutput(gomock.Any()).Return([]byte("django==5.2\n"), nil)
 				Expect(supplier.InstallUv()).To(Succeed())
+				DeferCleanup(func() { os.RemoveAll(supplier.UvDir) })
 			})
 
 			It("moves it from the app directory to the deps dir", func() {

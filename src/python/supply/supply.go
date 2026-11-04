@@ -22,9 +22,6 @@ import (
 
 const EnvPipVersion = "BP_PIP_VERSION"
 
-var uvDir = filepath.Join("/tmp", "uv")
-var uvBin = filepath.Join(uvDir, "bin", "uv")
-
 var pythonVersionFileRegex = regexp.MustCompile(`^(?:cpython[-@]?)?(\d+\.\d+(?:\.\d+)?)$`)
 
 type Stager interface {
@@ -71,6 +68,7 @@ type Supplier struct {
 	HasNltkData            bool
 	removeRequirementsText bool
 	usesUv                 bool
+	UvDir                  string
 	Requirements           Reqs
 }
 
@@ -122,6 +120,9 @@ func RunPython(s *Supplier) error {
 	if err := s.InstallUv(); err != nil {
 		s.Log.Error("Could not install uv: %v", err)
 		return err
+	}
+	if s.UvDir != "" {
+		defer os.RemoveAll(s.UvDir)
 	}
 
 	if err := s.InstallPipEnv(); err != nil {
@@ -573,7 +574,7 @@ func (s *Supplier) InstallUv() error {
 	s.usesUv = true
 
 	s.Log.Info("Generating 'requirements.txt' from uv.lock")
-	cmd := exec.Command(uvBin, uvExportArgs()...)
+	cmd := exec.Command(s.uvBin(), uvExportArgs()...)
 	cmd.Dir = s.Stager.BuildDir()
 	cmd.Env = s.uvEnv()
 	cmd.Stderr = indentWriter(os.Stderr)
@@ -585,8 +586,9 @@ func (s *Supplier) InstallUv() error {
 	return s.writeTempRequirementsTxt(string(output))
 }
 
-// installUv installs the uv wheel from the manifest into uvDir, outside of the
-// Python installation, so that uv does not end up in the droplet.
+// installUv installs the uv wheel from the manifest into a temporary UvDir,
+// outside of the Python installation, so that uv does not end up in the
+// droplet.
 func (s *Supplier) installUv() error {
 	wheelDir, err := os.MkdirTemp("", "uv-wheel")
 	if err != nil {
@@ -598,7 +600,8 @@ func (s *Supplier) installUv() error {
 		return err
 	}
 
-	if err := os.RemoveAll(uvDir); err != nil {
+	s.UvDir, err = os.MkdirTemp("", "uv")
+	if err != nil {
 		return err
 	}
 
@@ -608,12 +611,16 @@ func (s *Supplier) installUv() error {
 		"install", "uv",
 		"--no-index",
 		fmt.Sprintf("--find-links=%s", wheelDir),
-		fmt.Sprintf("--target=%s", uvDir),
+		fmt.Sprintf("--target=%s", s.UvDir),
 	); err != nil {
 		return fmt.Errorf("could not install uv: %v", err)
 	}
 
 	return nil
+}
+
+func (s *Supplier) uvBin() string {
+	return filepath.Join(s.UvDir, "bin", "uv")
 }
 
 // RunUvSync installs the locked packages with 'uv sync' directly into the
@@ -624,7 +631,7 @@ func (s *Supplier) RunUvSync() error {
 	args := uvSyncArgs()
 	s.Log.Info("uv %s", strings.Join(args, " "))
 
-	cmd := exec.Command(uvBin, args...)
+	cmd := exec.Command(s.uvBin(), args...)
 	cmd.Dir = s.Stager.BuildDir()
 	cmd.Env = append(s.uvEnv(), "UV_PROJECT_ENVIRONMENT="+filepath.Join(s.Stager.DepDir(), "python"))
 	cmd.Stdout = indentWriter(os.Stdout)
@@ -654,7 +661,7 @@ func (s *Supplier) RunUvVendored() error {
 	}
 	s.Log.Info("uv %s", strings.Join(args, " "))
 
-	cmd := exec.Command(uvBin, args...)
+	cmd := exec.Command(s.uvBin(), args...)
 	cmd.Dir = s.Stager.BuildDir()
 	cmd.Env = s.uvEnv()
 	cmd.Stdout = indentWriter(os.Stdout)
