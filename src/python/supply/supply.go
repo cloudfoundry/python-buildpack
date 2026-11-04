@@ -662,13 +662,21 @@ func (s *Supplier) RunUvSync() error {
 func (s *Supplier) RunUvVendored() error {
 	s.Log.BeginStep("Running uv pip install (Vendored)")
 
+	vendorDir := filepath.Join(s.Stager.BuildDir(), "vendor")
+	vendorEntries, err := os.ReadDir(vendorDir)
+	if err != nil {
+		return err
+	} else if len(vendorEntries) == 0 {
+		return fmt.Errorf("the vendor directory is empty: add the packages from uv.lock to it, or remove it to install the packages from the package index")
+	}
+
 	pythonPath := filepath.Join(s.Stager.DepDir(), "python", "bin", "python")
 	args := []string{
 		"pip", "install",
 		"--python", pythonPath,
 		"--offline",
 		"--no-index",
-		"--find-links", filepath.Join(s.Stager.BuildDir(), "vendor"),
+		"--find-links", vendorDir,
 		"-r", filepath.Join(s.Stager.BuildDir(), "requirements.txt"),
 	}
 	s.Log.Info("uv %s", strings.Join(args, " "))

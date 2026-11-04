@@ -552,6 +552,8 @@ var _ = Describe("Supply", func() {
 	Describe("RunUvVendored", func() {
 		BeforeEach(func() {
 			supplier.UvDir = "/tmp/uv-test"
+			Expect(os.Mkdir(filepath.Join(buildDir, "vendor"), 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(buildDir, "vendor", "flask-3.1.3-py3-none-any.whl"), []byte{}, 0644)).To(Succeed())
 		})
 
 		It("installs the exported packages from the vendor directory", func() {
@@ -581,6 +583,16 @@ var _ = Describe("Supply", func() {
 
 				Expect(supplier.RunUvVendored()).To(MatchError("could not run uv pip install: exit status 1"))
 				Expect(buffer.String()).To(ContainSubstring("The vendor directory must contain all packages from uv.lock, matching the hashes in uv.lock. If the project defines a [build-system], its build backend must be vendored as well."))
+			})
+		})
+
+		Context("when the vendor directory is empty", func() {
+			BeforeEach(func() {
+				Expect(os.Remove(filepath.Join(buildDir, "vendor", "flask-3.1.3-py3-none-any.whl"))).To(Succeed())
+			})
+
+			It("fails without running uv", func() {
+				Expect(supplier.RunUvVendored()).To(MatchError("the vendor directory is empty: add the packages from uv.lock to it, or remove it to install the packages from the package index"))
 			})
 		})
 	})
