@@ -25,6 +25,8 @@ const EnvPipVersion = "BP_PIP_VERSION"
 var uvDir = filepath.Join("/tmp", "uv")
 var uvBin = filepath.Join(uvDir, "bin", "uv")
 
+var pythonVersionFileRegex = regexp.MustCompile(`^(?:cpython[-@]?)?(\d+\.\d+(?:\.\d+)?)$`)
+
 type Stager interface {
 	BuildDir() string
 	CacheDir() string
@@ -275,9 +277,11 @@ func (s *Supplier) HandleUvPythonVersion() error {
 		return err
 	}
 
-	version, ok := parsePythonVersionFile(string(contents))
-	if !ok {
-		s.Log.Warning("Unsupported Python version in .python-version, using the default Python version")
+	version, err := parsePythonVersionFile(string(contents))
+	if err != nil {
+		return err
+	} else if version == "" {
+		s.Log.Warning("No Python version found in .python-version, using the default Python version")
 		return nil
 	}
 
@@ -286,25 +290,25 @@ func (s *Supplier) HandleUvPythonVersion() error {
 }
 
 // parsePythonVersionFile returns the first version in a .python-version
-// file. Only CPython versions like "3.12", "3.12.4" or "cpython-3.12" are
-// supported.
-func parsePythonVersionFile(contents string) (string, bool) {
-	versionRegex := regexp.MustCompile(`^(?:cpython[-@]?)?(\d+\.\d+(?:\.\d+)?)$`)
-
+// file, or an empty string if it contains no version. Only CPython versions
+// like "3.12", "3.12.4" or "cpython-3.12" are supported. Other versions fail
+// staging, as falling back to the default version would only fail later in
+// uv with a less helpful message if it does not satisfy requires-python.
+func parsePythonVersionFile(contents string) (string, error) {
 	for _, line := range strings.Split(contents, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 
-		match := versionRegex.FindStringSubmatch(line)
+		match := pythonVersionFileRegex.FindStringSubmatch(line)
 		if match == nil {
-			return "", false
+			return "", fmt.Errorf("unsupported Python version %q in .python-version: only CPython versions like 3.12 or 3.12.4 are supported, change .python-version or set the version in runtime.txt", line)
 		}
-		return match[1], true
+		return match[1], nil
 	}
 
-	return "", false
+	return "", nil
 }
 
 func (s *Supplier) InstallPython() error {

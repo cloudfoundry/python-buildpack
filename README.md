@@ -16,7 +16,7 @@ Apps managed with [uv](https://docs.astral.sh/uv/) are supported by pushing the 
 
 * During staging the buildpack runs `uv sync --frozen` to install the locked packages into the buildpack's Python installation. Every package is verified against the hashes in `uv.lock`, and staging fails on a mismatch. Keep `uv.lock` up to date (`uv lock`) before pushing, as it is used as is.
 * Only the default dependencies are installed, dependency groups such as `dev` are skipped. If the project defines a `[build-system]`, the project itself is installed as well (non-editable).
-* The Python version is taken from `.python-version` (e.g. `3.12`, as written by `uv python pin`), unless a `runtime.txt` exists. uv never downloads its own Python; staging fails if the version does not satisfy `requires-python`.
+* The Python version is taken from `.python-version` (e.g. `3.12`, as written by `uv python pin`), unless a `runtime.txt` exists. Only CPython versions like `3.12` or `3.12.4` are supported; staging fails for other values (e.g. `pypy@3.10` or `>=3.11`). uv never downloads its own Python; staging fails if the version does not satisfy `requires-python`.
 * Package indexes configured via `[[tool.uv.index]]` are used as configured. Credentials are not part of `uv.lock`; provide them as environment variables, e.g. `cf set-env <app> UV_INDEX_<NAME>_USERNAME ...` and `UV_INDEX_<NAME>_PASSWORD`. uv trusts the system certificate store, like pip does.
 * Django's `collectstatic`, as well as the installation of libffi and libmemcached, work as for pip apps.
 * If the app also contains a `requirements.txt`, the `uv.lock` and `.python-version` are ignored and pip is used.

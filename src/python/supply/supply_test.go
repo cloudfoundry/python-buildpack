@@ -234,14 +234,26 @@ var _ = Describe("Supply", func() {
 			Entry("comments and multiple versions", "# pinned\n\n3.11\n3.12\n", "python-3.11.x"),
 		)
 
-		Context("when .python-version contains an unsupported version", func() {
+		DescribeTable("fails for an unsupported version in .python-version",
+			func(pythonVersion string) {
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte(pythonVersion+"\n"), 0644)).To(Succeed())
+
+				Expect(supplier.HandleUvPythonVersion()).To(MatchError(fmt.Sprintf("unsupported Python version %q in .python-version: only CPython versions like 3.12 or 3.12.4 are supported, change .python-version or set the version in runtime.txt", pythonVersion)))
+				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
+			},
+			Entry("other implementation", "pypy@3.10"),
+			Entry("wildcard", "3.12.*"),
+			Entry("version specifier", ">=3.11"),
+		)
+
+		Context("when .python-version contains no version", func() {
 			BeforeEach(func() {
-				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("pypy@3.10\n"), 0644)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("# no version\n"), 0644)).To(Succeed())
 			})
 
 			It("warns and falls back to the default Python version", func() {
 				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
-				Expect(buffer.String()).To(ContainSubstring("Unsupported Python version in .python-version"))
+				Expect(buffer.String()).To(ContainSubstring("No Python version found in .python-version"))
 				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
 			})
 		})
