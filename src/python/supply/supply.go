@@ -248,7 +248,7 @@ func (s *Supplier) HandlePipfile() error {
 // uv app, unless the app provides its own runtime.txt. Like InstallUv, it
 // ignores apps that provide a requirements.txt.
 func (s *Supplier) HandleUvPythonVersion() error {
-	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	uvProject, err := s.isUvProject()
 	if err != nil {
 		return err
 	}
@@ -269,7 +269,7 @@ func (s *Supplier) HandleUvPythonVersion() error {
 		return err
 	}
 
-	if !uvLockExists || requirementstxtExists || runtimeExists || !pythonVersionExists {
+	if !uvProject || requirementstxtExists || runtimeExists || !pythonVersionExists {
 		return nil
 	}
 
@@ -552,10 +552,10 @@ func (s *Supplier) InstallPipEnv() error {
 // themselves are installed by RunUvSync. An existing requirements.txt always
 // takes precedence.
 func (s *Supplier) InstallUv() error {
-	uvLockExists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "uv.lock"))
+	uvProject, err := s.isUvProject()
 	if err != nil {
 		return fmt.Errorf("could not check uv.lock existence: %v", err)
-	} else if !uvLockExists {
+	} else if !uvProject {
 		return nil
 	}
 
@@ -563,7 +563,7 @@ func (s *Supplier) InstallUv() error {
 	if err != nil {
 		return err
 	} else if requirementstxtExists {
-		s.Log.Info("Found requirements.txt, ignoring uv.lock")
+		s.Log.Warning("Found requirements.txt, ignoring uv.lock")
 		return nil
 	}
 
@@ -584,6 +584,18 @@ func (s *Supplier) InstallUv() error {
 	}
 
 	return s.writeTempRequirementsTxt(string(output))
+}
+
+// isUvProject returns whether the app is a uv project, i.e. it has both a
+// pyproject.toml and a uv.lock, as checked by bin/detect.
+func (s *Supplier) isUvProject() (bool, error) {
+	for _, file := range []string{"pyproject.toml", "uv.lock"} {
+		exists, err := libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), file))
+		if err != nil || !exists {
+			return false, err
+		}
+	}
+	return true, nil
 }
 
 // installUv installs the uv wheel from the manifest into a temporary UvDir,

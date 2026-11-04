@@ -216,6 +216,7 @@ var _ = Describe("Supply", func() {
 	Describe("HandleUvPythonVersion", func() {
 		BeforeEach(func() {
 			Expect(os.MkdirAll(depDir, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
 			Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
 		})
 
@@ -286,17 +287,17 @@ var _ = Describe("Supply", func() {
 			})
 		})
 
-		Context("when the app does not use uv", func() {
-			BeforeEach(func() {
-				Expect(os.Remove(filepath.Join(buildDir, "uv.lock"))).To(Succeed())
+		DescribeTable("ignores .python-version when the app is not a uv project",
+			func(removedFile string) {
+				Expect(os.Remove(filepath.Join(buildDir, removedFile))).To(Succeed())
 				Expect(os.WriteFile(filepath.Join(buildDir, ".python-version"), []byte("3.12\n"), 0644)).To(Succeed())
-			})
 
-			It("ignores .python-version", func() {
 				Expect(supplier.HandleUvPythonVersion()).To(Succeed())
 				Expect(filepath.Join(depDir, "runtime.txt")).NotTo(BeAnExistingFile())
-			})
-		})
+			},
+			Entry("without uv.lock", "uv.lock"),
+			Entry("without pyproject.toml", "pyproject.toml"),
+		)
 	})
 
 	// Add the expects for what the installFfi function uses
@@ -397,8 +398,20 @@ var _ = Describe("Supply", func() {
 			})
 		})
 
+		Context("when uv.lock exists but pyproject.toml does not exist", func() {
+			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
+			})
+
+			It("does not install uv", func() {
+				Expect(supplier.InstallUv()).To(Succeed())
+				Expect(filepath.Join(buildDir, "requirements.txt")).NotTo(BeAnExistingFile())
+			})
+		})
+
 		Context("when uv.lock and requirements.txt both exist", func() {
 			BeforeEach(func() {
+				Expect(os.WriteFile(filepath.Join(buildDir, "pyproject.toml"), []byte("[project]"), 0644)).To(Succeed())
 				Expect(os.WriteFile(filepath.Join(buildDir, "uv.lock"), []byte("version = 1"), 0644)).To(Succeed())
 				Expect(os.WriteFile(filepath.Join(buildDir, "requirements.txt"), []byte("flask"), 0644)).To(Succeed())
 			})
